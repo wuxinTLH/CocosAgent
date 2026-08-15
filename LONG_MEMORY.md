@@ -69,3 +69,29 @@
 - 结果：完成全部 TODO 实现项。OCR 使用 Windows 离线能力完成真实识别；WSS mock 覆盖鉴权、流式、心跳、重连和上下文；CCS 连接逻辑对本机 cc-switch 配置与 mock 路由验证通过；扩展已安装并完成 bridge 健康检查；CI/hook/文档检查已启用。`ccs doctor` 确认当前机器没有已安装的 Cocos Creator 3.8，因此无法对不存在的编辑器进程进行 UI 级运行验证，但安装、配置、协议和自动化验证均已完成。
 - 文件：VERSION、.env.example、.github/workflows/ci.yml、.githooks/pre-commit、cli/scripts/*、cli/src/tests/*、cli/scripts/windows-ocr.ps1、examples/cocos3d-demo/*、docs/constraints/PROJECT-cocos-agent.md、extensions/cocos-agent/*、scripts/*、TODO、CONSTRAINTS。
 - 后续：当安装 Cocos Creator 3.8 后，打开 `examples/cocos3d-demo` 并从 `Cocos Agent -> Open CLI` 执行最终 UI 烟测；生产 WSS 仅需设置 `.env.example` 所列环境变量。
+
+### AGT-20260815-003
+
+- TaskHash：`sha256:5f53596cedf715f6d6606265ce090f40430adbed6db6df1fe9d8a403b799c342`
+- 开始：`2026-08-15T18:53:35+08:00`
+- 结束：`2026-08-15T18:53:35+08:00`
+- 请求：根据 TODO.md 完成完整系统性测试、提交 GitHub 仓库并创建 v0.0.0.1-a release。
+- 推理：发布前先审计 staged 文件，发现 WSS mock PFX 是私钥容器，因此从 public repo 移除，改为 CI 临时生成证书；之后执行完整 verify、创建提交并推送，使用标签触发 GitHub Actions Release 工作流，最后通过 GitHub API 确认 release 已创建。
+- 计划：
+1. 完成系统测试和公开仓库敏感文件审计。
+2. 提交并推送 `master`。
+3. 创建、推送 `v0.0.0.1-a` 标签并触发 Release 工作流。
+4. 查询 GitHub Release API，更新 TODO 与记忆。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-15T18:35:00 | `npm run verify` 通过，常规测试与文档校验完成 |
+| 2026-08-15T18:40:00 | 审计并移除仓库内 WSS 测试私钥容器，CI 改为临时证书 |
+| 2026-08-15T18:45:00 | 提交 `dc3cdf4` 并推送到公开 GitHub 仓库 |
+| 2026-08-15T18:50:00 | 提交 Release workflow、推送 `master`、强制更新版本标签 |
+| 2026-08-15T18:53:35 | GitHub API 确认 prerelease 已创建 |
+
+- 结果：公开仓库 `https://github.com/wuxinTLH/CocosAgent` 已同步；`master` 包含完整实现与 CI；`v0.0.0.1-a` 标签与 GitHub prerelease 已创建；发布前不含 `.env`、PFX、PEM 或私钥文件。
+- 文件：CHANGELOG、VERSION、.github/workflows/ci.yml、.github/workflows/release.yml、TODO、LONG_MEMORY、SHORT_MEMORY、.gitignore。
+- 后续：生产网关使用 `.env.example` 配置；Cocos Creator 3.8 安装后执行扩展 UI 烟测。

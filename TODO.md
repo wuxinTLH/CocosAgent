@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-15T18:25:47+08:00`（UTC+8）
+更新时间：`2026-08-15T18:53:35+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -66,7 +66,7 @@
 ## 代办列表
 1. [x] 进行完整系统性测试：`npm run verify` 通过，常规测试 `14/14` 通过，WSS 证书依赖测试由 CI 临时证书执行。
 2. [x] 提交 GitHub 仓库：`dc3cdf4` 已推送至 `origin/master`，公开仓库为 `https://github.com/wuxinTLH/CocosAgent`。
-3. [ ] 创建 `v0.0.0.1-a` release。
+3. [x] 创建 [v0.0.0.1-a prerelease](https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.1-a)，标签已推送并由 GitHub Actions 发布。
 
 
 ## 已解决任务（一次性闭环）
