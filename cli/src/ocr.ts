@@ -1,9 +1,10 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { resolveInside } from './sandbox.js';
 
-export type OcrEngine = 'external' | 'tesseract-js';
+export type OcrEngine = 'external' | 'tesseract-js' | 'windows-ocr';
 
 export interface OcrItem {
   text: string;
@@ -36,7 +37,10 @@ export function parseRegion(region?: string): OcrRegion | undefined {
 
 function defaultEngine(): OcrEngine {
   const configured = process.env.COCOS_AGENT_OCR_ENGINE;
-  return configured === 'external' ? 'external' : 'tesseract-js';
+  if (configured === 'external' || configured === 'tesseract-js' || configured === 'windows-ocr') {
+    return configured;
+  }
+  return process.platform === 'win32' ? 'windows-ocr' : 'tesseract-js';
 }
 
 export async function runOcr(
@@ -55,6 +59,9 @@ export async function runOcr(
   }
   if (engine === 'tesseract-js') {
     return runTesseractJs(imagePath, parsedRegion);
+  }
+  if (engine === 'windows-ocr') {
+    return runWindowsOcr(imagePath, parsedRegion);
   }
   throw new Error(`UNKNOWN_OCR_ENGINE: ${engine}`);
 }
@@ -104,7 +111,10 @@ async function runTesseractJs(imagePath: string, region: OcrRegion | undefined):
       fs.readFileSync(imagePath),
       region ? { rectangle: region } : undefined,
     );
-    const items: OcrItem[] = (data.words ?? []).map((word) => ({
+    const words = (data.blocks ?? []).flatMap((block) =>
+      block.paragraphs.flatMap((paragraph) => paragraph.lines.flatMap((line) => line.words)),
+    );
+    const items: OcrItem[] = words.map((word) => ({
       text: word.text,
       box: {
         x: word.bbox.x0,
@@ -118,4 +128,51 @@ async function runTesseractJs(imagePath: string, region: OcrRegion | undefined):
   } finally {
     await worker.terminate();
   }
+}
+
+function windowsOcrScript(): string {
+  const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    process.env.COCOS_AGENT_WINDOWS_OCR_SCRIPT,
+    path.resolve(moduleDir, '..', 'scripts', 'windows-ocr.ps1'),
+  ];
+  const script = candidates.find((candidate) => candidate && fs.existsSync(candidate));
+  if (!script) {
+    throw new Error('WINDOWS_OCR_SCRIPT_NOT_FOUND');
+  }
+  return script;
+}
+
+function runWindowsOcr(imagePath: string, region: OcrRegion | undefined): OcrResult {
+  if (process.platform !== 'win32') {
+    throw new Error('WINDOWS_OCR_UNSUPPORTED_PLATFORM');
+  }
+  const language = process.env.COCOS_AGENT_WINDOWS_OCR_LANG ?? 'en-US';
+  const regionText = region
+    ? `${region.left},${region.top},${region.width},${region.height}`
+    : '';
+  const output = execFileSync(
+    process.env.SystemRoot ? path.join(process.env.SystemRoot, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe') : 'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      windowsOcrScript(),
+      '-ImagePath',
+      path.win32.normalize(imagePath),
+      '-Language',
+      language,
+      '-Region',
+      regionText,
+    ],
+    {
+      encoding: 'utf8',
+      windowsHide: true,
+      timeout: 120_000,
+    },
+  );
+  const result = JSON.parse(output) as OcrResult;
+  return { ...result, engine: 'windows-ocr' };
 }

@@ -98,6 +98,12 @@
 - 变更必须附带可复现的验证结果。
 - TypeScript 必须通过严格编译；CLI 必须实际运行验证。
 
+### G-15 版本
+
+- 全局版本固定为 `v0.0.0.1-a`，以根目录 `VERSION` 为唯一来源。
+- npm 包与 Cocos 扩展使用合法 semver `0.0.1-a`，并在 manifest 的 `cocosAgentVersion` 中保留全局版本。
+- 版本变更必须更新 `VERSION`、CLI、扩展、项目约束、TODO 与记忆记录。
+
 ## 项目级约束
 
 每个 Cocos 项目生成独立约束文件：
@@ -132,6 +138,7 @@ docs/constraints/PROJECT-<项目名>.md
 | G-09 | 语言 | [typescript.md](docs/constraints/typescript.md)、[javascript.md](docs/constraints/javascript.md) |
 | G-10 | 项目结构 | [cocos-creator.md](docs/constraints/cocos-creator.md) |
 | G-11 | 安全 | [project-scope.md](docs/constraints/project-scope.md) |
-| G-12 | Skills/MCP | [skills/](../skills/)、[mcp/](../mcp/) |
+| G-12 | Skills/MCP | [skills/](skills/)、[mcp/](mcp/) |
 | G-13 | 编辑纪律 | 本文件 |
 | G-14 | 验证 | [CODE_REVIEW.md](CODE_REVIEW.md) |
+| G-15 | 版本 | [VERSION](VERSION) |

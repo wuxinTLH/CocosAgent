@@ -29,6 +29,13 @@ export function findProjectRoot(start: string): string {
     if (hasAssets && hasMarker) {
       return normalizeRoot(current);
     }
+    const isAgentWorkspace =
+      fs.existsSync(path.join(current, 'WORKFLOW.md')) &&
+      fs.existsSync(path.join(current, 'CONSTRAINTS.md')) &&
+      fs.existsSync(path.join(current, 'cli'));
+    if (isAgentWorkspace) {
+      return normalizeRoot(current);
+    }
     const parent = path.dirname(current);
     if (parent === current) {
       break;

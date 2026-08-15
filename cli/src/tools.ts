@@ -9,6 +9,7 @@ import { listNodes, readScene, writeScene } from './scene.js';
 import { findAssets } from './assets.js';
 import { connectRoute, resolveRoute } from './ccs.js';
 import { chatOnce } from './gateway.js';
+import { AGENT_VERSION } from './version.js';
 
 export interface McpToolDefinition {
   name: string;
@@ -25,7 +26,7 @@ export const MCP_TOOLS: McpToolDefinition[] = [
       properties: {
         image: { type: 'string' },
         region: { type: 'string' },
-        engine: { type: 'string', enum: ['tesseract-js', 'external'] },
+        engine: { type: 'string', enum: ['windows-ocr', 'tesseract-js', 'external'] },
       },
       required: ['image'],
     },
@@ -138,6 +139,7 @@ export function statusReport(ctx: ProjectContext): Record<string, unknown> {
   const skills = loadSkills(ctx.root);
   return {
     projectRoot: ctx.root,
+    version: AGENT_VERSION,
     timeUtc8: nowUtc8(),
     skills: skills.map((skill) => skill.name),
     longMemoryEntries: countLongMemory(ctx.root),

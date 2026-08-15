@@ -27,5 +27,6 @@ powershell -ExecutionPolicy Bypass -File scripts/install-extension.ps1
 ## 说明
 
 - 桥接进程只监听 `127.0.0.1`，不对外网开放。
+- 安装脚本会写入 `~/.cocos-agent/config.json`，将用户级扩展关联到已构建的 CLI；CLI 重新构建后可重新运行安装脚本刷新路径。
 - 面板发送的路径会由 CLI 的 sandbox 校验，越界自动拒绝。
 - 如果编辑器扩展 API 版本差异导致面板不显示，先按官方扩展协议调整 `package.json` 的 `contributions` 字段。

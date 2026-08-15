@@ -2,6 +2,8 @@
 
 TypeScript 实现的 CLI，用于执行 WorkFlow、计算任务 hash、读写记忆、调用 Skills 能力，并提供 MCP 服务与 Cocos 编辑器本地桥接。
 
+全局版本：`v0.0.0.1-a`
+
 ## 构建
 
 ```powershell
@@ -34,7 +36,8 @@ bridge start           启动本地桥接服务
 | --- | --- |
 | `COCOS_AGENT_PROJECT_ROOT` | 当前 Cocos 项目根目录 |
 | `COCOS_AGENT_OCR_CMD` | OCR 引擎命令模板，支持 `{image}`、`{output}`、`{region}` |
-| `COCOS_AGENT_OCR_ENGINE` | OCR 引擎：`tesseract-js`（默认）或 `external` |
+| `COCOS_AGENT_OCR_ENGINE` | OCR 引擎：Windows 默认 `windows-ocr`，或 `tesseract-js`、`external` |
+| `COCOS_AGENT_WINDOWS_OCR_LANG` | Windows OCR 语言，默认 `en-US`，可设 `zh-CN` |
 | `COCOS_AGENT_TESSERACT_LANG` | tesseract.js 语言，默认 `eng`，可设 `chi_sim` |
 | `COCOS_AGENT_GATEWAY_URL` | WSS 网关地址 |
 | `COCOS_AGENT_GATEWAY_TOKEN` | WSS 鉴权 Token |
@@ -42,6 +45,7 @@ bridge start           启动本地桥接服务
 | `COCOS_AGENT_CCS_URL` | ccs 路由直连地址 |
 | `COCOS_AGENT_CCS_ROUTE` | 默认 ccs 路由 |
 | `COCOS_AGENT_CCS_BIN` | ccs CLI 可执行文件路径 |
+| `COCOS_AGENT_CCS_INSECURE` | 仅本地自签名 ccs 测试时设为 `true` |
 | `CC_SWITCH_CONFIG` | cc-switch 配置路径，默认 `~/.cc-switch/settings.json` |
 
 ## 示例
@@ -54,6 +58,7 @@ node dist/index.js assets find --query main --type scene
 node dist/index.js bridge start --port 8899
 node dist/index.js gateway mock --port 8787
 node dist/index.js gateway connect --url ws://127.0.0.1:8787/ws --chat "你好"
+node dist/index.js gateway connect --url "wss://gateway.example.com/chat" --chat "你好"
 node dist/index.js docs check
 node dist/index.js project init --name cocos-agent
 ```

@@ -1,0 +1,15 @@
+[
+  {
+    "__type__": "cc.SceneAsset",
+    "_name": "MainScene",
+    "_children": [
+      { "__id__": 1 }
+    ]
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "Main Camera",
+    "_parent": { "__id__": 0 },
+    "_children": []
+  }
+]

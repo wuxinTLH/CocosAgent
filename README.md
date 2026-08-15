@@ -1,5 +1,7 @@
 # Cocos Agent
 
+全局版本：`v0.0.0.1-a`
+
 面向 Cocos Creator 3D 项目的 Agent 工作区。本项目以 WorkFlow 工作流为骨架，统一约束系统、任务管理、记忆体系、Skills、MCP 工具、CLI 接入与 Cocos 编辑器扩展。
 
 ## 定位
@@ -27,6 +29,7 @@
 | [mcp/](mcp/) | MCP 服务配置 |
 | [cli/](cli/) | TypeScript CLI 与 MCP/桥接服务 |
 | [extensions/cocos-agent/](extensions/cocos-agent/) | Cocos Creator 扩展（编辑器内 CLI 窗口） |
+| [examples/cocos3d-demo/](examples/cocos3d-demo/) | 独立约束已生成的 Cocos Creator 3D demo 项目 |
 
 ## 快速开始
 
@@ -53,6 +56,13 @@ powershell -ExecutionPolicy Bypass -File scripts/install-skills.ps1
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/install-extension.ps1
+```
+
+完整本地验证：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/verify.ps1
+powershell -ExecutionPolicy Bypass -File scripts/run-wss-smoke.ps1
 ```
 
 ## 目录结构

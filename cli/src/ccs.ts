@@ -53,7 +53,12 @@ export async function connectRoute(route?: string): Promise<Record<string, unkno
   if (!url) {
     throw new Error('CCS_ROUTE_URL_NOT_CONFIGURED: set COCOS_AGENT_CCS_URL or COCOS_AGENT_GATEWAY_URL');
   }
-  await pingWebSocket(url, 5000);
+  await pingWebSocket(
+    url,
+    5000,
+    process.env.COCOS_AGENT_GATEWAY_TOKEN,
+    process.env.COCOS_AGENT_CCS_INSECURE === 'true',
+  );
   return { route: resolved.route, url, status: 'connected' };
 }
 

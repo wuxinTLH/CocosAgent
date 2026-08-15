@@ -31,7 +31,8 @@ description: 使用 OCR 全局识别 Cocos Creator 编辑器或场景截图，�
 ## 约束
 
 - 图像输入与结果文件必须在项目根目录内，越界报错 `SANDBOX_VIOLATION`。
-- OCR 引擎通过 `COCOS_AGENT_OCR_CMD` 配置，未配置时必须返回明确错误。
+- Windows 默认使用系统离线 OCR（`windows-ocr`）；`COCOS_AGENT_OCR_ENGINE` 可切换为 `tesseract-js` 或 `external`。
+- 外部引擎通过 `COCOS_AGENT_OCR_CMD` 配置；tesseract.js 使用项目/本机缓存的语言数据，运行时下载失败必须返回明确错误。
 - 识别结果不得自动写入游戏资产；如需写入，走 scene/asset 工具。
 
 ## MCP 工具

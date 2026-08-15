@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -eu
+
+git diff --cached --check
+cd cli
+npm run verify

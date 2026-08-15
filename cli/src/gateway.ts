@@ -11,6 +11,7 @@ export interface GatewayChatOptions {
   chat: string;
   memoryContext?: string;
   timeoutMs?: number;
+  allowSelfSigned?: boolean;
 }
 
 export interface GatewayChatResult {
@@ -23,9 +24,17 @@ function authHeaders(token?: string): Record<string, string> | undefined {
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 }
 
-export function openSocket(url: string, token?: string, timeoutMs = 5000): Promise<WebSocket> {
+export function openSocket(
+  url: string,
+  token?: string,
+  timeoutMs = 5000,
+  allowSelfSigned = false,
+): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(url, { headers: authHeaders(token) });
+    const ws = new WebSocket(url, {
+      headers: authHeaders(token),
+      rejectUnauthorized: !allowSelfSigned,
+    });
     const timer = setTimeout(() => {
       ws.terminate();
       reject(new Error(`WEBSOCKET_TIMEOUT: ${url}`));
@@ -41,15 +50,20 @@ export function openSocket(url: string, token?: string, timeoutMs = 5000): Promi
   });
 }
 
-export async function pingWebSocket(url: string, timeoutMs = 5000): Promise<void> {
-  const ws = await openSocket(url, process.env.COCOS_AGENT_GATEWAY_TOKEN, timeoutMs);
+export async function pingWebSocket(
+  url: string,
+  timeoutMs = 5000,
+  token = process.env.COCOS_AGENT_GATEWAY_TOKEN,
+  allowSelfSigned = false,
+): Promise<void> {
+  const ws = await openSocket(url, token, timeoutMs, allowSelfSigned);
   ws.close();
 }
 
 export function chatOnce(options: GatewayChatOptions): Promise<GatewayChatResult> {
   return new Promise((resolve, reject) => {
     const timeoutMs = options.timeoutMs ?? 120_000;
-    openSocket(options.url, options.token, 10_000)
+    openSocket(options.url, options.token, 10_000, options.allowSelfSigned)
       .then((ws) => {
         const timer = setTimeout(() => {
           ws.terminate();
@@ -122,13 +136,14 @@ export async function keepAlive(options: {
   token?: string;
   onEvent?: (event: unknown) => void;
   maxReconnects?: number;
+  allowSelfSigned?: boolean;
 }): Promise<void> {
   let delayMs = 1000;
   let reconnects = 0;
   for (;;) {
     let ws: WebSocket;
     try {
-      ws = await openSocket(options.url, options.token, 10_000);
+      ws = await openSocket(options.url, options.token, 10_000, options.allowSelfSigned);
       delayMs = 1000;
       process.stderr.write(`[gateway] connected ${options.url}\n`);
     } catch (error) {

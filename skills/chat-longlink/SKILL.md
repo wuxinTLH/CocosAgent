@@ -38,6 +38,7 @@ description: 建立 Chat Completions 的 WSS 长连接，保持心跳与自动�
 - `COCOS_AGENT_GATEWAY_URL`：网关地址。
 - `COCOS_AGENT_GATEWAY_TOKEN`：鉴权 Token。
 - `COCOS_AGENT_LONG_TERM_MEMORY`：是否注入长期记忆，默认 false。
+- 本地自签名 WSS mock 仅可通过 CLI `--insecure` 或测试参数访问；生产连接保持证书校验。
 
 ## 约束
 

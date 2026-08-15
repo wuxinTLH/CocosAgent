@@ -1,15 +1,15 @@
-# PROJECT-<项目名> 约束
+# PROJECT-cocos3d-demo 约束
 
-项目根目录：`<绝对路径>`
+项目根目录：`e:/code/Cocos Agent/examples/cocos3d-demo`
 Cocos Creator 版本：`3.8.x`
 语言：TypeScript / JavaScript
 时区：UTC+8
 全局版本：`v0.0.0.1-a`
-创建时间：`<YYYY-MM-DDTHH:mm:ss+08:00>`
+创建时间：`2026-08-15T18:19:14+08:00`
 
 ## 项目目标
 
-- 本文件仅约束 `<项目名>`，与其他 Cocos 项目互不覆盖。
+- 本文件仅约束 `cocos3d-demo`，与其他 Cocos 项目互不覆盖。
 - Agent 可查询和受控修改当前项目 `assets/`；场景、预制体、材质和模型必须保持 Cocos Creator 官方序列化格式。
 
 ## 目录与命名

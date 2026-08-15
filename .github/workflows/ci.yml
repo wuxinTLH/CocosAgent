@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: cli/package-lock.json
+      - name: Install dependencies
+        working-directory: cli
+        run: npm ci
+      - name: Generate temporary WSS test certificate
+        run: |
+          openssl req -x509 -newkey rsa:2048 -keyout /tmp/cocos-agent-key.pem -out /tmp/cocos-agent-cert.pem -days 1 -nodes -subj "/CN=localhost"
+          openssl pkcs12 -export -out /tmp/cocos-agent-wss.pfx -inkey /tmp/cocos-agent-key.pem -in /tmp/cocos-agent-cert.pem -passout pass:cocos-agent-test
+          echo "COCOS_AGENT_TEST_WSS_PFX=/tmp/cocos-agent-wss.pfx" >> "$GITHUB_ENV"
+          echo "COCOS_AGENT_TEST_WSS_PASSPHRASE=cocos-agent-test" >> "$GITHUB_ENV"
+      - name: Verify TypeScript, JavaScript, tests, and docs
+        working-directory: cli
+        run: npm run verify

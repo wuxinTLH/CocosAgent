@@ -121,7 +121,9 @@ async function main(): Promise<void> {
         ctx.root,
         requireString(args, 'image'),
         args.flags.region ? String(args.flags.region) : undefined,
-        args.flags.engine ? (String(args.flags.engine) as 'external' | 'tesseract-js') : undefined,
+        args.flags.engine
+          ? (String(args.flags.engine) as 'external' | 'tesseract-js' | 'windows-ocr')
+          : undefined,
       );
       console.log(JSON.stringify(ocrResult, null, 2));
       break;
@@ -197,16 +199,23 @@ async function main(): Promise<void> {
           throw new Error('MISSING_ARG: --url or COCOS_AGENT_GATEWAY_URL');
         }
         const token = process.env.COCOS_AGENT_GATEWAY_TOKEN;
+        const allowSelfSigned = args.flags.insecure === true;
         if (args.flags.chat) {
           const result = await chatOnce({
             url,
             token,
             chat: String(args.flags.chat),
             memoryContext: buildMemoryContext(ctx.root),
+            allowSelfSigned,
           });
           console.log(JSON.stringify(result, null, 2));
         } else {
-          await keepAlive({ url, token, onEvent: (event) => console.log(JSON.stringify(event)) });
+          await keepAlive({
+            url,
+            token,
+            allowSelfSigned,
+            onEvent: (event) => console.log(JSON.stringify(event)),
+          });
         }
       }
       break;
@@ -244,8 +253,13 @@ async function main(): Promise<void> {
       }
       {
         const name = String(args.flags.name ?? args.positional[0] ?? '');
-        const targetRoot = String(args.flags.root ?? ctx.root);
-        const target = initProjectConstraints(ctx.root, name, targetRoot);
+        const targetRoot = args.flags.root
+          ? resolveInside(ctx.root, String(args.flags.root))
+          : ctx.root;
+        const creatorVersion = args.flags['creator-version']
+          ? String(args.flags['creator-version'])
+          : undefined;
+        const target = initProjectConstraints(ctx.root, name, targetRoot, creatorVersion);
         console.log(JSON.stringify({ ok: true, file: target }, null, 2));
       }
       break;

@@ -1,6 +1,7 @@
 import readline from 'node:readline';
 import { loadContext } from './context.js';
 import { dispatchTool, MCP_TOOLS } from './tools.js';
+import { AGENT_VERSION } from './version.js';
 
 interface McpRequest {
   id?: unknown;
@@ -33,7 +34,7 @@ export async function runMcpServer(): Promise<void> {
       respond(request.id, {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'cocos-agent', version: '0.1.0' },
+        serverInfo: { name: 'cocos-agent', version: AGENT_VERSION },
       });
     } else if (request.method === 'tools/list') {
       respond(request.id, { tools: MCP_TOOLS });
