@@ -1,0 +1,27 @@
+{
+  "name": "cocos-agent-cli",
+  "version": "0.1.0",
+  "description": "Cocos Agent CLI: WorkFlow, memory, skills, MCP and Cocos Creator bridge",
+  "type": "module",
+  "bin": {
+    "cocos-agent": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/tests/"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "tesseract.js": "^7.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.2"
+  }
+}

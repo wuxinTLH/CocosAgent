@@ -1,0 +1,31 @@
+{
+  "name": "cocos-agent",
+  "version": "0.1.0",
+  "description": "Cocos Agent CLI window: connects to the local bridge and invokes agent tools.",
+  "author": "Cocos Agent",
+  "main": "./src/main.js",
+  "contributions": {
+    "menu": [
+      {
+        "path": "Cocos Agent/Open CLI",
+        "message": "cocos-agent:open-cli"
+      }
+    ],
+    "messages": {
+      "open-cli": {
+        "methods": ["openCli"]
+      }
+    },
+    "panels": {
+      "cli": {
+        "title": "Cocos Agent CLI",
+        "type": "dockable",
+        "main": "./src/panel.js",
+        "size": {
+          "width": 720,
+          "height": 480
+        }
+      }
+    }
+  }
+}

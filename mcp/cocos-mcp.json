@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "cocos-agent": {
+      "command": "node",
+      "args": [
+        "E:/code/Cocos Agent/cli/dist/index.js",
+        "mcp"
+      ],
+      "env": {
+        "COCOS_AGENT_PROJECT_ROOT": "E:/code/Cocos Agent"
+      }
+    }
+  }
+}
