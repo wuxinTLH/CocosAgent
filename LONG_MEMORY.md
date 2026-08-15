@@ -122,3 +122,26 @@
 - 结果：TODO 唯一任务已闭环。现在可以使用 `bin/cocos-agent-overlay.cmd -ProjectRoot <project>`，或 Release 中的 `CocosAgentOverlay.exe <project>`；它会复制项目扩展、配置 CLI bridge、探测并启动 Cocos Creator，扩展加载后自动打开覆盖原生工作区的 `cocos-agent.overlay` 浮动面板。当前机器未安装 Creator 时 dry-run 返回 `creator=not-found`，不会伪造启动成功。
 - 文件：extensions/cocos-agent/package.json、extensions/cocos-agent/src/overlay.js、scripts/launch-cocos-agent.ps1、bin/cocos-agent-overlay.cmd、launcher/*、.github/workflows/release.yml、README、CHANGELOG、TODO。
 - 后续：安装 Cocos Creator 3.8 后运行启动器即可进行真实编辑器 UI 烟测；Release workflow 会上传包含 `CocosAgentOverlay.exe`、扩展、CLI dist 和 runtime dependencies 的 Windows zip。
+
+### AGT-20260815-005
+
+- TaskHash：`sha256:254e3f4d2dc10165019184ef2757a534aec10ed78af24620a6690298cd8a146b`
+- 开始：`2026-08-15T21:18:35+08:00`
+- 结束：`2026-08-15T21:18:35+08:00`
+- 请求：验证一键 Overlay Windows release 资产并同步 TODO 和记忆。
+- 推理：版本标签已触发 Release 工作流，必须通过 GitHub Release API 确认实际资产上传成功，而不能仅依据 git tag 判断发布完成。
+- 计划：
+1. 查询 `v0.0.0.1-a` Release API。
+2. 核对资产名称、大小和 uploaded 状态。
+3. 更新 TODO 和长期/短期记忆。
+4. 提交并推送发布记录。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-15T21:17:30 | 修复项目扩展重复复制问题并推送标签 |
+| 2026-08-15T21:18:35 | GitHub API 确认 Windows zip 资产为 uploaded |
+
+- 结果：Release 资产 `cocos-agent-v0.0.0.1-a-windows.zip` 已上传，大小 48,758,029 bytes；资产包含 `CocosAgentOverlay.exe`、CLI dist/runtime、Cocos 扩展与一键启动脚本。
+- 文件：TODO、LONG_MEMORY、SHORT_MEMORY。
+- 后续：使用 Release zip 解压后运行 `CocosAgentOverlay.exe <Cocos项目根目录>`。

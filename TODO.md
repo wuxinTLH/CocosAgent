@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-15T21:11:39+08:00`（UTC+8）
+更新时间：`2026-08-15T21:18:35+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -68,6 +68,7 @@
 1. [x] 发布版本提供实际可执行的 `CocosAgentOverlay.exe`，并提供 `.cmd`/PowerShell 入口。
 2. [x] 一键入口自动复制项目扩展、启动本地 bridge、探测 Cocos Creator 并打开 `cocos-agent.overlay` 浮动覆盖层。
 3. [x] Overlay 面板覆盖 Cocos 原生编辑器工作区，支持 `status`、Scene 查询、素材查询和 CCS 诊断。
+4. [x] [v0.0.0.1-a prerelease](https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.1-a) 已上传 `cocos-agent-v0.0.0.1-a-windows.zip`（48,758,029 bytes）。
 
 
 ## 已解决任务（一次性闭环）
