@@ -20,7 +20,11 @@ if (-not (Test-Path -LiteralPath $CliIndex -PathType Leaf)) {
 }
 
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
-Copy-Item -LiteralPath $sourceDir -Destination $target -Recurse -Force
+if (Test-Path -LiteralPath $target) {
+    Remove-Item -LiteralPath $target -Recurse -Force
+}
+New-Item -ItemType Directory -Force -Path $target | Out-Null
+Get-ChildItem -LiteralPath $sourceDir -Force | Copy-Item -Destination $target -Recurse -Force
 New-Item -ItemType Directory -Force -Path $configDir | Out-Null
 @{
     cliIndex = [IO.Path]::GetFullPath($CliIndex)

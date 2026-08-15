@@ -29,6 +29,14 @@ if (-not (Test-Path -LiteralPath $cliIndex -PathType Leaf)) {
 }
 
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $extensionTarget) | Out-Null
+$projectRootForCheck = [IO.Path]::GetFullPath($project).TrimEnd([char[]]@([char]92, [char]47))
+$extensionTargetForCheck = [IO.Path]::GetFullPath($extensionTarget).TrimEnd([char[]]@([char]92, [char]47))
+if (-not $extensionTargetForCheck.StartsWith($projectRootForCheck + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Extension target escaped project root: $extensionTargetForCheck"
+}
+if (Test-Path -LiteralPath $extensionTarget) {
+    Remove-Item -LiteralPath $extensionTarget -Recurse -Force
+}
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
 $configDir = Join-Path $env:USERPROFILE '.cocos-agent'
 New-Item -ItemType Directory -Force -Path $configDir | Out-Null
