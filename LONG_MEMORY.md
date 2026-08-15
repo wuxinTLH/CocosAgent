@@ -95,3 +95,30 @@
 - 结果：公开仓库 `https://github.com/wuxinTLH/CocosAgent` 已同步；`master` 包含完整实现与 CI；`v0.0.0.1-a` 标签与 GitHub prerelease 已创建；发布前不含 `.env`、PFX、PEM 或私钥文件。
 - 文件：CHANGELOG、VERSION、.github/workflows/ci.yml、.github/workflows/release.yml、TODO、LONG_MEMORY、SHORT_MEMORY、.gitignore。
 - 后续：生产网关使用 `.env.example` 配置；Cocos Creator 3.8 安装后执行扩展 UI 烟测。
+
+### AGT-20260815-004
+
+- TaskHash：`sha256:1c6dc9953dcd50f6bda922c2aa596cb944cab3fa676624520eff030c23f016ef`
+- 开始：`2026-08-15T21:11:39+08:00`
+- 结束：`2026-08-15T21:11:39+08:00`
+- 请求：根据 TODO.md 完成 release 实际可执行文件和覆盖 Cocos 原生 UI 的一键式 Overlay 功能。
+- 推理：现有 release 只有源码和脚本，不能满足一键执行；因此增加 Cocos Creator `float` 面板、项目级扩展复制器、Creator 探测/启动脚本、Windows self-contained .NET 启动器，并把 CLI runtime dependencies 一并放入 release zip。
+- 计划：
+1. 增加 Overlay 面板与菜单入口，自动启动 bridge。
+2. 增加 PowerShell/命令行/Windows self-contained 启动器。
+3. 增加 Overlay manifest、脚本、dry-run、扩展契约测试。
+4. 更新 release zip 打包并完成完整验证。
+5. 更新 TODO 与记忆，提交并发布修订版本。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-15T20:55:00 | 审计 TODO，确认 release 缺少实际可执行入口 |
+| 2026-08-15T21:02:00 | 完成 `cocos-agent.overlay` 浮动覆盖面板 |
+| 2026-08-15T21:06:00 | 完成 PowerShell/.cmd/`.NET` 一键启动器 |
+| 2026-08-15T21:09:00 | `npm run verify`、Overlay dry-run、启动器 dry-run 通过 |
+| 2026-08-15T21:11:39 | 更新 release zip 打包、TODO 与记忆 |
+
+- 结果：TODO 唯一任务已闭环。现在可以使用 `bin/cocos-agent-overlay.cmd -ProjectRoot <project>`，或 Release 中的 `CocosAgentOverlay.exe <project>`；它会复制项目扩展、配置 CLI bridge、探测并启动 Cocos Creator，扩展加载后自动打开覆盖原生工作区的 `cocos-agent.overlay` 浮动面板。当前机器未安装 Creator 时 dry-run 返回 `creator=not-found`，不会伪造启动成功。
+- 文件：extensions/cocos-agent/package.json、extensions/cocos-agent/src/overlay.js、scripts/launch-cocos-agent.ps1、bin/cocos-agent-overlay.cmd、launcher/*、.github/workflows/release.yml、README、CHANGELOG、TODO。
+- 后续：安装 Cocos Creator 3.8 后运行启动器即可进行真实编辑器 UI 烟测；Release workflow 会上传包含 `CocosAgentOverlay.exe`、扩展、CLI dist 和 runtime dependencies 的 Windows zip。

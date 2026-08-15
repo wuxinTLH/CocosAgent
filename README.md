@@ -30,6 +30,7 @@
 | [cli/](cli/) | TypeScript CLI 与 MCP/桥接服务 |
 | [extensions/cocos-agent/](extensions/cocos-agent/) | Cocos Creator 扩展（编辑器内 CLI 窗口） |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/) | 独立约束已生成的 Cocos Creator 3D demo 项目 |
+| [launcher/](launcher/) | Windows 一键 Overlay 启动器源码 |
 
 ## 快速开始
 
@@ -57,6 +58,14 @@ powershell -ExecutionPolicy Bypass -File scripts/install-skills.ps1
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/install-extension.ps1
 ```
+
+一键安装项目扩展、启动 bridge、探测 Cocos Creator 并覆盖原生编辑器 UI：
+
+```powershell
+bin\cocos-agent-overlay.cmd -ProjectRoot examples\cocos3d-demo
+```
+
+Release 包提供 `CocosAgentOverlay.exe`；没有安装 Creator 时启动器会返回明确诊断，不会静默失败。
 
 完整本地验证：
 

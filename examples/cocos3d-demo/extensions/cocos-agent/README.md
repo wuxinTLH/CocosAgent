@@ -29,7 +29,6 @@ bin\cocos-agent-overlay.cmd -ProjectRoot examples\cocos3d-demo
 - 扩展加载后自动启动本地桥接 `ws://127.0.0.1:8899/ws` 并打开 `cocos-agent.overlay` 浮动面板。
 - 菜单：`Cocos Agent -> Open CLI`。
 - 菜单：`Cocos Agent -> Overlay`，可重新打开浮动覆盖层。
-- Overlay 使用 Cocos Creator `float` 面板覆盖编辑器工作区，不修改 Cocos 原生资源或私有 UI 文件。
 - 面板内可直接输入：`status`、`scene nodes assets/scenes/main.scene`、`assets find main`、`ccs resolve`。
 
 ## 说明

@@ -12,3 +12,6 @@ build/
 *.pfx
 *.pem
 *.key
+launcher/bin/
+launcher/obj/
+release-package/

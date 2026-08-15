@@ -12,11 +12,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Create GitHub prerelease
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: cli/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+      - name: Build release package
+        working-directory: cli
+        run: |
+          npm ci
+          npm run build
+          npm prune --omit=dev
+          mkdir -p ../release-package/cli ../release-package/extensions ../release-package/bin ../release-package/scripts
+          cp -r dist ../release-package/cli/dist
+          cp -r node_modules ../release-package/cli/node_modules
+          cp package.json ../release-package/cli/package.json
+          cp package-lock.json ../release-package/cli/package-lock.json
+          cp -r ../extensions/cocos-agent ../release-package/extensions/cocos-agent
+          cp -r ../scripts/launch-cocos-agent.ps1 ../scripts/install-extension.ps1 ../release-package/scripts/
+          cp -r ../bin/cocos-agent-overlay.cmd ../release-package/bin/
+          cp ../VERSION ../README.md ../CHANGELOG.md ../release-package/
+          cd ..
+          dotnet publish launcher/CocosAgentOverlay.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+          cp launcher/bin/Release/net8.0/win-x64/publish/CocosAgentOverlay.exe release-package/
+          zip -r "cocos-agent-${GITHUB_REF_NAME}-windows.zip" release-package >/dev/null
+      - name: Create or update GitHub prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            --title "Cocos Agent $GITHUB_REF_NAME" \
-            --notes-file CHANGELOG.md \
-            --prerelease
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "cocos-agent-${GITHUB_REF_NAME}-windows.zip" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "Cocos Agent $GITHUB_REF_NAME" \
+              --notes-file CHANGELOG.md \
+              --prerelease \
+              "cocos-agent-${GITHUB_REF_NAME}-windows.zip"
+          fi

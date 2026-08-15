@@ -6,6 +6,7 @@
 - 提供 Cocos Creator Scene、素材库、OCR、cc-switch/ccs、WSS 长连接的 Skills、MCP 与 CLI。
 - 提供 Windows 离线 OCR、WSS Token/上下文/重连验证、Cocos Creator 扩展桥接和独立 demo 项目约束。
 - 增加 TypeScript/JavaScript 验证、15 项自动化测试、文档链接检查、GitHub Actions CI 和 pre-commit 门禁。
+- 增加 `CocosAgentOverlay.exe` Windows 一键启动器、浮动 Overlay 面板和 Windows release zip 资产。
 
 ## 发布规则
 

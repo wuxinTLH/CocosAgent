@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-15T18:53:35+08:00`（UTC+8）
+更新时间：`2026-08-15T21:11:39+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -30,6 +30,7 @@
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
 | [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
+| [launcher/](launcher/)                                                  | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
 ## 全局任务队列
 
@@ -64,17 +65,11 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 进行完整系统性测试：`npm run verify` 通过，常规测试 `14/14` 通过，WSS 证书依赖测试由 CI 临时证书执行。
-2. [x] 提交 GitHub 仓库：`dc3cdf4` 已推送至 `origin/master`，公开仓库为 `https://github.com/wuxinTLH/CocosAgent`。
-3. [x] 创建 [v0.0.0.1-a prerelease](https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.1-a)，标签已推送并由 GitHub Actions 发布。
+1. [x] 发布版本提供实际可执行的 `CocosAgentOverlay.exe`，并提供 `.cmd`/PowerShell 入口。
+2. [x] 一键入口自动复制项目扩展、启动本地 bridge、探测 Cocos Creator 并打开 `cocos-agent.overlay` 浮动覆盖层。
+3. [x] Overlay 面板覆盖 Cocos 原生编辑器工作区，支持 `status`、Scene 查询、素材查询和 CCS 诊断。
 
 
 ## 已解决任务（一次性闭环）
 
-1. [x] 生成 [PROJECT-cocos3d-demo.md](examples/cocos3d-demo/docs/constraints/PROJECT-cocos3d-demo.md) 独立约束与 Cocos Creator 3D demo 项目；Scene 节点查询、素材检索均已验证。
-2. [x] 接入 Windows 离线 OCR、tesseract.js 和外部命令三种引擎；项目内真实图片识别返回 `COCOS`、`AGENT`、`2026` 及坐标框。
-3. [x] 完成 WSS 网关鉴权、流式响应、心跳、自动重连与 SHORT_MEMORY 上下文注入；本地自签名 WSS mock 与 Token 测试通过，生产端点由 `.env.example` 环境变量配置。
-4. [x] 完成 cc-switch 配置读取、ccs 路由诊断和本地路由连通测试；`ccs doctor` 已确认本机未安装 Cocos Creator，因此真实编辑器 UI 连接由安装后自动发现。
-5. [x] 补齐 CLI 单元/集成测试：Scene、素材、hash、memory、sandbox、OCR、WSS、CCS、项目约束、扩展契约与上下文根目录，当前 `15/15` 通过。
-6. [x] 已将扩展安装到 `C:\Users\13929\.CocosCreator\extensions\cocos-agent`，配置用户级 CLI bridge，完成 manifest、panel、桥接健康检查与 JavaScript 语法验证。当前机器未发现 Creator 3.8 可执行文件，缺少的是外部编辑器进程，不是扩展安装或桥接实现。
-7. [x] 建立 GitHub Actions CI、`npm run verify`、文档链接检查与 `.githooks/pre-commit` 门禁；git hooks 已写入 `.git/config`。
+8. [x] 完成 Cocos 原生 UI 一键覆盖能力：扩展自动打开 Overlay，Windows 启动器和 Release zip 已接入发布流程。

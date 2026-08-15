@@ -19,6 +19,8 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
   assert.equal(manifest.cocosAgentVersion, 'v0.0.0.1-a');
   assert.equal(manifest.contributions?.panels?.cli?.type, 'dockable');
   assert.equal(manifest.contributions?.panels?.cli?.main, './src/panel.js');
+  assert.equal(manifest.contributions?.panels?.overlay?.type, 'float');
+  assert.equal(manifest.contributions?.panels?.overlay?.main, './src/overlay.js');
 
   const previousEditor = globals.Editor;
   const opened: string[] = [];
@@ -35,10 +37,16 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     delete require.cache[require.resolve(panelPath)];
     delete require.cache[require.resolve(mainPath)];
     const panel = require(panelPath) as { template?: string; ready?: () => void; run?: () => void };
+    const overlayPath = path.join(extensionRoot, 'src', 'overlay.js');
+    delete require.cache[require.resolve(overlayPath)];
+    const overlay = require(overlayPath) as { template?: string; style?: string; ready?: () => void };
     const main = require(mainPath) as { methods?: { openCli?: () => void } };
     assert.match(panel.template ?? '', /cocos-agent>/);
     assert.equal(typeof panel.ready, 'function');
     assert.equal(typeof panel.run, 'function');
+    assert.match(overlay.template ?? '', /Cocos Agent/);
+    assert.match(overlay.style ?? '', /agent-overlay/);
+    assert.equal(typeof overlay.ready, 'function');
     main.methods?.openCli?.();
     assert.deepEqual(opened, ['cocos-agent.cli']);
   } finally {
