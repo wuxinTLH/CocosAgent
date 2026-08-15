@@ -65,7 +65,7 @@
 
 ## 代办列表
 1. [x] 进行完整系统性测试：`npm run verify` 通过，常规测试 `14/14` 通过，WSS 证书依赖测试由 CI 临时证书执行。
-2. [ ] 提交 GitHub 仓库。
+2. [x] 提交 GitHub 仓库：`dc3cdf4` 已推送至 `origin/master`，公开仓库为 `https://github.com/wuxinTLH/CocosAgent`。
 3. [ ] 创建 `v0.0.0.1-a` release。
 
 
