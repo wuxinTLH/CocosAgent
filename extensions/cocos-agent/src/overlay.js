@@ -13,7 +13,18 @@ function commandFor(line) {
     'scene nodes': ['scene_nodes', { path: rest[0] || '' }],
     'assets find': ['asset_find', { query: rest.join(' ') }],
     'ccs doctor': ['ccs_resolve', {}],
+    providers: ['provider_list', {}],
+    sessions: ['workspace_list', {}],
+    skills: ['skills_list', {}],
+    mcp: ['mcp_status', {}],
   };
+  if (head === 'chat') return { tool: 'workspace_chat', args: { chat: rest.join(' ') } };
+  if (head === 'session' && rest[0] === 'new') return { tool: 'workspace_create', args: { name: rest.slice(1).join(' ') } };
+  if (head === 'session' && rest[0] === 'switch') return { tool: 'workspace_switch', args: { id: rest[1] || '' } };
+  if (head === 'provider' && rest[0] === 'select') return { tool: 'provider_select', args: { provider: rest[1] || '' } };
+  if (head === 'locale') return { tool: 'agent_config', args: { locale: rest[0] || '' } };
+  if (head === 'permission') return { tool: 'agent_config', args: { permissionMode: rest[0] || '' } };
+  if (head === 'terminal') return { tool: 'terminal_run', args: { shell: rest[0] || '', command: rest.slice(1).join(' ') } };
   const selected = aliases[`${head} ${rest[0] || ''}`] || aliases[head] || [head, {}];
   return { tool: selected[0], args: selected[1] };
 }
@@ -23,7 +34,7 @@ module.exports = Editor.Panel.define({
     <div class="agent-overlay">
       <div class="agent-overlay__bar"><strong>Cocos Agent</strong><span id="state">offline</span><button id="close" title="Close overlay">x</button></div>
       <div id="output" class="agent-overlay__output"></div>
-      <form id="form" class="agent-overlay__form"><input id="input" autocomplete="off" placeholder="status" /><button title="Run command">Run</button></form>
+      <form id="form" class="agent-overlay__form"><input id="input" autocomplete="off" placeholder="chat 你好" /><button title="Run command">Run</button></form>
     </div>
   `,
   style: `

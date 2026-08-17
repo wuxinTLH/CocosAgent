@@ -14,6 +14,10 @@ function parseCommand(line) {
     'assets find': { tool: 'asset_find', args: { query: rest.join(' ') } },
     'ccs resolve': { tool: 'ccs_resolve', args: {} },
     'ccs connect': { tool: 'ccs_connect', args: {} },
+    providers: { tool: 'provider_list', args: {} },
+    sessions: { tool: 'workspace_list', args: {} },
+    skills: { tool: 'skills_list', args: {} },
+    mcp: { tool: 'mcp_status', args: {} },
   };
   const twoWords = `${head} ${rest[0] || ''}`;
   if (map[twoWords]) {
@@ -23,6 +27,13 @@ function parseCommand(line) {
       args: command.args,
     };
   }
+  if (head === 'chat') return { tool: 'workspace_chat', args: { chat: rest.join(' ') } };
+  if (head === 'session' && rest[0] === 'new') return { tool: 'workspace_create', args: { name: rest.slice(1).join(' ') } };
+  if (head === 'session' && rest[0] === 'switch') return { tool: 'workspace_switch', args: { id: rest[1] || '' } };
+  if (head === 'provider' && rest[0] === 'select') return { tool: 'provider_select', args: { provider: rest[1] || '' } };
+  if (head === 'locale') return { tool: 'agent_config', args: { locale: rest[0] || '' } };
+  if (head === 'permission') return { tool: 'agent_config', args: { permissionMode: rest[0] || '' } };
+  if (head === 'terminal') return { tool: 'terminal_run', args: { shell: rest[0] || '', command: rest.slice(1).join(' ') } };
   if (map[head]) {
     return map[head];
   }
@@ -51,7 +62,7 @@ module.exports = Editor.Panel.define({
         this.run();
       }
     });
-    this.append('Cocos Agent CLI ready. Input: status | scene nodes <path> | assets find <query> | ccs resolve');
+    this.append('Cocos Agent CLI ready. Input: status | providers | sessions | chat <text> | provider select <id> | locale <id> | permission <mode>');
   },
   close() {
     if (this.ws) {

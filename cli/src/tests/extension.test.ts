@@ -45,6 +45,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.equal(typeof panel.ready, 'function');
     assert.equal(typeof panel.run, 'function');
     assert.match(overlay.template ?? '', /Cocos Agent/);
+    assert.match(overlay.template ?? '', /chat/);
     assert.match(overlay.style ?? '', /agent-overlay/);
     assert.equal(typeof overlay.ready, 'function');
     main.methods?.openCli?.();

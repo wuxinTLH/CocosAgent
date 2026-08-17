@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-15T21:18:35+08:00`（UTC+8）
+更新时间：`2026-08-17T20:42:10+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -30,7 +30,7 @@
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
 | [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
-| [launcher/](launcher/)                                                  | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
+| [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
 ## 全局任务队列
 
@@ -65,12 +65,16 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 发布版本提供实际可执行的 `CocosAgentOverlay.exe`，并提供 `.cmd`/PowerShell 入口。
-2. [x] 一键入口自动复制项目扩展、启动本地 bridge、探测 Cocos Creator 并打开 `cocos-agent.overlay` 浮动覆盖层。
-3. [x] Overlay 面板覆盖 Cocos 原生编辑器工作区，支持 `status`、Scene 查询、素材查询和 CCS 诊断。
-4. [x] [v0.0.0.1-a prerelease](https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.1-a) 已上传 `cocos-agent-v0.0.0.1-a-windows.zip`（48,758,029 bytes）。
+1. [x] 支持 OpenAI（ChatGPT）、Anthropic（Claude）、DeepSeek、Kimi、Qwen 与既有 WSS Gateway；端点/模型可配置，凭据仅从环境变量读取。
+2. [x] 增加 `zh-CN`、`en-US` i18n 对话语言设置，并将语言上下文注入所有提供商请求。
+3. [x] 增加模型工作区、多会话创建/切换/删除、对话记录与按会话提供商回退链。
+4. [x] 增加 `full-access`、`only-safe`、`only-access` 权限模式；提升权限须在进程启动前显式设置 `COCOS_AGENT_PERMISSION_ELEVATION`。
+5. [x] 增加受控 `cmd`、PowerShell 与 Windows Terminal (`wt`) 调用，固定当前 Cocos 项目工作目录并限制危险控制符及越界路径。
+6. [x] 扩展 MCP 工具发现与 Skills 管理：新增模型工作区、权限和 Windows 终端 Skills，并安装到本机 Codex Skills 目录。
 
 
 ## 已解决任务（一次性闭环）
 
 8. [x] 完成 Cocos 原生 UI 一键覆盖能力：扩展自动打开 Overlay，Windows 启动器和 Release zip 已接入发布流程。
+
+9. [x] 完成多模型、i18n、会话工作区、权限模式、Windows Terminal/CMD、MCP/Skills 增强；npm run verify、MCP initialize/tools/list、回退/权限/终端单测均已通过。

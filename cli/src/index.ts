@@ -13,7 +13,7 @@ import { checkDocLinks } from './check-docs.js';
 import { initProjectConstraints } from './project.js';
 import { runMcpServer } from './mcp.js';
 import { startBridge } from './bridge.js';
-import { buildMemoryContext, statusReport } from './tools.js';
+import { buildMemoryContext, dispatchTool, statusReport } from './tools.js';
 import { resolveInside } from './sandbox.js';
 
 interface ParsedArgs {
@@ -219,7 +219,52 @@ async function main(): Promise<void> {
         }
       }
       break;
-    case 'mcp':
+    case 'provider':
+      if (sub === 'list') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'provider_list', {}), null, 2));
+      } else if (sub === 'select') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'provider_select', { provider: requireString(args, 'provider') }), null, 2));
+      } else if (sub === 'configure') {
+        const result = await dispatchTool(ctx, 'provider_configure', {
+          provider: requireString(args, 'provider'),
+          endpoint: args.flags.endpoint ? String(args.flags.endpoint) : undefined,
+          model: args.flags.model ? String(args.flags.model) : undefined,
+        });
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        throw new Error(`UNKNOWN_SUBCOMMAND: provider ${sub ?? ''}`);
+      }
+      break;
+    case 'agent':
+      if (sub !== 'config') throw new Error(`UNKNOWN_SUBCOMMAND: agent ${sub ?? ''}`);
+      console.log(JSON.stringify(await dispatchTool(ctx, 'agent_config', {
+        locale: args.flags.locale ? String(args.flags.locale) : undefined,
+        permissionMode: args.flags.permission ? String(args.flags.permission) : undefined,
+        activeProvider: args.flags.provider ? String(args.flags.provider) : undefined,
+        fallbackProviders: args.flags.fallback ? String(args.flags.fallback).split(',').map((item) => item.trim()) : undefined,
+      }), null, 2));
+      break;
+    case 'workspace':
+      if (sub === 'list') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_list', {}), null, 2));
+      } else if (sub === 'new') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_create', { name: requireString(args, 'name'), provider: args.flags.provider ? String(args.flags.provider) : undefined }), null, 2));
+      } else if (sub === 'switch') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_switch', { id: requireString(args, 'id') }), null, 2));
+      } else if (sub === 'delete') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_delete', { id: requireString(args, 'id') }), null, 2));
+      } else if (sub === 'chat') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_chat', { chat: requireString(args, 'chat') }), null, 2));
+      } else {
+        throw new Error(`UNKNOWN_SUBCOMMAND: workspace ${sub ?? ''}`);
+      }
+      break;
+    case 'terminal':
+      if (sub !== 'run') throw new Error(`UNKNOWN_SUBCOMMAND: terminal ${sub ?? ''}`);
+      console.log(JSON.stringify(await dispatchTool(ctx, 'terminal_run', {
+        shell: requireString(args, 'shell'), command: requireString(args, 'command'), dryRun: args.flags['dry-run'] === true,
+      }), null, 2));
+      break;    case 'mcp':
       await runMcpServer();
       break;
     case 'bridge': {

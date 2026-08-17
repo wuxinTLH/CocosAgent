@@ -15,3 +15,5 @@ build/
 launcher/bin/
 launcher/obj/
 release-package/
+
+.cocos-agent/

@@ -12,6 +12,7 @@ export interface GatewayChatOptions {
   memoryContext?: string;
   timeoutMs?: number;
   allowSelfSigned?: boolean;
+  model?: string;
 }
 
 export interface GatewayChatResult {
@@ -113,7 +114,7 @@ export function chatOnce(options: GatewayChatOptions): Promise<GatewayChatResult
             type: 'chat.completions',
             id: messageId,
             payload: {
-              model: process.env.COCOS_AGENT_GATEWAY_MODEL ?? 'agent-default',
+              model: options.model ?? process.env.COCOS_AGENT_GATEWAY_MODEL ?? 'agent-default',
               messages: [
                 { role: 'system', content: options.memoryContext ?? 'Cocos Agent' },
                 { role: 'user', content: options.chat },
@@ -137,6 +138,7 @@ export async function keepAlive(options: {
   onEvent?: (event: unknown) => void;
   maxReconnects?: number;
   allowSelfSigned?: boolean;
+  model?: string;
 }): Promise<void> {
   let delayMs = 1000;
   let reconnects = 0;

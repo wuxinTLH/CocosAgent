@@ -30,7 +30,7 @@ bin\cocos-agent-overlay.cmd -ProjectRoot examples\cocos3d-demo
 - 菜单：`Cocos Agent -> Open CLI`。
 - 菜单：`Cocos Agent -> Overlay`，可重新打开浮动覆盖层。
 - Overlay 使用 Cocos Creator `float` 面板覆盖编辑器工作区，不修改 Cocos 原生资源或私有 UI 文件。
-- 面板内可直接输入：`status`、`scene nodes assets/scenes/main.scene`、`assets find main`、`ccs resolve`。
+- 面板内可直接输入：`status`、`providers`、`sessions`、`chat <文本>`、`session new <名称>`、`session switch <id>`、`provider select <id>`、`locale zh-CN|en-US`、`permission only-access|only-safe|full-access`。`terminal <cmd|powershell|wt> <命令>` 仅在 `full-access` 可用。
 
 ## 说明
 

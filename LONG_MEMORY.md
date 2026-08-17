@@ -145,3 +145,67 @@
 - 结果：Release 资产 `cocos-agent-v0.0.0.1-a-windows.zip` 已上传，大小 48,758,029 bytes；资产包含 `CocosAgentOverlay.exe`、CLI dist/runtime、Cocos 扩展与一键启动脚本。
 - 文件：TODO、LONG_MEMORY、SHORT_MEMORY。
 - 后续：使用 Release zip 解压后运行 `CocosAgentOverlay.exe <Cocos项目根目录>`。
+
+### AGT-20260817-006
+
+- TaskHash：`sha256:41a71183f0f823a5e4a9dd5ea633e0b7ef2855799cdec3d7db25aa2621834ee5`
+- 开始：`2026-08-17T20:06:40+08:00`
+- 结束：`2026-08-17T20:43:30+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：六项待办必须在 CLI、MCP 和 Cocos 扩展间共享同一分发层。项目配置和会话只保存到当前项目 `.cocos-agent/`，API Key 始终只读环境变量；权限模式必须由统一工具分发器执行，并用进程启动环境门禁阻止受限 MCP 客户端自行提升权限。
+- 计划：
+1. 审查 CLI、Gateway、MCP、桥接和扩展结构。
+2. 增加多提供商、i18n、会话工作区和回退链。
+3. 增加权限策略、Windows 终端、MCP/Skills 与面板命令。
+4. 增加测试、文档并执行验证。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-17T20:06:40+08:00 | 读取 TODO、WorkFlow 与约束，确认六项待办未实现。 |
+| 2026-08-17T20:23:46+08:00 | 完成多提供商、工作区、i18n、权限与终端核心模块。 |
+| 2026-08-17T20:29:00+08:00 | 完成 CLI、MCP 和 Cocos CLI/Overlay 命令接入。 |
+| 2026-08-17T20:35:00+08:00 | 完成回退、权限、终端边界测试并安装新增 Skills。 |
+| 2026-08-17T20:36:16+08:00 | 验证 MCP `initialize` 与 `tools/list`，新工具可被客户端发现。 |
+| 2026-08-17T20:41:31+08:00 | 计算任务 hash，更新文档、TODO 与记忆。 |
+| 2026-08-17T20:43:30+08:00 | 完成最终验证、审查与收尾记录。 |
+
+- 结果：完成 TODO 六项任务。新增 OpenAI、Anthropic、DeepSeek、Kimi、Qwen 和 WSS Gateway 提供商；支持 `zh-CN`/`en-US`；支持多会话、会话切换与回退链；支持 `only-access`、`only-safe`、`full-access` 并要求 `COCOS_AGENT_PERMISSION_ELEVATION` 显式提升；支持受控 cmd/PowerShell/Windows Terminal；新增模型工作区、权限与终端 Skills，扩展 MCP 工具和 Cocos 面板命令。`npm run verify`、MCP stdio 发现、18 组测试（17 通过，1 个既有 WSS 证书测试按环境跳过）均通过。
+- 文件：
+- `.env.example`、`.gitignore`、`README.md`、`TODO.md`
+- `cli/README.md`、`cli/src/config.ts`、`cli/src/i18n.ts`、`cli/src/permissions.ts`
+- `cli/src/providers.ts`、`cli/src/workspace.ts`、`cli/src/terminal.ts`
+- `cli/src/tools.ts`、`cli/src/index.ts`、`cli/src/gateway.ts`
+- `cli/src/tests/agent-workspace.test.ts`、`cli/src/tests/extension.test.ts`
+- `extensions/cocos-agent/*`、`mcp/README.md`、`skills/model-workspace/SKILL.md`
+- `skills/agent-permissions/SKILL.md`、`skills/windows-terminal/SKILL.md`
+- 后续：
+- 安装 Cocos Creator 3.8 后，用真实编辑器启动 Overlay 做 UI 烟测；当前机器未检测到 Creator，未声称外部编辑器验证完成。
+### AGT-20260817-007
+
+- TaskHash：`sha256:41a71183f0f823a5e4a9dd5ea633e0b7ef2855799cdec3d7db25aa2621834ee5`
+- 开始：`2026-08-17T20:43:31+08:00`
+- 结束：`2026-08-17T20:45:00+08:00`
+- 请求：修正 AGT-20260817-006 的最终验证记录。
+- 推理：后续补充了 `only-safe` Gateway 端点覆盖拒绝测试，并按 HASH 规范用实际开始时间重算任务 hash；必须以追加方式更正长期记忆，不能改写历史结论。
+- 计划：
+1. 用实际开始时间重算任务 hash。
+2. 同步 LONG_MEMORY 与 SHORT_MEMORY。
+3. 记录最终验证数量和安全扫描结果。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-17T20:43:31+08:00 | 重算 AGT-20260817-006 的任务 hash 为 `sha256:41a71183...` 并同步短期记忆。 |
+| 2026-08-17T20:45:00+08:00 | 增加 Gateway 端点覆盖限制测试，最终验证为 19 组测试、18 通过、1 跳过。 |
+
+- 结果：AGT-20260817-006 的最终验证更正为：`npm run verify` 通过；19 组测试中 18 组通过，1 组既有 WSS 证书测试因未设置 `COCOS_AGENT_TEST_WSS_PFX` 按条件跳过；文档检查通过，密钥扫描无发现。
+- 文件：
+- `LONG_MEMORY.md`
+- `SHORT_MEMORY.md`
+- `cli/src/config.ts`
+- `cli/src/tools.ts`
+- `cli/src/terminal.ts`
+- `cli/src/tests/agent-workspace.test.ts`
+- 后续：
+- 无代码待办；真实 Cocos Creator 编辑器 UI 烟测仍需安装 Creator 后执行。

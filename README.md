@@ -12,6 +12,8 @@
 - 所有读写范围默认限制为“当前 Cocos 项目根目录”，禁止越界访问。
 - 提供 Skills（OCR 识别、Scene 读写、素材库、cc-switch 连接、长连接对话）和 MCP 服务。
 - 提供 TypeScript CLI，并可在 Cocos Creator 内打开 CLI 面板窗口。
+- 支持 OpenAI、Anthropic、DeepSeek、Kimi、Qwen 与 WSS Gateway，提供会话工作区、回退链及中英文对话。
+- 内置 `only-access`、`only-safe`、`full-access` 权限模式；支持项目内受控 CMD、PowerShell 与 Windows Terminal。
 
 ## 文档体系
 

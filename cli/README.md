@@ -24,6 +24,10 @@ scene read|write|nodes 读写 Scene/Prefab
 assets find            检索素材库
 ccs resolve|connect|doctor  cc-switch/ccs 路由解析、直连与诊断
 gateway connect|mock        WSS 长连接对话与本地模拟网关
+provider list|configure|select  管理多模型提供商、模型与当前会话模型
+agent config                 设置 locale、permission、默认提供商与回退链
+workspace list|new|switch|delete|chat  管理模型工作区、多会话和对话回退
+terminal run                在 full-access 下运行 cmd/PowerShell/Windows Terminal
 docs check                  校验文档链接
 project init                生成项目独立约束
 mcp                    启动 stdio MCP 服务
@@ -61,4 +65,20 @@ node dist/index.js gateway connect --url ws://127.0.0.1:8787/ws --chat "你好"
 node dist/index.js gateway connect --url "wss://gateway.example.com/chat" --chat "你好"
 node dist/index.js docs check
 node dist/index.js project init --name cocos-agent
+node dist/index.js provider list
+node dist/index.js provider configure --provider deepseek --model deepseek-chat
+node dist/index.js agent config --locale en-US --permission only-safe --provider deepseek --fallback gateway
+node dist/index.js workspace new --name "Level design" --provider qwen
+node dist/index.js workspace chat --chat "为主场景创建 3D 光照方案"
+node dist/index.js terminal run --shell powershell --command "Get-ChildItem assets" --dry-run
 ```
+
+## 多模型、工作区与权限
+
+- 内置提供商：OpenAI、Anthropic、DeepSeek、Kimi、Qwen 与既有 WSS Gateway。OpenAI 兼容平台使用 `/chat/completions`，Anthropic 使用官方 `/messages` 协议，Gateway 保持既有流式 WSS 协议。
+- 项目本地状态写入 `.cocos-agent/config.json` 和 `.cocos-agent/workspace.json`，已被 Git 忽略。该目录只保存语言、权限、端点、模型和会话消息，绝不保存 API Key。
+- `workspace chat` 会按当前会话提供商执行；失败时依次尝试该会话的 `fallbackProviders`。响应与尝试信息会被写回当前会话。
+- `zh-CN`、`en-US` 是当前内置 UI/对话语言。`agent config --locale <id>` 可切换。
+- 从较低权限提升到 `only-safe` 或 `full-access` 时，必须在启动 CLI/bridge 前设置 `COCOS_AGENT_PERMISSION_ELEVATION=<目标模式>`；MCP 调用不能静默绕过这个门禁。
+- 权限模式：`only-access` 仅允许安全的项目只读/MCP 查询；`only-safe` 允许已配置网关的安全对话；`full-access` 才能写 Scene、写配置、执行终端或建立需要提升权限的连接。
+- `terminal run` 的工作目录固定为当前 Cocos 项目根目录，支持 `cmd`、`powershell`、`wt`；命令拒绝控制操作符、绝对路径和 `..` 越界片段。
