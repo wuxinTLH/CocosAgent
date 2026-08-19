@@ -17,6 +17,8 @@ function commandFor(line) {
     sessions: ['workspace_list', {}],
     skills: ['skills_list', {}],
     mcp: ['mcp_status', {}],
+    'animation optimize': ['animation_optimize', { path: rest[1] || '' }],
+    'animation analyze': ['animation_analyze', { path: rest[1] || '' }],
   };
   if (head === 'chat') return { tool: 'workspace_chat', args: { chat: rest.join(' ') } };
   if (head === 'session' && rest[0] === 'new') return { tool: 'workspace_create', args: { name: rest.slice(1).join(' ') } };

@@ -16,6 +16,7 @@ import { assertToolPermission, permissionSummary } from './permissions.js';
 import { providerCatalog, chatWithFallback, resolveProvider } from './providers.js';
 import { activeSession, appendMessage, conversationContext, createSession, deleteSession, listSessions, switchSession, updateSessionProvider } from './workspace.js';
 import { runTerminal, type TerminalShell } from './terminal.js';
+import { analyzeAnimation, createAnimationController, optimizeAnimation, recognizeAnimationStates } from './animation.js';
 
 export interface McpToolDefinition {
   name: string;
@@ -166,6 +167,26 @@ export const MCP_TOOLS: McpToolDefinition[] = [
     name: 'terminal_run',
     description: '在当前项目根目录通过 cmd、PowerShell 或 Windows Terminal 执行命令',
     inputSchema: { type: 'object', properties: { shell: { type: 'string', enum: ['cmd', 'powershell', 'wt'] }, command: { type: 'string' }, dryRun: { type: 'boolean' } }, required: ['shell', 'command'] },
+  },
+  {
+    name: 'animation_analyze',
+    description: '只读分析当前项目内的 Cocos AnimationClip (.anim)',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] },
+  },
+  {
+    name: 'animation_optimize',
+    description: '基于 AnimationClip 结构生成非破坏性动作优化建议',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] },
+  },
+  {
+    name: 'animation_ocr_states',
+    description: '通过 OCR 从当前项目截图提取动画状态候选',
+    inputSchema: { type: 'object', properties: { image: { type: 'string' }, region: { type: 'string' }, engine: { type: 'string' } }, required: ['image'] },
+  },
+  {
+    name: 'animation_create_controller',
+    description: '生成使用 Cocos Animation 公开 API 的状态控制器脚本',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' }, className: { type: 'string' }, definition: { type: 'object' } }, required: ['path', 'className', 'definition'] },
   },
   {
     name: 'task_hash',
@@ -330,6 +351,24 @@ export async function dispatchTool(
       appendMessage(ctx.root, session.id, { role: 'assistant', content: result.content, timeUtc8: nowUtc8(), provider: result.provider });
       return { sessionId: session.id, ...result };
     }
+    case 'animation_analyze':
+      return analyzeAnimation(ctx.root, String(args.path ?? ''));
+    case 'animation_optimize':
+      return optimizeAnimation(analyzeAnimation(ctx.root, String(args.path ?? '')));
+    case 'animation_ocr_states':
+      return recognizeAnimationStates(
+        ctx.root,
+        String(args.image ?? ''),
+        args.region ? String(args.region) : undefined,
+        args.engine ? String(args.engine) as OcrEngine : undefined,
+      );
+    case 'animation_create_controller':
+      return createAnimationController(
+        ctx.root,
+        String(args.path ?? ''),
+        String(args.className ?? ''),
+        args.definition,
+      );
     case 'memory_write':
       return writeExecution(ctx.root, args as unknown as ExecutionRecord);
     default:

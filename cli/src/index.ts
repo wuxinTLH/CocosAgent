@@ -259,6 +259,28 @@ async function main(): Promise<void> {
         throw new Error(`UNKNOWN_SUBCOMMAND: workspace ${sub ?? ''}`);
       }
       break;
+    case 'animation':
+      if (sub === 'analyze') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'animation_analyze', { path: scenePath(args) }), null, 2));
+      } else if (sub === 'optimize') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'animation_optimize', { path: scenePath(args) }), null, 2));
+      } else if (sub === 'ocr') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'animation_ocr_states', {
+          image: requireString(args, 'image'),
+          region: args.flags.region ? String(args.flags.region) : undefined,
+          engine: args.flags.engine ? String(args.flags.engine) : undefined,
+        }), null, 2));
+      } else if (sub === 'controller') {
+        const definition = args.flags.definition ? JSON.parse(String(args.flags.definition)) : JSON.parse(fs.readFileSync(resolveInside(ctx.root, requireString(args, 'definition-file')), 'utf8'));
+        console.log(JSON.stringify(await dispatchTool(ctx, 'animation_create_controller', {
+          path: requireString(args, 'path'),
+          className: requireString(args, 'class'),
+          definition,
+        }), null, 2));
+      } else {
+        throw new Error(`UNKNOWN_SUBCOMMAND: animation ${sub ?? ''}`);
+      }
+      break;
     case 'terminal':
       if (sub !== 'run') throw new Error(`UNKNOWN_SUBCOMMAND: terminal ${sub ?? ''}`);
       console.log(JSON.stringify(await dispatchTool(ctx, 'terminal_run', {

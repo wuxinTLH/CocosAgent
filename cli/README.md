@@ -2,7 +2,7 @@
 
 TypeScript 实现的 CLI，用于执行 WorkFlow、计算任务 hash、读写记忆、调用 Skills 能力，并提供 MCP 服务与 Cocos 编辑器本地桥接。
 
-全局版本：`v0.0.0.1-a`
+全局版本：`v0.0.0.2-a`
 
 ## 构建
 
@@ -28,6 +28,8 @@ provider list|configure|select  管理多模型提供商、模型与当前会话
 agent config                 设置 locale、permission、默认提供商与回退链
 workspace list|new|switch|delete|chat  管理模型工作区、多会话和对话回退
 terminal run                在 full-access 下运行 cmd/PowerShell/Windows Terminal
+animation analyze|optimize 分析和优化当前项目内 .anim 动画
+animation ocr|controller   OCR 提取状态或生成 Animation 控制器
 docs check                  校验文档链接
 project init                生成项目独立约束
 mcp                    启动 stdio MCP 服务
@@ -71,6 +73,9 @@ node dist/index.js agent config --locale en-US --permission only-safe --provider
 node dist/index.js workspace new --name "Level design" --provider qwen
 node dist/index.js workspace chat --chat "为主场景创建 3D 光照方案"
 node dist/index.js terminal run --shell powershell --command "Get-ChildItem assets" --dry-run
+node dist/index.js animation analyze --path assets/animations/locomotion.anim
+node dist/index.js animation optimize --path assets/animations/locomotion.anim
+node dist/index.js animation controller --path assets/scripts/PlayerAnimation.ts --class PlayerAnimation --definition-file animation-state.json
 ```
 
 ## 多模型、工作区与权限

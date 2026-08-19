@@ -1,0 +1,7 @@
+{
+  "_name": "Locomotion",
+  "_duration": 1.2,
+  "_sample": 30,
+  "_tracks": [{ "_path": { "toString": "Root" } }],
+  "_events": [{ "frame": 0.3, "func": "onStep" }]
+}

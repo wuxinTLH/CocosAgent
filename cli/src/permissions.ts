@@ -2,7 +2,7 @@ import { loadAgentConfig, type PermissionMode } from './config.js';
 
 const ACCESS_TOOLS = new Set([
   'status', 'task_hash', 'ocr_recognize', 'scene_read', 'scene_nodes', 'asset_find',
-  'ccs_resolve', 'skills_list', 'mcp_status', 'provider_list', 'workspace_list', 'agent_config',
+  'ccs_resolve', 'skills_list', 'mcp_status', 'provider_list', 'workspace_list', 'agent_config', 'animation_analyze', 'animation_optimize', 'animation_ocr_states',
 ]);
 const SAFE_TOOLS = new Set([...ACCESS_TOOLS, 'gateway_chat', 'workspace_chat', 'ccs_connect', 'workspace_create', 'workspace_switch', 'workspace_delete', 'provider_select']);
 

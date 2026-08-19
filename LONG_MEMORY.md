@@ -209,3 +209,34 @@
 - `cli/src/tests/agent-workspace.test.ts`
 - 后续：
 - 无代码待办；真实 Cocos Creator 编辑器 UI 烟测仍需安装 Creator 后执行。
+
+### AGT-20260819-008
+
+- TaskHash：`sha256:e2b70ec62d7fd774ae09ba34956a8df1a8a1ad5c640136c64c3f26da1150db24`
+- 开始：`2026-08-19T19:47:44+08:00`
+- 结束：`2026-08-19T19:48:58+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：本轮待办聚焦 Cocos AnimationClip 工作流和版本发布收尾。动画资源由 Cocos 编辑器管理，必须只读解析 `.anim`，状态控制器只能生成基于官方 `Animation.crossFade` 的 TypeScript；所有工具继续复用当前项目 sandbox 和权限门禁。发布前还需清理文档排版残留、安装 Skill、验证 MCP 工具发现，并以可复现 hash 和 UTC+8 记录结果。
+- 计划：
+  1. 检查并修复 Markdown 字面量换行与版本/待办状态。
+  2. 安装 `cocos-animation` Skill，验证 MCP `initialize` 与 `tools/list`。
+  3. 执行 `npm run verify`、Release 构建验证、安全扫描和 diff 检查。
+  4. 更新 TODO、LONG_MEMORY、SHORT_MEMORY，提交并推送版本。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-19T19:47:44 | 按 HASH.md 规范确定请求、项目根目录和任务开始时间。 |
+| 2026-08-19T19:47:55 | 修复 README 与 CLI README 中的 `` `r`n `` 字面量换行。 |
+| 2026-08-19T19:48:05 | 安装全部项目 Skills，包含新增 `cocos-animation`。 |
+| 2026-08-19T19:48:20 | MCP `initialize` 与 `tools/list` 通过，发现四个动画工具。 |
+| 2026-08-19T19:48:58 | 更新 TODO 和短长期记忆，进入提交发布阶段。 |
+
+- 结果：动画分析、优化、OCR 状态候选、`idle -> run -> jump` 控制器生成已实现并接入 CLI、MCP、扩展面板和 Skill；版本统一为 `v0.0.0.2-a`，本地 Windows Release 构建已验证。`npm run verify` 为 TypeScript/JavaScript 检查通过、21 项测试中 20 项通过、1 项 WSS 证书测试因未设置 `COCOS_AGENT_TEST_WSS_PFX` 按设计跳过；文档检查通过，`git diff --check` 通过。当前机器没有 Cocos Creator，真实编辑器 UI 烟测未宣称完成。
+- 文件：
+  - `cli/src/animation.ts`、`cli/src/tools.ts`、`cli/src/index.ts`
+  - `cli/src/tests/animation.test.ts`、`cli/tests/fixtures/sample.anim`
+  - `skills/cocos-animation/SKILL.md`
+  - `README.md`、`cli/README.md`、`mcp/README.md`、`TODO.md`、`CHANGELOG.md`
+  - `VERSION` 及 npm/Cocos manifest、扩展面板和发布脚本
+- 后续：提交当前变更并推送 `master` 与 `v0.0.0.2-a`；推送后核对 GitHub Release 资产。真实 Cocos Creator UI 烟测仍需在安装 Creator 的机器执行。

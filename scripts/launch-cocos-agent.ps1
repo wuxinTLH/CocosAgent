@@ -40,7 +40,7 @@ if (Test-Path -LiteralPath $extensionTarget) {
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
 $configDir = Join-Path $env:USERPROFILE '.cocos-agent'
 New-Item -ItemType Directory -Force -Path $configDir | Out-Null
-@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.1-a'; overlay = $true } |
+@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $configDir 'config.json') -Encoding UTF8
 
 function Resolve-CocosCreator {

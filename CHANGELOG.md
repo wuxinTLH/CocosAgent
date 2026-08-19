@@ -1,3 +1,9 @@
+## v0.0.0.2-a - 2026-08-19
+
+- 新增 Cocos AnimationClip 分析、动作优化建议和 OCR 状态识别。
+- 新增 `idle -> run -> jump` 等状态机控制器生成，使用官方 `Animation.crossFade` API。
+- 新增 `cocos-animation` Skill 与四个 MCP 动画工具。
+- 修复版本约束漂移，并验证 Windows Release 构建流程。
 # Changelog
 
 ## v0.0.0.1-a - 2026-08-15
@@ -10,5 +16,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.1-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.1-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.2-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.2-a`，并保留 `cocosAgentVersion` 映射。

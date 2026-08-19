@@ -47,6 +47,10 @@ env = { COCOS_AGENT_PROJECT_ROOT = "E:/code/Cocos Agent" }
 | `agent_config` | i18n、权限与默认回退链 | agent-permissions |
 | `skills_list` / `mcp_status` | Skills 和 MCP 能力自检 | CLI registry |
 | `terminal_run` | `cmd`/PowerShell/Windows Terminal | windows-terminal |
+| `animation_analyze` | 只读分析 Cocos AnimationClip (.anim) | cocos-animation |
+| `animation_optimize` | 生成非破坏性动画优化建议 | cocos-animation |
+| `animation_ocr_states` | OCR 提取编辑器截图中的状态候选 | cocos-animation + cocos-ocr |
+| `animation_create_controller` | 生成使用公开 Animation API 的 TypeScript 控制器 | cocos-animation |
 
 所有工具自动执行 sandbox 校验，越界路径返回 `SANDBOX_VIOLATION`。
 

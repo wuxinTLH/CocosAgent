@@ -17,3 +17,4 @@ launcher/obj/
 release-package/
 
 .cocos-agent/
+cocos-agent-v*-windows.zip

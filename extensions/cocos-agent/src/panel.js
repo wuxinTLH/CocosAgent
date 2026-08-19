@@ -18,6 +18,8 @@ function parseCommand(line) {
     sessions: { tool: 'workspace_list', args: {} },
     skills: { tool: 'skills_list', args: {} },
     mcp: { tool: 'mcp_status', args: {} },
+    'animation optimize': { tool: 'animation_optimize', args: { path: rest[1] || '' } },
+    'animation analyze': { tool: 'animation_analyze', args: { path: rest[1] || '' } },
   };
   const twoWords = `${head} ${rest[0] || ''}`;
   if (map[twoWords]) {
@@ -62,7 +64,7 @@ module.exports = Editor.Panel.define({
         this.run();
       }
     });
-    this.append('Cocos Agent CLI ready. Input: status | providers | sessions | chat <text> | provider select <id> | locale <id> | permission <mode>');
+    this.append('Cocos Agent CLI ready. Input: status | providers | sessions | chat <text> | provider select <id> | locale <id> | permission <mode> | animation analyze <path> | animation optimize <path>');
   },
   close() {
     if (this.ws) {
