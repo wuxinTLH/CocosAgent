@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-19T22:22:50+08:00`（UTC+8）
+更新时间：`2026-08-19T22:27:36+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -84,3 +84,4 @@
 - [x] 详细记录已追加到 `LONG_MEMORY.md`，最近记录已同步到 `SHORT_MEMORY.md`。
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.2-a` prerelease 及 Windows zip 资产已上传。
 - [x] `v0.0.0.3-a` 已完成启动器、扩展与 Release workflow 的本地验证；真实 Creator UI 烟测等待安装 Creator 的环境执行。
+- [x] GitHub Actions Release 已成功完成，`v0.0.0.3-a` prerelease 与 Windows zip 资产已上传。

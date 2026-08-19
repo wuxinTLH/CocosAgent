@@ -292,3 +292,23 @@
   - `.github/workflows/release.yml`、`cli/src/tests/extension.test.ts`
   - `VERSION`、`CHANGELOG.md`、`README.md`、`TODO.md`
 - 后续：在安装 Cocos Creator 3.8 的 Windows 环境运行 `CocosAgentOverlay.exe -ProjectRoot <项目路径>`，确认 `overlay-status.json` 为 `ready` 并检查自动打开的 Cocos Agent 面板；然后推送 `v0.0.0.3-a` 触发 Windows prerelease。
+
+### AGT-20260819-011
+
+- TaskHash：`sha256:3ce66f76959cf13c45d222aa4b1921b14e65379d54a42f3665f0f5866d83ab0d`
+- 开始：`2026-08-19T22:22:50+08:00`
+- 结束：`2026-08-19T22:27:36+08:00`
+- 请求：完成本轮 TODO 收尾后的提交、推送与 Release 核验。
+- 推理：修复完成后必须确认远程分支、版本标签、GitHub Actions 和真实 Release 资产。标签首推遇到短暂 Schannel TLS 握手失败，`master` 已成功推送；按既有可行方案使用 HTTP/1.1 单独重试标签推送，再通过 GitHub API 验证发布。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-19T22:23:10 | 提交 `df060ad`：`fix: report cocos overlay startup failures`，提交钩子再次通过 `npm run verify`。 |
+| 2026-08-19T22:24:00 | `master` 推送成功；首次标签推送出现 TLS 握手失败。 |
+| 2026-08-19T22:24:20 | 使用 HTTP/1.1 成功推送 `v0.0.0.3-a`。 |
+| 2026-08-19T22:26:55 | GitHub Actions Release run `32263993635` 完成，结论 `success`。 |
+| 2026-08-19T22:27:36 | GitHub API 确认 prerelease 和 Windows zip 资产上传完成。 |
+
+- 结果：远程 `master` 与 `v0.0.0.3-a` 均指向 `df060adf556c8694c6b33a1836f50aea6f95d935`。Release 地址为 `https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.3-a`，资产 `cocos-agent-v0.0.0.3-a-windows.zip` 状态为 `uploaded`，大小 48,792,827 bytes。
+- 后续：真实 Cocos Creator UI 烟测仍需在安装 Creator 的 Windows 环境执行；启动后查看项目 `.cocos-agent/overlay-status.json` 与用户级 `launcher.log`。
