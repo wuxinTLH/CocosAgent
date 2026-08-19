@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-19T19:48:58+08:00`（UTC+8）
+更新时间：`2026-08-19T19:55:02+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -85,3 +85,4 @@
 - [x] 文档字面量换行已修复，`git diff --check` 通过。
 - [x] TypeScript/JavaScript 检查、21 项测试（20 通过、1 个按环境跳过）与 Windows Release 构建已完成；真实 Cocos Creator UI 烟测因本机未安装 Creator 保留为环境条件项。
 - [x] 详细记录已追加到 `LONG_MEMORY.md`，最近记录已同步到 `SHORT_MEMORY.md`。
+- [x] GitHub Actions Release 已成功完成，`v0.0.0.2-a` prerelease 及 Windows zip 资产已上传。

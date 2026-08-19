@@ -240,3 +240,23 @@
   - `README.md`、`cli/README.md`、`mcp/README.md`、`TODO.md`、`CHANGELOG.md`
   - `VERSION` 及 npm/Cocos manifest、扩展面板和发布脚本
 - 后续：提交当前变更并推送 `master` 与 `v0.0.0.2-a`；推送后核对 GitHub Release 资产。真实 Cocos Creator UI 烟测仍需在安装 Creator 的机器执行。
+
+### AGT-20260819-009
+
+- TaskHash：`sha256:e2b70ec62d7fd774ae09ba34956a8df1a8a1ad5c640136c64c3f26da1150db24`
+- 开始：`2026-08-19T19:48:58+08:00`
+- 结束：`2026-08-19T19:55:02+08:00`
+- 请求：完成本轮 TODO 收尾后的提交、推送与 Release 核验。
+- 推理：代码和本地验证已通过，发布阶段必须分别确认 master、版本标签、GitHub Actions 和 Release 资产，不能把本地 tag 视为发布成功。首次标签推送遇到 Schannel TLS 握手失败，改用 HTTP/1.1 重试成功；随后用 GitHub API 验证工作流和资产状态。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-19T19:49:10 | 提交 `0d1b003`：`feat: add cocos animation workflow`，提交钩子再次通过 `npm run verify`。 |
+| 2026-08-19T19:50:00 | `master` 推送成功；标签首次推送因 TLS 握手失败。 |
+| 2026-08-19T19:51:00 | 使用 HTTP/1.1 成功推送 `v0.0.0.2-a`。 |
+| 2026-08-19T19:54:30 | GitHub Actions Release run `32249853193` 完成，结论 `success`。 |
+| 2026-08-19T19:55:02 | GitHub API 确认 prerelease 与 Windows zip 资产已上传。 |
+
+- 结果：远程 `master` 与 `v0.0.0.2-a` 均指向 `0d1b003c555087234536eb88cc705b7ab844e24e`。Release 地址为 `https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.2-a`，资产 `cocos-agent-v0.0.0.2-a-windows.zip` 状态为 `uploaded`，大小 48,787,181 bytes。
+- 后续：无代码待办；真实 Cocos Creator UI 烟测仍需在安装 Creator 的机器执行。
