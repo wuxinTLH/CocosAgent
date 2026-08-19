@@ -8,6 +8,25 @@ const path = require('node:path');
 const BRIDGE_PORT = 8899;
 let bridgeProcess = null;
 
+function statusFile() {
+  return path.join(projectRoot(), '.cocos-agent', 'overlay-status.json');
+}
+
+function writeStatus(state, message = '') {
+  try {
+    const file = statusFile();
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify({
+      state,
+      message,
+      version: 'v0.0.0.3-a',
+      updatedAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().replace('Z', '+08:00'),
+    }, null, 2));
+  } catch (error) {
+    console.error(`[cocos-agent] unable to write status: ${error.message}`);
+  }
+}
+
 function resolveCliIndex() {
   const configFile = path.join(os.homedir(), '.cocos-agent', 'config.json');
   let configuredCliIndex = null;
@@ -52,11 +71,26 @@ function startBridge() {
       cwd: projectRoot(),
       stdio: 'ignore',
       windowsHide: true,
+      env: {
+        ...process.env,
+        COCOS_AGENT_PROJECT_ROOT: projectRoot(),
+        ELECTRON_RUN_AS_NODE: '1',
+      },
     },
   );
+  bridgeProcess.on('error', (error) => {
+    writeStatus('error', `CLI bridge failed to start: ${error.message}`);
+  });
   bridgeProcess.on('exit', () => {
     bridgeProcess = null;
   });
+}
+
+function openOverlay() {
+  if (typeof Editor === 'undefined' || !Editor.Panel) {
+    throw new Error('Cocos Creator Editor.Panel API is unavailable.');
+  }
+  return Promise.resolve(Editor.Panel.open('cocos-agent.overlay'));
 }
 
 function stopBridge() {
@@ -68,9 +102,20 @@ function stopBridge() {
 
 module.exports = {
   load() {
-    startBridge();
-    if (typeof Editor !== 'undefined' && Editor.Panel) {
-      Editor.Panel.open('cocos-agent.overlay');
+    writeStatus('loading', 'Cocos Agent extension is loading.');
+    try {
+      startBridge();
+      setTimeout(() => {
+        openOverlay()
+          .then(() => writeStatus('ready', 'Cocos Agent panel opened.'))
+          .catch((error) => {
+            writeStatus('error', `Unable to open Cocos Agent panel: ${error.message}`);
+            console.error(`[cocos-agent] ${error.stack || error.message}`);
+          });
+      }, 250);
+    } catch (error) {
+      writeStatus('error', error.message);
+      console.error(`[cocos-agent] ${error.stack || error.message}`);
     }
   },
   unload() {
@@ -81,7 +126,10 @@ module.exports = {
       Editor.Panel.open('cocos-agent.cli');
     },
     openOverlay() {
-      Editor.Panel.open('cocos-agent.overlay');
+      openOverlay().catch((error) => {
+        writeStatus('error', `Unable to open Cocos Agent panel: ${error.message}`);
+        console.error(`[cocos-agent] ${error.stack || error.message}`);
+      });
     },
   },
 };

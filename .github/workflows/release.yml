@@ -37,7 +37,7 @@ jobs:
           cp ../VERSION ../README.md ../CHANGELOG.md ../release-package/
           cd ..
           dotnet publish launcher/CocosAgentOverlay.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
-          cp launcher/bin/Release/net8.0/win-x64/publish/CocosAgentOverlay.exe release-package/
+          cp launcher/bin/Release/net8.0-windows/win-x64/publish/CocosAgentOverlay.exe release-package/
           zip -r "cocos-agent-${GITHUB_REF_NAME}-windows.zip" release-package >/dev/null
       - name: Create or update GitHub prerelease
         env:

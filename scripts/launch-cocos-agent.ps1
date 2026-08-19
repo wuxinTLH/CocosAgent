@@ -3,15 +3,40 @@ param(
     [string]$ProjectRoot,
     [string]$CreatorPath = '',
     [switch]$SkipBuild,
-    [switch]$DryRun
+    [switch]$DryRun,
+    [ValidateRange(1, 120)]
+    [int]$ExtensionTimeoutSeconds = 20
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$project = [IO.Path]::GetFullPath($ProjectRoot)
-$cliIndex = Join-Path $repoRoot 'cli\dist\index.js'
-$extensionSource = Join-Path $repoRoot 'extensions\cocos-agent'
-$extensionTarget = Join-Path $project 'extensions\cocos-agent'
+$configDir = Join-Path $env:USERPROFILE '.cocos-agent'
+New-Item -ItemType Directory -Force -Path $configDir | Out-Null
+$launcherLog = Join-Path $configDir 'launcher.log'
+
+function Write-LauncherLog([string]$Message) {
+    $timestamp = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
+    "$timestamp $Message" | Add-Content -LiteralPath $launcherLog -Encoding UTF8
+}
+
+function Write-OverlayStatus([string]$State, [string]$Message = '') {
+    if (-not $script:overlayStatusFile) { return }
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $script:overlayStatusFile) | Out-Null
+    @{
+        state = $State
+        message = $Message
+        version = 'v0.0.0.3-a'
+        updatedAt = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
+    } | ConvertTo-Json | Set-Content -LiteralPath $script:overlayStatusFile -Encoding UTF8
+}
+
+try {
+    $project = [IO.Path]::GetFullPath($ProjectRoot)
+    $cliIndex = Join-Path $repoRoot 'cli\dist\index.js'
+    $extensionSource = Join-Path $repoRoot 'extensions\cocos-agent'
+    $extensionTarget = Join-Path $project 'extensions\cocos-agent'
+    $script:overlayStatusFile = Join-Path $project '.cocos-agent\overlay-status.json'
+    Write-LauncherLog "launch requested project=$project"
 
 if (-not (Test-Path -LiteralPath (Join-Path $project 'assets') -PathType Container)) {
     throw "Not a Cocos project: assets directory missing: $project"
@@ -38,9 +63,7 @@ if (Test-Path -LiteralPath $extensionTarget) {
     Remove-Item -LiteralPath $extensionTarget -Recurse -Force
 }
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
-$configDir = Join-Path $env:USERPROFILE '.cocos-agent'
-New-Item -ItemType Directory -Force -Path $configDir | Out-Null
-@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true } |
+@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.3-a'; overlay = $true } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $configDir 'config.json') -Encoding UTF8
 
 function Resolve-CocosCreator {
@@ -67,12 +90,36 @@ if (-not $creator) {
         Write-Output "DRY_RUN creator=not-found project=$project overlay=cocos-agent.overlay"
         exit 0
     }
-    Write-Warning "Cocos Creator executable not found. Extension installed at $extensionTarget; install Creator 3.8.x, then rerun this script."
-    exit 2
+    throw "Cocos Creator executable not found. Extension installed at $extensionTarget; set -CreatorPath or COCOS_CREATOR_PATH, then rerun this script."
 }
 if ($DryRun) {
     Write-Output "DRY_RUN creator=$creator project=$project overlay=cocos-agent.overlay"
     exit 0
 }
+Write-OverlayStatus 'starting' 'Cocos Creator is starting and the project extension is being loaded.'
 Start-Process -FilePath $creator -ArgumentList @('--project', $project) -WorkingDirectory (Split-Path -Parent $creator)
-Write-Output "Started Cocos Creator with Cocos Agent overlay: $project"
+
+$deadline = (Get-Date).AddSeconds($ExtensionTimeoutSeconds)
+do {
+    Start-Sleep -Milliseconds 500
+    if (Test-Path -LiteralPath $script:overlayStatusFile -PathType Leaf) {
+        $status = Get-Content -LiteralPath $script:overlayStatusFile -Raw | ConvertFrom-Json
+        if ($status.state -eq 'ready') {
+            Write-LauncherLog "overlay ready project=$project"
+            Write-Output "Cocos Agent panel opened in Cocos Creator: $project"
+            exit 0
+        }
+        if ($status.state -eq 'error') {
+            throw "Cocos Agent extension failed to load: $($status.message)"
+        }
+    }
+} while ((Get-Date) -lt $deadline)
+
+throw "Cocos Creator started but Cocos Agent did not report a ready panel within $ExtensionTimeoutSeconds seconds. Open Cocos Agent > Overlay manually, then review $script:overlayStatusFile and $launcherLog."
+} catch {
+    $message = $_.Exception.Message
+    Write-OverlayStatus 'error' $message
+    Write-LauncherLog "launch failed: $message"
+    Write-Error $message
+    exit 1
+}

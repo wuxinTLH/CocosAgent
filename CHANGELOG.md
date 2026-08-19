@@ -1,3 +1,9 @@
+## v0.0.0.3-a - 2026-08-19
+
+- 修复 `CocosAgentOverlay.exe` 的 `-ProjectRoot` 参数兼容性、启动日志、错误窗口与扩展加载超时诊断。
+- 将 Cocos Agent Overlay 改为官方 `dockable` 面板，并在项目内写入 `ready/error` 状态回执。
+- 修复 Creator Electron 下 CLI bridge 的 Node 启动环境和项目根目录传递。
+
 ## v0.0.0.2-a - 2026-08-19
 
 - 新增 Cocos AnimationClip 分析、动作优化建议和 OCR 状态识别。
@@ -16,5 +22,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.2-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.2-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.3-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.3-a`，并保留 `cocosAgentVersion` 映射。

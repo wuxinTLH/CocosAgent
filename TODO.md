@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.2-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.3-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-19T19:55:02+08:00`（UTC+8）
+更新时间：`2026-08-19T22:22:50+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.2-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.3-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -65,12 +65,9 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 添加 `cocos-animation` Skill/MCP：分析 AnimationClip、调用 OCR 识别状态候选并生成优化建议。
-2. [x] 支持 Animation 状态机自定义调用，例如 `idle -> run -> jump`，生成使用官方 `Animation.crossFade` 的 TypeScript 控制器。
-3. [x] 添加动画动作优化能力：检查时长、采样率、轨道和 AnimationEvent，并返回非破坏性建议。
-4. [x] 修复版本约束漂移，统一升级至 `v0.0.0.2-a`，验证 Release 构建并推送新版本。
+1. [x] 修复 `CocosAgentOverlay.exe` 无法打开 Cocos Agent UI 且无错误提示：改用官方 `dockable` 面板、等待扩展 `ready/error` 状态回执、记录启动日志并显示失败窗口；兼容 `-ProjectRoot` 参数。
 
-本轮任务 hash：`sha256:e2b70ec62d7fd774ae09ba34956a8df1a8a1ad5c640136c64c3f26da1150db24`
+本轮任务 hash：`sha256:1463191d8e8171e4c298b65589356570364a38072e2ac488f8f1d58da2340175`
 
 
 ## 已解决任务（一次性闭环）
@@ -86,3 +83,4 @@
 - [x] TypeScript/JavaScript 检查、21 项测试（20 通过、1 个按环境跳过）与 Windows Release 构建已完成；真实 Cocos Creator UI 烟测因本机未安装 Creator 保留为环境条件项。
 - [x] 详细记录已追加到 `LONG_MEMORY.md`，最近记录已同步到 `SHORT_MEMORY.md`。
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.2-a` prerelease 及 Windows zip 资产已上传。
+- [x] `v0.0.0.3-a` 已完成启动器、扩展与 Release workflow 的本地验证；真实 Creator UI 烟测等待安装 Creator 的环境执行。

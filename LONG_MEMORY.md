@@ -260,3 +260,35 @@
 
 - 结果：远程 `master` 与 `v0.0.0.2-a` 均指向 `0d1b003c555087234536eb88cc705b7ab844e24e`。Release 地址为 `https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.2-a`，资产 `cocos-agent-v0.0.0.2-a-windows.zip` 状态为 `uploaded`，大小 48,787,181 bytes。
 - 后续：无代码待办；真实 Cocos Creator UI 烟测仍需在安装 Creator 的机器执行。
+
+### AGT-20260819-010
+
+- TaskHash：`sha256:1463191d8e8171e4c298b65589356570364a38072e2ac488f8f1d58da2340175`
+- 开始：`2026-08-19T22:13:23+08:00`
+- 结束：`2026-08-19T22:22:50+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：用户验证到 `v0.0.0.2-a` 的 Overlay 启动器未显示 UI 且没有错误。原实现使用了不可靠的 `float` 面板类型，EXE 只启动 Creator 而未确认扩展加载；同时文档使用的 `-ProjectRoot` 参数不被 EXE 解析，双击出错也不会留下可见反馈。修复必须仅使用公开 `Editor.Panel` 协议，不能尝试强制改写 Creator 私有 UI。
+- 计划：
+  1. 将 Overlay 改为标准 `dockable` 面板，并捕获打开失败。
+  2. 让项目扩展写入 `.cocos-agent/overlay-status.json`，启动脚本等待 `ready/error` 回执。
+  3. 为 EXE 加入 `-ProjectRoot`、PowerShell 参数安全传递、错误窗口和持久日志。
+  4. 修正 Creator Electron 启动 CLI bridge 的 Node 运行环境，完善测试、发布路径和版本映射。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-19T22:13:23 | 读取 TODO、WorkFlow、启动器与扩展链路，确认 `float`、无回执和参数不兼容风险。 |
+| 2026-08-19T22:16:00 | 实现 dockable 面板、扩展状态回执、启动日志、错误窗口和 20 秒加载超时。 |
+| 2026-08-19T22:18:00 | 为 Electron bridge 设置 `ELECTRON_RUN_AS_NODE` 与当前项目根目录。 |
+| 2026-08-19T22:19:30 | `dotnet build`、`dotnet publish`、PowerShell 语法检查和 `-ProjectRoot` dry-run 通过。 |
+| 2026-08-19T22:21:20 | `npm run verify` 通过，21 项测试中 20 项通过、1 项证书测试按环境跳过，文档检查通过。 |
+| 2026-08-19T22:22:50 | 更新 TODO、版本、记忆和 Release workflow 路径，进入提交发布阶段。 |
+
+- 结果：修复 Overlay 启动器和扩展加载链路，版本提升到 `v0.0.0.3-a`。`CocosAgentOverlay.exe` 现在同时接受位置项目路径和 `-ProjectRoot`；失败时展示原生错误窗口，并将诊断写入 `%USERPROFILE%\\.cocos-agent\\launcher.log`。项目内扩展使用官方 `dockable` 面板，在 `.cocos-agent/overlay-status.json` 写入 `ready/error` 回执；Creator 不提供强制覆盖整个原生工作区的公开 API，因此文档已改为准确的“自动打开 Cocos Agent 面板”表述。发布单文件 EXE 的 dry-run、扩展安装、TypeScript/JavaScript 检查、完整 CLI 测试、文档检查和 `git diff --check` 均通过。当前机器未安装 Cocos Creator，不能宣称真实编辑器 UI 已烟测。
+- 文件：
+  - `launcher/Program.cs`、`launcher/CocosAgentOverlay.csproj`
+  - `scripts/launch-cocos-agent.ps1`、`scripts/install-extension.ps1`
+  - `extensions/cocos-agent/*`、`examples/cocos3d-demo/extensions/cocos-agent/*`
+  - `.github/workflows/release.yml`、`cli/src/tests/extension.test.ts`
+  - `VERSION`、`CHANGELOG.md`、`README.md`、`TODO.md`
+- 后续：在安装 Cocos Creator 3.8 的 Windows 环境运行 `CocosAgentOverlay.exe -ProjectRoot <项目路径>`，确认 `overlay-status.json` 为 `ready` 并检查自动打开的 Cocos Agent 面板；然后推送 `v0.0.0.3-a` 触发 Windows prerelease。
