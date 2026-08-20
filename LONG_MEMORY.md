@@ -474,3 +474,34 @@
   - `cli/src/tests/extension.test.ts`
   - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、约束文档、`TODO.md`
 - 后续：安装 `v0.0.0.7-a` release zip 后在 Cocos Creator 中确认 `Cocos Agent -> Open CLI/Overlay` 可正常点击并打开对应面板。
+
+### AGT-20260820-018
+
+- TaskHash：`sha256:d46758c213647a64017eb024da70cf0c97f41221c1e3775a954bcb27f4764799`
+- 开始：`2026-08-20T22:06:15+08:00`
+- 结束：`2026-08-20T22:10:48+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：TODO 日志显示 `Open CLI` 已能找到消息处理器，但 `Editor.Panel.open('cocos-agent.cli')` 报未定义。根因是扩展 manifest 中 `panels` 被放在 `contributions` 下，而 Cocos Creator 按顶层 `panels` 字段注册可打开面板；因此菜单能派发到主进程，面板却没有注册。
+- 计划：
+  1. 将 `overlay`、`cli` 面板声明移到 package 顶层，保留 `contributions` 仅处理菜单和消息。
+  2. 增加清单回归断言，验证根级 panels 并拒绝 `contributions.panels`。
+  3. 升级 `v0.0.0.8-a`，验证 CLI、Windows 发布构建、启动器 dry-run 和本机安装副本。
+  4. 提交、推送并发布 prerelease，核验 Release 资产，更新记忆。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T22:06:15 | 确认面板注册位置根因并生成任务 hash。 |
+| 2026-08-20T22:07:00 | 根扩展和 demo 扩展迁移顶层 `panels`，新增回归断言并升级版本。 |
+| 2026-08-20T22:08:00 | `npm run verify`、Windows 单文件发布构建、脚本与 EXE dry-run 通过。 |
+| 2026-08-20T22:08:30 | 本机用户级扩展已安装；安装副本确认 `panelsAtRoot=True`、`panelsInContributions=False`。 |
+| 2026-08-20T22:09:30 | 提交 `31eaf9d` 并推送 master 与 `v0.0.0.8-a` 标签。 |
+| 2026-08-20T22:10:32 | GitHub Actions Release run `32378470478` 完成，结论 `success`。 |
+| 2026-08-20T22:10:48 | GitHub API 确认 prerelease 和 Windows zip 资产 `uploaded`，更新记忆。 |
+
+- 结果：`cocos-agent.cli` 与 `cocos-agent.overlay` 现在在 manifest 顶层注册，`Open CLI` 可解析该面板，不再报 `Panel(cocos-agent.cli) is not defined`。`npm run verify`（20 通过、1 个按环境跳过）、文档检查 55/0、Windows 单文件发布构建、脚本/EXE dry-run 均通过。远程 `master` 与 `v0.0.0.8-a` 指向 `31eaf9d`，Release 资产 `cocos-agent-v0.0.0.8-a-windows.zip` 大小 84,872,128 bytes。
+- 文件：
+  - `extensions/cocos-agent/package.json`、`examples/cocos3d-demo/extensions/cocos-agent/package.json`
+  - `cli/src/tests/extension.test.ts`
+  - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、约束文档、`TODO.md`
+- 后续：重启 Cocos Creator 或在扩展管理器刷新 `cocos-agent` 后，点击 `Cocos Agent -> Open CLI` 验证 CLI 面板已显示。
