@@ -98,3 +98,29 @@ test('only-safe gateway chat rejects endpoint overrides outside configured routi
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('only-safe allows the read-only cc-switch diagnostic', async () => {
+  const { root, ctx } = tempContext();
+  try {
+    const result = await dispatchTool(ctx, 'ccs_doctor', {}) as { checks: Record<string, unknown> };
+    assert.ok(result.checks);
+    assert.ok(MCP_TOOLS.some((tool) => tool.name === 'ccs_doctor'));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('only-safe allows non-secret provider endpoint and model configuration', async () => {
+  const { root, ctx } = tempContext();
+  try {
+    const config = await dispatchTool(ctx, 'provider_configure', {
+      provider: 'deepseek',
+      endpoint: 'https://api.deepseek.com/v1',
+      model: 'deepseek-chat',
+    }) as { providers: { deepseek?: { endpoint?: string; model?: string } } };
+    assert.equal(config.providers.deepseek?.endpoint, 'https://api.deepseek.com/v1');
+    assert.equal(config.providers.deepseek?.model, 'deepseek-chat');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

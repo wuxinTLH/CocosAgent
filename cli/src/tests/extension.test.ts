@@ -21,7 +21,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
       messages?: Record<string, unknown>;
     };
   };
-  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.8-a');
+  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.1-a');
   assert.equal(manifest.panels?.cli?.type, 'dockable');
   assert.equal(manifest.panels?.cli?.main, './src/panel.js');
   assert.equal(manifest.panels?.overlay?.type, 'dockable');
@@ -59,7 +59,10 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     const mainSource = fs.readFileSync(mainPath, 'utf8');
     const launcherSource = fs.readFileSync(path.join(launcherRoot, 'Program.cs'), 'utf8');
     const launchScript = fs.readFileSync(path.join(repoRoot, 'scripts', 'launch-cocos-agent.ps1'), 'utf8');
-    assert.match(panel.template ?? '', /cocos-agent>/);
+    assert.match(panel.template ?? '', /Model Provider/);
+    assert.match(panel.template ?? '', /cc-switch \/ ccs/);
+    assert.match(panel.template ?? '', /id="save-provider"/);
+    assert.match(panel.template ?? '', /id="ccs-doctor"/);
     assert.equal(typeof panel.ready, 'function');
     assert.equal(typeof panel.run, 'function');
     assert.match(overlay.template ?? '', /Cocos Agent/);

@@ -7,7 +7,7 @@ import { loadSkills, skillManifest } from './skills.js';
 import { runOcr, type OcrEngine } from './ocr.js';
 import { listNodes, readScene, writeScene } from './scene.js';
 import { findAssets } from './assets.js';
-import { connectRoute, resolveRoute } from './ccs.js';
+import { ccsDoctor, connectRoute, resolveRoute } from './ccs.js';
 import { chatOnce } from './gateway.js';
 import { AGENT_VERSION } from './version.js';
 import { loadAgentConfig, saveAgentConfig, updateProvider, type PermissionMode } from './config.js';
@@ -95,6 +95,11 @@ export const MCP_TOOLS: McpToolDefinition[] = [
       type: 'object',
       properties: { route: { type: 'string' } },
     },
+  },
+  {
+    name: 'ccs_doctor',
+    description: '检查 cc-switch 配置、ccs 路由与当前 Creator 环境',
+    inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'gateway_chat',
@@ -287,6 +292,8 @@ export async function dispatchTool(
       return resolveRoute(args.route ? String(args.route) : undefined);
     case 'ccs_connect':
       return connectRoute(args.route ? String(args.route) : undefined);
+    case 'ccs_doctor':
+      return ccsDoctor(ctx.root);
     case 'gateway_chat': {
       const gateway = resolveProvider(ctx.root, 'gateway');
       const requestedUrl = args.url ? String(args.url) : gateway.endpoint;

@@ -1,6 +1,6 @@
 # Cocos Agent
 
-全局版本：`v0.0.0.8-a`
+全局版本：`v0.0.0.1-a`
 
 面向 Cocos Creator 3D 项目的 Agent 工作区。本项目以 WorkFlow 工作流为骨架，统一约束系统、任务管理、记忆体系、Skills、MCP 工具、CLI 接入与 Cocos 编辑器扩展。
 
@@ -13,6 +13,7 @@
 - 提供 Skills（OCR 识别、Scene 读写、素材库、cc-switch 连接、长连接对话）和 MCP 服务。
 - 提供 TypeScript CLI，并可在 Cocos Creator 内打开 CLI 面板窗口。
 - 支持 OpenAI、Anthropic、DeepSeek、Kimi、Qwen 与 WSS Gateway，提供会话工作区、回退链及中英文对话。
+- Cocos Creator 的 `Open CLI` 面板提供模型、端点、默认/回退渠道和 cc-switch / ccs 路由的表单式配置；密钥只读取环境变量。
 - 内置 `only-access`、`only-safe`、`full-access` 权限模式；支持项目内受控 CMD、PowerShell 与 Windows Terminal。
 - 提供 Cocos AnimationClip 分析、OCR 状态识别、动作优化建议和公开 Animation API 状态控制器生成。
 

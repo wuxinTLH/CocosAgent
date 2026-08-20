@@ -100,8 +100,8 @@
 
 ### G-15 版本
 
-- 全局版本固定为 `v0.0.0.8-a`，以根目录 `VERSION` 为唯一来源。
-- npm 包与 Cocos 扩展使用合法 semver `0.0.8-a`，并在 manifest 的 `cocosAgentVersion` 中保留全局版本。
+- 全局版本固定为 `v0.0.0.1-a`，以根目录 `VERSION` 为唯一来源。
+- npm 包与 Cocos 扩展使用合法 semver `0.0.1-a`，并在 manifest 的 `cocosAgentVersion` 中保留全局版本。
 - 版本变更必须更新 `VERSION`、CLI、扩展、项目约束、TODO 与记忆记录。
 
 ## 项目级约束

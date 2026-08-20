@@ -37,6 +37,7 @@ env = { COCOS_AGENT_PROJECT_ROOT = "E:/code/Cocos Agent" }
 | `scene_nodes` | 列出节点树 | cocos-scene |
 | `asset_find` | 检索素材库 | cocos-assets |
 | `ccs_resolve` | 解析 cc-switch/ccs 路由 | cc-switch-connect |
+| `ccs_doctor` | 诊断 cc-switch 配置、路由和 Creator 环境 | cc-switch-connect |
 | `ccs_connect` | 建立路由直连 | cc-switch-connect |
 | `gateway_chat` | WSS 长连接对话 | chat-longlink |
 | `task_hash` | 计算任务 hash | HASH.md |

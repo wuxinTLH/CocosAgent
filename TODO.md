@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.8-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.1-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T22:10:48+08:00`（UTC+8）
+更新时间：`2026-08-20T22:32:20+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.8-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -74,49 +74,11 @@ Panel(cocos-agent.cli) is not defined.
 
 ## 已解决任务（一次性闭环）
 
-1. [x] 完成 Cocos 原生 UI 一键覆盖能力：扩展自动打开 Overlay，Windows 启动器和 Release zip 已接入发布流程。
-
-2. [x] 完成多模型、i18n、会话工作区、权限模式、Windows Terminal/CMD、MCP/Skills 增强；npm run verify、MCP initialize/tools/list、回退/权限/终端单测均已通过。
+1. [x] CLI 配置方式改为表单：支持 OpenAI、Anthropic、DeepSeek、Kimi、Qwen、Gateway 的模型和端点配置、默认/回退渠道，以及 cc-switch / ccs 路由诊断与连接；API Key/Token 仅从环境变量读取。
+2. [x] 已删除历史 GitHub Release、资产与 `v0.0.0.1-a` 至 `v0.0.0.8-a` 标签；发布和记忆从新的 `v0.0.0.1-a` 基线重建。
 
 ## 本轮收尾结果
 
-- [x] `cocos-animation` Skill 已安装到本机 Codex Skills 目录，动画 MCP 四工具已通过 `initialize` 与 `tools/list` 发现验证。
-- [x] 文档字面量换行已修复，`git diff --check` 通过。
-- [x] TypeScript/JavaScript 检查、21 项测试（20 通过、1 个按环境跳过）与 Windows Release 构建已完成；真实 Cocos Creator UI 烟测因本机未安装 Creator 保留为环境条件项。
-- [x] 详细记录已追加到 `LONG_MEMORY.md`，最近记录已同步到 `SHORT_MEMORY.md`。
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.2-a` prerelease 及 Windows zip 资产已上传。
-- [x] `v0.0.0.3-a` 已完成启动器、扩展与 Release workflow 的本地验证；真实 Creator UI 烟测等待安装 Creator 的环境执行。
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.3-a` prerelease 与 Windows zip 资产已上传。
+- [x] 新版 `Open CLI` 表单、`ccs_doctor`、文档和发布基线已完成；完整验证通过，准备重新创建唯一 `v0.0.0.1-a` Release。
 
-
-
-```log bug日志
-Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-root> [--repo <agent-root>] [--creator <CocosCreator.exe>] [--dry-run]
-```
-
-3. [x] 修复无参数启动 EXE 只显示 Usage：使用 Windows 项目目录选择器，取消选择时正常退出；保留位置参数和 `-ProjectRoot` 自动化入口。
-
-本轮任务 hash：`sha256:918677c76f2c5ad1abd0438d6a1d427a2aeeae30c06f8d4539654d21637d0920`
-
-本轮任务 hash：`sha256:5d9bb44356a61720130deae30733bf8133e3be6a6d872e62c2d94d268e9c2116`
-
-- [x] `v0.0.0.4-a` 已通过无参数与 `-ProjectRoot` dry-run、Windows 发布构建、CLI 测试和文档检查；真实 Creator UI 烟测仍需安装 Creator 的环境执行。
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.4-a` prerelease 与 Windows zip 资产已上传。
-- [x] `v0.0.0.5-a` 已通过本机 Creator 探测、项目/安装目录区分、Windows 发布构建、CLI 测试和文档检查。
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.5-a` prerelease 与 Windows zip 资产已上传。
-
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.6-a` prerelease 与 Windows zip 资产已上传。
-
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.7-a` prerelease 与 Windows zip 资产已上传。
-
-- [x] GitHub Actions Release 已成功完成，`v0.0.0.8-a` prerelease 与 Windows zip 资产已上传。
-
-本轮任务 hash：`sha256:ce05a243d41abd5b966ecfaf9d557a9888e952824d8f16cfd7bfdd821e670fec`
-
-本轮任务 hash：`sha256:e2db6c85321cddab37d96b9e0fd0b497bb96c5cf16476f79c9c2e09f038ddf18`
-
-本轮任务 hash：`sha256:d46758c213647a64017eb024da70cf0c97f41221c1e3775a954bcb27f4764799`
-
-本轮任务 hash：`sha256:c8af21146a574452e25990cb8aef53ba43121a31f9d2011037f062ec1481ab24`
-
-本轮任务 hash：`sha256:e9b1ac5ccc94cc1a1759e447bcd9560fa6f12213786c48f5a7b58de84a417577`
+本轮任务 hash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`

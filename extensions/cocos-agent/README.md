@@ -30,7 +30,9 @@ bin\cocos-agent-overlay.cmd -ProjectRoot examples\cocos3d-demo
 - 菜单：`Cocos Agent -> Open CLI`。
 - 菜单：`Cocos Agent -> Overlay`，可重新打开浮动覆盖层。
 - Overlay 使用官方 `dockable` 面板协议自动打开，不修改 Cocos 原生资源或私有 UI 文件。Cocos Creator 不提供将第三方扩展强制覆盖整个原生工作区的公开 API。
-- 面板内可直接输入：`status`、`providers`、`sessions`、`chat <文本>`、`session new <名称>`、`session switch <id>`、`provider select <id>`、`locale zh-CN|en-US`、`permission only-access|only-safe|full-access`。`terminal <cmd|powershell|wt> <命令>` 仅在 `full-access` 可用。
+- `Open CLI` 提供表单式配置：选择 OpenAI、Anthropic、DeepSeek、Kimi、Qwen 或 Gateway，填写模型/端点，设置默认和回退提供商，并检查或连接 cc-switch / ccs 路由。
+- API Key/Token 不会显示或保存到项目配置。面板会提示对应环境变量，凭据必须在启动 Cocos Creator 前配置到系统环境中。
+- 保留命令输入：`status`、`providers`、`sessions`、`chat <文本>`、`ccs doctor`、`ccs connect`。`terminal <cmd|powershell|wt> <命令>` 仅在 `full-access` 可用。
 
 ## 说明
 

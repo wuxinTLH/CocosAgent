@@ -2,7 +2,7 @@
 
 TypeScript 实现的 CLI，用于执行 WorkFlow、计算任务 hash、读写记忆、调用 Skills 能力，并提供 MCP 服务与 Cocos 编辑器本地桥接。
 
-全局版本：`v0.0.0.8-a`
+全局版本：`v0.0.0.1-a`
 
 ## 构建
 
@@ -48,6 +48,11 @@ bridge start           启动本地桥接服务
 | `COCOS_AGENT_GATEWAY_URL` | WSS 网关地址 |
 | `COCOS_AGENT_GATEWAY_TOKEN` | WSS 鉴权 Token |
 | `COCOS_AGENT_GATEWAY_MODEL` | 默认模型名 |
+| `OPENAI_API_KEY` / `COCOS_AGENT_OPENAI_API_KEY` | OpenAI 凭据 |
+| `ANTHROPIC_API_KEY` / `COCOS_AGENT_ANTHROPIC_API_KEY` | Anthropic 凭据 |
+| `DEEPSEEK_API_KEY` / `COCOS_AGENT_DEEPSEEK_API_KEY` | DeepSeek 凭据 |
+| `KIMI_API_KEY` / `COCOS_AGENT_KIMI_API_KEY` | Kimi/Moonshot 凭据 |
+| `DASHSCOPE_API_KEY` / `COCOS_AGENT_QWEN_API_KEY` | Qwen/DashScope 凭据 |
 | `COCOS_AGENT_CCS_URL` | ccs 路由直连地址 |
 | `COCOS_AGENT_CCS_ROUTE` | 默认 ccs 路由 |
 | `COCOS_AGENT_CCS_BIN` | ccs CLI 可执行文件路径 |
@@ -69,7 +74,10 @@ node dist/index.js docs check
 node dist/index.js project init --name cocos-agent
 node dist/index.js provider list
 node dist/index.js provider configure --provider deepseek --model deepseek-chat
+node dist/index.js provider configure --provider qwen --endpoint https://dashscope.aliyuncs.com/compatible-mode/v1 --model qwen-plus
 node dist/index.js agent config --locale en-US --permission only-safe --provider deepseek --fallback gateway
+node dist/index.js ccs doctor
+node dist/index.js ccs connect --route current
 node dist/index.js workspace new --name "Level design" --provider qwen
 node dist/index.js workspace chat --chat "为主场景创建 3D 光照方案"
 node dist/index.js terminal run --shell powershell --command "Get-ChildItem assets" --dry-run
@@ -82,8 +90,9 @@ node dist/index.js animation controller --path assets/scripts/PlayerAnimation.ts
 
 - 内置提供商：OpenAI、Anthropic、DeepSeek、Kimi、Qwen 与既有 WSS Gateway。OpenAI 兼容平台使用 `/chat/completions`，Anthropic 使用官方 `/messages` 协议，Gateway 保持既有流式 WSS 协议。
 - 项目本地状态写入 `.cocos-agent/config.json` 和 `.cocos-agent/workspace.json`，已被 Git 忽略。该目录只保存语言、权限、端点、模型和会话消息，绝不保存 API Key。
+- OpenAI、Anthropic、DeepSeek、Kimi、Qwen 与 Gateway 可从 Cocos Creator 的 `Open CLI` 面板直接配置；端点/模型写入当前项目 `.cocos-agent/config.json`，凭据始终从环境变量读取。
 - `workspace chat` 会按当前会话提供商执行；失败时依次尝试该会话的 `fallbackProviders`。响应与尝试信息会被写回当前会话。
 - `zh-CN`、`en-US` 是当前内置 UI/对话语言。`agent config --locale <id>` 可切换。
 - 从较低权限提升到 `only-safe` 或 `full-access` 时，必须在启动 CLI/bridge 前设置 `COCOS_AGENT_PERMISSION_ELEVATION=<目标模式>`；MCP 调用不能静默绕过这个门禁。
-- 权限模式：`only-access` 仅允许安全的项目只读/MCP 查询；`only-safe` 允许已配置网关的安全对话；`full-access` 才能写 Scene、写配置、执行终端或建立需要提升权限的连接。
+- 权限模式：`only-access` 仅允许安全的项目只读/MCP 查询；`only-safe` 允许已配置网关的安全对话、cc-switch 诊断和不含密钥的模型端点/模型配置；`full-access` 才能写 Scene、执行终端或建立需要提升权限的连接。
 - `terminal run` 的工作目录固定为当前 Cocos 项目根目录，支持 `cmd`、`powershell`、`wt`；命令拒绝控制操作符、绝对路径和 `..` 越界片段。
