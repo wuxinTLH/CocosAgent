@@ -17,7 +17,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     cocosAgentVersion?: string;
     contributions?: { panels?: Record<string, { main?: string; type?: string }> };
   };
-  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.4-a');
+  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.5-a');
   assert.equal(manifest.contributions?.panels?.cli?.type, 'dockable');
   assert.equal(manifest.contributions?.panels?.cli?.main, './src/panel.js');
   assert.equal(manifest.contributions?.panels?.overlay?.type, 'dockable');
@@ -59,6 +59,10 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(launcherSource, /MessageBoxW/);
     assert.match(launcherSource, /FolderBrowserDialog/);
     assert.match(launcherSource, /DRY_RUN project=selection-required/);
+    assert.match(launcherSource, /IsCocosProject/);
+    assert.match(launcherSource, /LooksLikeCreatorInstallation/);
+    assert.match(launchScript, /creatorPath/);
+    assert.match(launchScript, /cocos editor/);
     assert.match(launchScript, /ExtensionTimeoutSeconds/);
     assert.match(launchScript, /overlay-status\.json/);
     main.methods?.openCli?.();

@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.4-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.5-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T20:37:46+08:00`（UTC+8）
+更新时间：`2026-08-20T21:00:40+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.4-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.5-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -65,16 +65,29 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 修复 `CocosAgentOverlay.exe` 无法打开 Cocos Agent UI 且无错误提示：改用官方 `dockable` 面板、等待扩展 `ready/error` 状态回执、记录启动日志并显示失败窗口；兼容 `-ProjectRoot` 参数。
+1. 启动器日志：
+```log
+2026-08-19T22:18:02+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
+2026-08-19T22:22:04+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
+2026-08-19T22:24:41+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
+2026-08-20T20:37:14+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
+2026-08-20T20:51:22+08:00 launch requested project=C:\Users\13929\NewProject
+2026-08-20T20:51:22+08:00 launch failed: Cocos Creator executable not found. Extension installed at C:\Users\13929\NewProject\extensions\cocos-agent; set -CreatorPath or COCOS_CREATOR_PATH, then rerun this script.
+2026-08-20T20:52:21+08:00 launch requested project=C:\Users\13929\NewProject
+2026-08-20T20:52:21+08:00 launch failed: Cocos Creator executable not found. Extension installed at C:\Users\13929\NewProject\extensions\cocos-agent; set -CreatorPath or COCOS_CREATOR_PATH, then rerun this script.
+2026-08-20T20:53:22+08:00 launch requested project=E:\cocos editor\Creator\3.8.8
+2026-08-20T20:53:22+08:00 launch failed: Not a Cocos project: assets directory missing: E:\cocos editor\Creator\3.8.8
 
-本轮任务 hash：`sha256:1463191d8e8171e4c298b65589356570364a38072e2ac488f8f1d58da2340175`
+```
+
+2. [x] 修复本机 Creator 探测：自动识别 `E:\cocos editor\Creator`、CocosDashboard、Program Files 等安装目录，并记住 `creatorPath`；误选 Creator 安装目录时给出明确提示。
 
 
 ## 已解决任务（一次性闭环）
 
-8. [x] 完成 Cocos 原生 UI 一键覆盖能力：扩展自动打开 Overlay，Windows 启动器和 Release zip 已接入发布流程。
+1. [x] 完成 Cocos 原生 UI 一键覆盖能力：扩展自动打开 Overlay，Windows 启动器和 Release zip 已接入发布流程。
 
-9. [x] 完成多模型、i18n、会话工作区、权限模式、Windows Terminal/CMD、MCP/Skills 增强；npm run verify、MCP initialize/tools/list、回退/权限/终端单测均已通过。
+2. [x] 完成多模型、i18n、会话工作区、权限模式、Windows Terminal/CMD、MCP/Skills 增强；npm run verify、MCP initialize/tools/list、回退/权限/终端单测均已通过。
 
 ## 本轮收尾结果
 
@@ -92,8 +105,12 @@
 Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-root> [--repo <agent-root>] [--creator <CocosCreator.exe>] [--dry-run]
 ```
 
-2. [x] 修复无参数启动 EXE 只显示 Usage：使用 Windows 项目目录选择器，取消选择时正常退出；保留位置参数和 `-ProjectRoot` 自动化入口。
+3. [x] 修复无参数启动 EXE 只显示 Usage：使用 Windows 项目目录选择器，取消选择时正常退出；保留位置参数和 `-ProjectRoot` 自动化入口。
 
 本轮任务 hash：`sha256:918677c76f2c5ad1abd0438d6a1d427a2aeeae30c06f8d4539654d21637d0920`
 
+本轮任务 hash：`sha256:5d9bb44356a61720130deae30733bf8133e3be6a6d872e62c2d94d268e9c2116`
+
 - [x] `v0.0.0.4-a` 已通过无参数与 `-ProjectRoot` dry-run、Windows 发布构建、CLI 测试和文档检查；真实 Creator UI 烟测仍需安装 Creator 的环境执行。
+- [x] GitHub Actions Release 已成功完成，`v0.0.0.4-a` prerelease 与 Windows zip 资产已上传。
+- [x] `v0.0.0.5-a` 已通过本机 Creator 探测、项目/安装目录区分、Windows 发布构建、CLI 测试和文档检查。

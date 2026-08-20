@@ -343,3 +343,52 @@
   - `VERSION`、npm/Cocos manifest、安装与启动脚本
   - `README.md`、`CHANGELOG.md`、`TODO.md`、`LONG_MEMORY.md`、`SHORT_MEMORY.md`
 - 后续：推送 `v0.0.0.4-a`，核验 GitHub Windows prerelease 资产；真实 Creator 环境中双击 EXE 选择项目后检查面板和 `overlay-status.json`。
+
+### AGT-20260820-013
+
+- TaskHash：`sha256:b96915e4510732142195e6514986378b9718e9c50fa366038ecb1986048a1c1d`
+- 开始：`2026-08-20T20:37:46+08:00`
+- 结束：`2026-08-20T20:42:35+08:00`
+- 请求：完成 v0.0.0.4-a 启动器修复后的提交、推送与 Release 核验。
+- 推理：本地实现和验证已经完成，发布阶段需要确认 commit、master、tag、GitHub Actions 和实际 Release 资产。Windows Forms 引入后自包含包体积会增加，必须以 API 返回的真实资产大小记录。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T20:38:00 | 提交 `256f6b4`：`fix: select cocos project on launcher startup`。 |
+| 2026-08-20T20:38:30 | `master` 与 `v0.0.0.4-a` 推送成功。 |
+| 2026-08-20T20:41:15 | GitHub Actions Release run `32370125145` 开始执行。 |
+| 2026-08-20T20:42:09 | GitHub Actions 完成，结论 `success`。 |
+| 2026-08-20T20:42:35 | GitHub API 确认 prerelease 与 Windows zip 资产上传完成。 |
+
+- 结果：远程 `master` 与 `v0.0.0.4-a` 指向 `256f6b4`；资产 `cocos-agent-v0.0.0.4-a-windows.zip` 状态 `uploaded`，大小 84,871,034 bytes。
+
+### AGT-20260820-014
+
+- TaskHash：`sha256:5d9bb44356a61720130deae30733bf8133e3be6a6d872e62c2d94d268e9c2116`
+- 开始：`2026-08-20T20:49:00+08:00`
+- 结束：`2026-08-20T21:00:40+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：TODO 日志显示用户选择了 `C:\Users\13929\NewProject` 后启动器找不到 Creator，随后误把 `E:\cocos editor\Creator\3.8.8` 当作项目目录。根因是 Creator 探测范围未覆盖该安装位置，且目录选择器没有区分项目目录和编辑器安装目录。修复应扩大自动探测范围、记住 `creatorPath`，并对误选目录给出明确提示。
+- 计划：
+  1. 扩展 `Resolve-CocosCreator` 的探测根目录，并持久化 `creatorPath`。
+  2. 在 EXE 中选择项目后校验 `assets` 与 manifest，识别 Creator 安装目录并给出提示。
+  3. 升级到 `v0.0.0.5-a`，补充回归断言，构建并验证单文件 EXE。
+  4. 更新 TODO 和记忆，提交并发布新 prerelease。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T20:49:00 | 确认 TODO 日志与 Creator 安装路径 `E:\cocos editor\Creator\3.8.8\CocosCreator.exe`。 |
+| 2026-08-20T20:52:00 | 扩展探测目录并持久化 `creatorPath`；脚本 dry-run 自动找到本机 Creator。 |
+| 2026-08-20T20:55:00 | EXE 增加项目目录校验和 Creator 安装目录识别。 |
+| 2026-08-20T20:58:00 | `npm run verify` 与 Windows 单文件发布构建通过。 |
+| 2026-08-20T21:00:00 | 发布版 EXE 无参数和 `-ProjectRoot` dry-run 均通过。 |
+| 2026-08-20T21:00:40 | 更新 TODO 和长短记忆，准备提交。 |
+
+- 结果：`CocosAgentOverlay.exe` 现在能自动找到 `E:\cocos editor\Creator\3.8.8\CocosCreator.exe`，并会把路径写入 `%USERPROFILE%\.cocos-agent\config.json` 的 `creatorPath`。选择 Creator 安装目录时不再只报“assets missing”，而是提示应选择包含 `assets` 的项目目录。`npm run verify`（20 通过、1 个 WSS 证书测试按环境跳过）、文档检查 55/0、发布版 EXE dry-run 和 `git diff --check` 均通过。真实 Creator UI 启动仍需在安装该版本后由用户最终确认。
+- 文件：
+  - `scripts/launch-cocos-agent.ps1`、`launcher/Program.cs`
+  - `cli/src/tests/extension.test.ts`
+  - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、`README.md`、`TODO.md`
+- 后续：推送 `v0.0.0.5-a` 并核验 GitHub Windows prerelease；安装后选择 `C:\Users\13929\NewProject` 应自动启动 Creator 并等待 `overlay-status.json` 为 `ready`。

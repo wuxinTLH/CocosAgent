@@ -25,7 +25,7 @@ function Write-OverlayStatus([string]$State, [string]$Message = '') {
     @{
         state = $State
         message = $Message
-        version = 'v0.0.0.4-a'
+        version = 'v0.0.0.5-a'
         updatedAt = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
     } | ConvertTo-Json | Set-Content -LiteralPath $script:overlayStatusFile -Encoding UTF8
 }
@@ -39,6 +39,10 @@ try {
     Write-LauncherLog "launch requested project=$project"
 
 if (-not (Test-Path -LiteralPath (Join-Path $project 'assets') -PathType Container)) {
+    $creatorExe = Get-ChildItem -LiteralPath $project -Filter 'CocosCreator.exe' -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($creatorExe) {
+        throw "Selected folder is the Cocos Creator installation folder, not a Cocos project. Choose the project folder that contains an assets directory, then rerun: $project"
+    }
     throw "Not a Cocos project: assets directory missing: $project"
 }
 if (-not (Test-Path -LiteralPath (Join-Path $project 'package.json')) -and -not (Test-Path -LiteralPath (Join-Path $project 'project.json'))) {
@@ -63,22 +67,59 @@ if (Test-Path -LiteralPath $extensionTarget) {
     Remove-Item -LiteralPath $extensionTarget -Recurse -Force
 }
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
-@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.4-a'; overlay = $true } |
-    ConvertTo-Json | Set-Content -LiteralPath (Join-Path $configDir 'config.json') -Encoding UTF8
+$configFile = Join-Path $configDir 'config.json'
+$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.5-a'; overlay = $true; creatorPath = '' }
+if (Test-Path -LiteralPath $configFile -PathType Leaf) {
+    try {
+        $loadedConfig = Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
+        $existingConfig.cliIndex = if ($loadedConfig.cliIndex) { [string]$loadedConfig.cliIndex } else { [IO.Path]::GetFullPath($cliIndex) }
+        $existingConfig.creatorPath = if ($loadedConfig.creatorPath) { [string]$loadedConfig.creatorPath } else { '' }
+        if ($loadedConfig.overlay) { $existingConfig.overlay = [bool]$loadedConfig.overlay }
+    } catch { $existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.5-a'; overlay = $true; creatorPath = '' } }
+}
+$existingConfig.cliIndex = [IO.Path]::GetFullPath($cliIndex)
+$existingConfig.version = 'v0.0.0.5-a'
+$existingConfig.overlay = $true
+$existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8
 
 function Resolve-CocosCreator {
-    if ($CreatorPath -and (Test-Path -LiteralPath $CreatorPath -PathType Leaf)) { return [IO.Path]::GetFullPath($CreatorPath) }
-    if ($env:COCOS_CREATOR_PATH -and (Test-Path -LiteralPath $env:COCOS_CREATOR_PATH -PathType Leaf)) { return [IO.Path]::GetFullPath($env:COCOS_CREATOR_PATH) }
+    if ($CreatorPath -and (Test-Path -LiteralPath $CreatorPath -PathType Leaf)) {
+        $resolvedCreator = [IO.Path]::GetFullPath($CreatorPath)
+        $existingConfig.creatorPath = $resolvedCreator
+        $existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8
+        return $resolvedCreator
+    }
+    if ($env:COCOS_CREATOR_PATH -and (Test-Path -LiteralPath $env:COCOS_CREATOR_PATH -PathType Leaf)) {
+        $resolvedCreator = [IO.Path]::GetFullPath($env:COCOS_CREATOR_PATH)
+        $existingConfig.creatorPath = $resolvedCreator
+        $existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8
+        return $resolvedCreator
+    }
+    $configuredCreator = $existingConfig.creatorPath
+    if ($configuredCreator -and (Test-Path -LiteralPath $configuredCreator -PathType Leaf)) { return [IO.Path]::GetFullPath($configuredCreator) }
     $roots = @(
         (Join-Path $env:ProgramFiles 'CocosCreator'),
+        (Join-Path ${env:ProgramFiles(x86)} 'CocosCreator'),
+        (Join-Path $env:ProgramFiles 'CocosDashboard'),
+        (Join-Path ${env:ProgramFiles(x86)} 'CocosDashboard'),
         (Join-Path $env:ProgramData 'cocos\editors'),
         (Join-Path $env:USERPROFILE '.CocosCreator\editors'),
-        'C:\CocosDashboard\editors', 'D:\CocosDashboard\editors', 'E:\CocosDashboard\editors'
+        (Join-Path $env:USERPROFILE 'CocosDashboard\editors'),
+        (Join-Path $env:LOCALAPPDATA 'Programs\CocosDashboard'),
+        (Join-Path $env:LOCALAPPDATA 'Programs\Cocos Creator'),
+        'C:\CocosDashboard', 'D:\CocosDashboard', 'E:\CocosDashboard',
+        'C:\CocosDashboard\editors', 'D:\CocosDashboard\editors', 'E:\CocosDashboard\editors',
+        'C:\CocosCreator', 'D:\CocosCreator', 'E:\CocosCreator',
+        'C:\cocos editor\Creator', 'D:\cocos editor\Creator', 'E:\cocos editor\Creator'
     )
     foreach ($root in $roots) {
         if (Test-Path -LiteralPath $root -PathType Container) {
             $found = Get-ChildItem -LiteralPath $root -Filter 'CocosCreator.exe' -File -Recurse -Depth 4 -ErrorAction SilentlyContinue | Select-Object -First 1
-            if ($found) { return $found.FullName }
+            if ($found) {
+                $existingConfig.creatorPath = $found.FullName
+                $existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8
+                return $found.FullName
+            }
         }
     }
     return $null
@@ -90,7 +131,7 @@ if (-not $creator) {
         Write-Output "DRY_RUN creator=not-found project=$project overlay=cocos-agent.overlay"
         exit 0
     }
-    throw "Cocos Creator executable not found. Extension installed at $extensionTarget; set -CreatorPath or COCOS_CREATOR_PATH, then rerun this script."
+    throw "Cocos Creator executable not found. Extension installed at $extensionTarget. Set -CreatorPath <CocosCreator.exe>, COCOS_CREATOR_PATH, or add creatorPath to $configFile, then rerun."
 }
 if ($DryRun) {
     Write-Output "DRY_RUN creator=$creator project=$project overlay=cocos-agent.overlay"

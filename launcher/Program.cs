@@ -16,6 +16,29 @@ static void ShowError(string text)
     NativeMethods.MessageBoxW(0, text, "Cocos Agent Overlay", 0x10);
 }
 
+static bool IsCocosProject(string root)
+{
+    return Directory.Exists(Path.Combine(root, "assets")) &&
+        (File.Exists(Path.Combine(root, "package.json")) || File.Exists(Path.Combine(root, "project.json")));
+}
+
+static bool LooksLikeCreatorInstallation(string root)
+{
+    if (File.Exists(Path.Combine(root, "CocosCreator.exe"))) return true;
+    try
+    {
+        foreach (var directory in Directory.EnumerateDirectories(root))
+        {
+            if (File.Exists(Path.Combine(directory, "CocosCreator.exe"))) return true;
+        }
+    }
+    catch (UnauthorizedAccessException)
+    {
+        // Ignore inaccessible siblings; the main project validation below is authoritative.
+    }
+    return false;
+}
+
 static string? SelectProjectRoot()
 {
     string? selectedPath = null;
@@ -26,7 +49,7 @@ static string? SelectProjectRoot()
         {
             using var dialog = new FolderBrowserDialog
             {
-                Description = "Select a Cocos Creator project folder",
+                Description = "Select a Cocos Creator project folder. It must contain an assets directory; do not select the Creator installation folder.",
                 UseDescriptionForTitle = true,
                 ShowNewFolderButton = false,
             };
@@ -103,6 +126,19 @@ if (string.IsNullOrWhiteSpace(project))
         Console.WriteLine("Cocos project selection cancelled.");
         return 0;
     }
+}
+
+if (!IsCocosProject(project))
+{
+    if (LooksLikeCreatorInstallation(project))
+    {
+        ShowError($"The selected folder looks like the Cocos Creator installation folder:\n{project}\n\nPlease select the project folder, which contains an assets directory.");
+    }
+    else
+    {
+        ShowError($"The selected folder is not a Cocos Creator project:\n{project}\n\nA project folder must contain an assets directory and package.json or project.json.");
+    }
+    return 2;
 }
 
 var script = Path.Combine(repo, "scripts", "launch-cocos-agent.ps1");

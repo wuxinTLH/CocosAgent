@@ -1,3 +1,9 @@
+## v0.0.0.5-a - 2026-08-20
+
+- 扩展 Cocos Creator 自动探测目录，支持 `E:\cocos editor\Creator`、CocosDashboard 与 Program Files 等常见安装位置。
+- 启动器记住 `creatorPath`，再次启动无需重复传入 Creator 路径。
+- 目录选择器明确区分 Cocos 项目目录和 Creator 安装目录；误选安装目录时给出可操作提示。
+
 ## v0.0.0.4-a - 2026-08-20
 
 - 修复无参数运行 `CocosAgentOverlay.exe` 时仅显示 Usage 的问题；现在会打开 Cocos 项目目录选择器，取消选择会正常退出。
@@ -27,5 +33,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.4-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.4-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.5-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.5-a`，并保留 `cocosAgentVersion` 映射。
