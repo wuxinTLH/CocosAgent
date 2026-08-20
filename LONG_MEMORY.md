@@ -18,7 +18,7 @@
 
 - TaskHash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`
 - 开始：`2026-08-20T22:22:25+08:00`
-- 结束：`2026-08-20T22:32:20+08:00`
+- 结束：`2026-08-20T22:37:12+08:00`
 - 请求：简化 Cocos Agent CLI 模型与 cc-switch 配置，清理历史 Release 并从 `v0.0.0.1-a` 重建。
 - 推理：CLI 面板已能打开，但此前把模型、端点、回退链与 cc-switch 配置暴露为命令行参数，操作成本过高。底层已支持 OpenAI、Anthropic、DeepSeek、Kimi、Qwen、Gateway 与 ccs；应提供表单入口，同时保持凭据只从环境变量读取。Release 重建要求清理旧线上资产、标签与发布记忆，而保留 Git 提交历史用于审计。
 - 计划：
@@ -36,5 +36,8 @@
 | 2026-08-20T22:24:30 | 删除远程与本地 `v0.0.0.1-a` 至 `v0.0.0.8-a` 标签。 |
 | 2026-08-20T22:29:00 | `npm run verify` 通过；cc-switch 诊断和非敏感模型配置均通过默认权限桥接实测。 |
 | 2026-08-20T22:32:20 | 刷新本机扩展，准备提交并重建唯一 `v0.0.0.1-a` Release。 |
+| 2026-08-20T22:33:00 | 推送基线提交 `befbb79`，创建新的 `v0.0.0.1-a` 标签。 |
+| 2026-08-20T22:35:42 | GitHub Actions Release run `32380856246` 完成，结论 `success`。 |
+| 2026-08-20T22:37:12 | 核验新的 prerelease 与 Windows zip 资产，更新记忆。 |
 
-- 结果：Open CLI 已提供模型和 cc-switch 的表单式配置，OpenAI、Anthropic、DeepSeek、Kimi、Qwen、Gateway 的端点/模型、默认提供商和回退链可直接保存；cc-switch 读取 `CC_SWITCH_CONFIG` 或 `~/.cc-switch/settings.json` 并可诊断/连接路由。API Key/Token 不会由 UI 写入，仅读取环境变量。完整验证为 23 通过、1 项按环境跳过，文档检查 55/0，Windows 单文件启动器构建与 dry-run 通过。旧 Release/资产和旧标签已清理，待推送当前基线并重新创建唯一 `v0.0.0.1-a` Release。
+- 结果：Open CLI 已提供模型和 cc-switch 的表单式配置，OpenAI、Anthropic、DeepSeek、Kimi、Qwen、Gateway 的端点/模型、默认提供商和回退链可直接保存；cc-switch 读取 `CC_SWITCH_CONFIG` 或 `~/.cc-switch/settings.json` 并可诊断/连接路由。API Key/Token 不会由 UI 写入，仅读取环境变量。完整验证为 23 通过、1 项按环境跳过，文档检查 55/0，Windows 单文件启动器构建与 dry-run 通过。旧 Release/资产和旧标签已清理；新的唯一 `v0.0.0.1-a` Release 指向 `befbb79`，资产 `cocos-agent-v0.0.0.1-a-windows.zip` 状态 `uploaded`，大小 84,872,903 bytes。

@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T22:32:20+08:00`（UTC+8）
+更新时间：`2026-08-20T22:37:12+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -79,6 +79,6 @@ Panel(cocos-agent.cli) is not defined.
 
 ## 本轮收尾结果
 
-- [x] 新版 `Open CLI` 表单、`ccs_doctor`、文档和发布基线已完成；完整验证通过，准备重新创建唯一 `v0.0.0.1-a` Release。
+- [x] 新版 `Open CLI` 表单、`ccs_doctor`、文档和发布基线已完成；完整验证通过，新的唯一 `v0.0.0.1-a` Release 和 Windows zip 资产已核验。
 
 本轮任务 hash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`
