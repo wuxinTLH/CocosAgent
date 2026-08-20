@@ -15,13 +15,24 @@ const globals = globalThis as typeof globalThis & { Editor?: unknown };
 test('Cocos Creator extension manifest and panel contract are valid', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(extensionRoot, 'package.json'), 'utf8')) as {
     cocosAgentVersion?: string;
-    contributions?: { panels?: Record<string, { main?: string; type?: string }> };
+    contributions?: {
+      panels?: Record<string, { main?: string; type?: string }>;
+      menu?: Array<{ path?: string; label?: string; message?: string }>;
+    };
   };
-  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.5-a');
+  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.6-a');
   assert.equal(manifest.contributions?.panels?.cli?.type, 'dockable');
   assert.equal(manifest.contributions?.panels?.cli?.main, './src/panel.js');
   assert.equal(manifest.contributions?.panels?.overlay?.type, 'dockable');
   assert.equal(manifest.contributions?.panels?.overlay?.main, './src/overlay.js');
+  const menu = manifest.contributions?.menu ?? [];
+  assert.ok(menu.length >= 2);
+  for (const item of menu) {
+    assert.ok(item.path?.startsWith('Cocos Agent/'));
+    assert.ok(item.label && item.label.length > 0);
+  }
+  assert.equal(menu.find((item) => item.message === 'cocos-agent:open-cli')?.label, 'Open CLI');
+  assert.equal(menu.find((item) => item.message === 'cocos-agent:open-overlay')?.label, 'Overlay');
 
   const previousEditor = globals.Editor;
   const opened: string[] = [];

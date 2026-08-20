@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.5-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.6-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T21:06:47+08:00`（UTC+8）
+更新时间：`2026-08-20T21:41:10+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.5-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.6-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -65,22 +65,7 @@
 # 任务队列
 
 ## 代办列表
-1. 启动器日志：
-```log
-2026-08-19T22:18:02+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
-2026-08-19T22:22:04+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
-2026-08-19T22:24:41+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
-2026-08-20T20:37:14+08:00 launch requested project=E:\code\Cocos Agent\examples\cocos3d-demo
-2026-08-20T20:51:22+08:00 launch requested project=C:\Users\13929\NewProject
-2026-08-20T20:51:22+08:00 launch failed: Cocos Creator executable not found. Extension installed at C:\Users\13929\NewProject\extensions\cocos-agent; set -CreatorPath or COCOS_CREATOR_PATH, then rerun this script.
-2026-08-20T20:52:21+08:00 launch requested project=C:\Users\13929\NewProject
-2026-08-20T20:52:21+08:00 launch failed: Cocos Creator executable not found. Extension installed at C:\Users\13929\NewProject\extensions\cocos-agent; set -CreatorPath or COCOS_CREATOR_PATH, then rerun this script.
-2026-08-20T20:53:22+08:00 launch requested project=E:\cocos editor\Creator\3.8.8
-2026-08-20T20:53:22+08:00 launch failed: Not a Cocos project: assets directory missing: E:\cocos editor\Creator\3.8.8
-
-```
-
-2. [x] 修复本机 Creator 探测：自动识别 `E:\cocos editor\Creator`、CocosDashboard、Program Files 等安装目录，并记住 `creatorPath`；误选 Creator 安装目录时给出明确提示。
+1. [x] 虽然通过overlay能正常覆盖原有项目的bar栏,新增cocosagent,但是二级列表或子列表为undefined,导致无法正常使用；已按官方 3.8 菜单规范为 `Open CLI` 与 `Overlay` 补充必填 `label`。
 
 
 ## 已解决任务（一次性闭环）
@@ -115,5 +100,7 @@ Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.4-a` prerelease 与 Windows zip 资产已上传。
 - [x] `v0.0.0.5-a` 已通过本机 Creator 探测、项目/安装目录区分、Windows 发布构建、CLI 测试和文档检查。
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.5-a` prerelease 与 Windows zip 资产已上传。
+
+本轮任务 hash：`sha256:c8af21146a574452e25990cb8aef53ba43121a31f9d2011037f062ec1481ab24`
 
 本轮任务 hash：`sha256:e9b1ac5ccc94cc1a1759e447bcd9560fa6f12213786c48f5a7b58de84a417577`

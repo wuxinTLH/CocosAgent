@@ -1,7 +1,7 @@
 {
   "name": "cocos-agent",
-  "version": "0.0.5-a",
-  "cocosAgentVersion": "v0.0.0.5-a",
+  "version": "0.0.6-a",
+  "cocosAgentVersion": "v0.0.0.6-a",
   "description": "Cocos Agent CLI window: connects to the local bridge and invokes agent tools.",
   "author": "Cocos Agent",
   "main": "./src/main.js",
@@ -9,10 +9,12 @@
     "menu": [
       {
         "path": "Cocos Agent/Open CLI",
+        "label": "Open CLI",
         "message": "cocos-agent:open-cli"
       },
       {
         "path": "Cocos Agent/Overlay",
+        "label": "Overlay",
         "message": "cocos-agent:open-overlay"
       }
     ],

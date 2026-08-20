@@ -1,3 +1,10 @@
+# Changelog
+
+## v0.0.0.6-a - 2026-08-20
+
+- 修复 Cocos Agent 扩展自定义主菜单二级菜单显示为 `undefined` 的问题：按官方 3.8 规范为 `Open CLI` 与 `Overlay` 菜单项补充必填 `label`。
+- 扩展清单增加菜单项 `path`/`label`/`message` 回归断言，防止再次出现空标签子菜单。
+
 ## v0.0.0.5-a - 2026-08-20
 
 - 扩展 Cocos Creator 自动探测目录，支持 `E:\cocos editor\Creator`、CocosDashboard 与 Program Files 等常见安装位置。
@@ -21,7 +28,6 @@
 - 新增 `idle -> run -> jump` 等状态机控制器生成，使用官方 `Animation.crossFade` API。
 - 新增 `cocos-animation` Skill 与四个 MCP 动画工具。
 - 修复版本约束漂移，并验证 Windows Release 构建流程。
-# Changelog
 
 ## v0.0.0.1-a - 2026-08-15
 
@@ -33,5 +39,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.5-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.5-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.6-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.6-a`，并保留 `cocosAgentVersion` 映射。
