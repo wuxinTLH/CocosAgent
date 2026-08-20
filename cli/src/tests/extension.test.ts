@@ -15,17 +15,18 @@ const globals = globalThis as typeof globalThis & { Editor?: unknown };
 test('Cocos Creator extension manifest and panel contract are valid', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(extensionRoot, 'package.json'), 'utf8')) as {
     cocosAgentVersion?: string;
+    panels?: Record<string, { main?: string; type?: string }>;
     contributions?: {
-      panels?: Record<string, { main?: string; type?: string }>;
       menu?: Array<{ path?: string; label?: string; message?: string }>;
       messages?: Record<string, unknown>;
     };
   };
-  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.7-a');
-  assert.equal(manifest.contributions?.panels?.cli?.type, 'dockable');
-  assert.equal(manifest.contributions?.panels?.cli?.main, './src/panel.js');
-  assert.equal(manifest.contributions?.panels?.overlay?.type, 'dockable');
-  assert.equal(manifest.contributions?.panels?.overlay?.main, './src/overlay.js');
+  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.8-a');
+  assert.equal(manifest.panels?.cli?.type, 'dockable');
+  assert.equal(manifest.panels?.cli?.main, './src/panel.js');
+  assert.equal(manifest.panels?.overlay?.type, 'dockable');
+  assert.equal(manifest.panels?.overlay?.main, './src/overlay.js');
+  assert.equal('panels' in (manifest.contributions ?? {}), false);
   const menu = manifest.contributions?.menu ?? [];
   assert.ok(menu.length >= 2);
   for (const item of menu) {

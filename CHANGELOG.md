@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.0.8-a - 2026-08-20
+
+- 修复点击 `Cocos Agent -> Open CLI` 报 `Panel(cocos-agent.cli) is not defined` 的问题。
+- 按 Cocos Creator 扩展 manifest 规范将 `panels` 从 `contributions` 移至 package 顶层，使 `cocos-agent.overlay` 与 `cocos-agent.cli` 在扩展加载时注册。
+- 扩展清单测试拒绝将面板配置放回 `contributions.panels`。
+
 ## v0.0.0.7-a - 2026-08-20
 
 - 修复点击 `Cocos Agent -> Open CLI` 报 `Message does not exist cocos-agent-cocos-agent:open-cli` 的问题。
@@ -45,5 +51,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.7-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.7-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.8-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.8-a`，并保留 `cocosAgentVersion` 映射。

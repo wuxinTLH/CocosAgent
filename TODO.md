@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.7-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.8-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T21:56:12+08:00`（UTC+8）
+更新时间：`2026-08-20T22:06:15+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.7-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.8-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -65,35 +65,9 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 点击 open cli 报错:
+1. [x] 点击 open cli 报错：已将扩展 `panels` 从 `contributions` 移到 manifest 顶层，确保 `cocos-agent.cli` 与 `cocos-agent.overlay` 在 Creator 启动时注册。
 ```log
-Error: Message does not exist: cocos-agent - cocos-agent:open-cli
-at send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\protected\browser\index.ccc:2:356)
-at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\public\browser.ccc:1:284)
-at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\index.ccc:1:517)
-at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\utils.ccc:1:1275
-at MenuItem.click (node:electron/js2c/browser_init:2:34382)
-at EventEmitter.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\index.ccc:1:4820)
-at EventEmitter.emit (node:events:519:28)
-at EventEmitter.emit (node:domain:488:12)
-at IpcMainImpl.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@base\electron-base-ipc\dist\browser.ccc:1:3556)
-at IpcMainImpl.emit (node:events:519:28)
-```
-以及
-```log
-
- Message does not exist: cocos-agent - cocos-agent:open-overlay
-Error: Message does not exist: cocos-agent - cocos-agent:open-overlay
-at send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\protected\browser\index.ccc:2:356)
-at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\public\browser.ccc:1:284)
-at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\index.ccc:1:517)
-at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\utils.ccc:1:1275
-at MenuItem.click (node:electron/js2c/browser_init:2:34382)
-at EventEmitter.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\index.ccc:1:4820)
-at EventEmitter.emit (node:events:519:28)
-at EventEmitter.emit (node:domain:488:12)
-at IpcMainImpl.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@base\electron-base-ipc\dist\browser.ccc:1:3556)
-at IpcMainImpl.emit (node:events:519:28)
+Panel(cocos-agent.cli) is not defined.
 ```
 
 
