@@ -416,3 +416,33 @@
 - 结果：远程 `master` 与 `v0.0.0.5-a` 指向 `e5be5d4`；Release 资产 `cocos-agent-v0.0.0.5-a-windows.zip` 状态 `uploaded`，大小 84,878,860 bytes。
 - 文件：`TODO.md`、`LONG_MEMORY.md`、`SHORT_MEMORY.md`
 - 后续：安装 release zip 后选择 `C:\Users\13929\NewProject`，确认 Overlay 面板显示并等待 `overlay-status.json` 为 `ready`。
+
+### AGT-20260820-016
+
+- TaskHash：`sha256:c8af21146a574452e25990cb8aef53ba43121a31f9d2011037f062ec1481ab24`
+- 开始：`2026-08-20T21:41:10+08:00`
+- 结束：`2026-08-20T21:44:37+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：TODO 待办显示 Overlay 能覆盖原始 bar 并新增 Cocos Agent，但二级菜单显示为 `undefined`。对照官方 Cocos Creator 3.8 自定义主菜单规范，菜单贡献必须提供必填 `label`；现有扩展只写了 `path` 和 `message`，因此子菜单项标签为空。
+- 计划：
+  1. 为 `Open CLI` 与 `Overlay` 菜单项补充 `label`，同步根扩展与 demo 项目扩展。
+  2. 增加扩展清单菜单项 `path`/`label`/`message` 回归断言。
+  3. 升级 `v0.0.0.6-a`，运行 CLI 验证、Windows 发布构建和启动器 dry-run。
+  4. 提交、推送并发布 `v0.0.0.6-a` prerelease，核验资产后写入记忆。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T21:41:10 | 确认官方菜单规范并要求菜单项 `label`，生成任务 hash。 |
+| 2026-08-20T21:42:00 | 为扩展菜单项补充 `label` 并新增回归断言，升级版本号。 |
+| 2026-08-20T21:43:00 | `npm run verify`、Windows 发布构建与启动器 dry-run 通过。 |
+| 2026-08-20T21:43:20 | 提交 `71b03fe` 并推送 master 与 `v0.0.0.6-a` 标签。 |
+| 2026-08-20T21:44:17 | GitHub Actions Release run `32375891360` 完成，结论 `success`。 |
+| 2026-08-20T21:44:37 | GitHub API 确认 prerelease 与 Windows zip 资产 `uploaded`，更新记忆。 |
+
+- 结果：`Open CLI` 与 `Overlay` 子菜单现在带官方必填 `label`，不再显示 `undefined`。`npm run verify`（20 通过、1 个按环境跳过）、文档检查 55/0、Windows 单文件发布构建与 EXE/脚本 dry-run 均通过。远程 `master` 与 `v0.0.0.6-a` 指向 `71b03fe`，Release 资产 `cocos-agent-v0.0.0.6-a-windows.zip` 大小 84,879,106 bytes。
+- 文件：
+  - `extensions/cocos-agent/package.json`、`examples/cocos3d-demo/extensions/cocos-agent/package.json`
+  - `cli/src/tests/extension.test.ts`
+  - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、约束文档、`TODO.md`
+- 后续：安装 `v0.0.0.6-a` release zip 后在 Cocos Creator 中确认 `Cocos Agent -> Open CLI/Overlay` 子菜单可正常点击并打开面板。

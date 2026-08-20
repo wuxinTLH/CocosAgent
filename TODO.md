@@ -4,7 +4,7 @@
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T21:41:10+08:00`（UTC+8）
+更新时间：`2026-08-20T21:44:37+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -100,6 +100,8 @@ Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.4-a` prerelease 与 Windows zip 资产已上传。
 - [x] `v0.0.0.5-a` 已通过本机 Creator 探测、项目/安装目录区分、Windows 发布构建、CLI 测试和文档检查。
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.5-a` prerelease 与 Windows zip 资产已上传。
+
+- [x] GitHub Actions Release 已成功完成，`v0.0.0.6-a` prerelease 与 Windows zip 资产已上传。
 
 本轮任务 hash：`sha256:c8af21146a574452e25990cb8aef53ba43121a31f9d2011037f062ec1481ab24`
 
