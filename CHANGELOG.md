@@ -1,3 +1,8 @@
+## v0.0.0.4-a - 2026-08-20
+
+- 修复无参数运行 `CocosAgentOverlay.exe` 时仅显示 Usage 的问题；现在会打开 Cocos 项目目录选择器，取消选择会正常退出。
+- 保持位置项目路径与 `-ProjectRoot <项目路径>` 两种自动化启动方式。
+
 ## v0.0.0.3-a - 2026-08-19
 
 - 修复 `CocosAgentOverlay.exe` 的 `-ProjectRoot` 参数兼容性、启动日志、错误窗口与扩展加载超时诊断。
@@ -22,5 +27,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.3-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.3-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.4-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.4-a`，并保留 `cocosAgentVersion` 映射。

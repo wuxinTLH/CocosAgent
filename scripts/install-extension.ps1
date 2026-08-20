@@ -29,7 +29,7 @@ New-Item -ItemType Directory -Force -Path $configDir | Out-Null
 @{
     cliIndex = [IO.Path]::GetFullPath($CliIndex)
     updatedAt = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
-    version = 'v0.0.0.3-a'
+    version = 'v0.0.0.4-a'
 } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $configDir 'config.json') -Encoding UTF8
 Write-Host "Installed extension: $target"
 Write-Host "Configured CLI bridge: $CliIndex"

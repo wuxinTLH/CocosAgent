@@ -25,7 +25,7 @@ function Write-OverlayStatus([string]$State, [string]$Message = '') {
     @{
         state = $State
         message = $Message
-        version = 'v0.0.0.3-a'
+        version = 'v0.0.0.4-a'
         updatedAt = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
     } | ConvertTo-Json | Set-Content -LiteralPath $script:overlayStatusFile -Encoding UTF8
 }
@@ -63,7 +63,7 @@ if (Test-Path -LiteralPath $extensionTarget) {
     Remove-Item -LiteralPath $extensionTarget -Recurse -Force
 }
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
-@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.3-a'; overlay = $true } |
+@{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.4-a'; overlay = $true } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $configDir 'config.json') -Encoding UTF8
 
 function Resolve-CocosCreator {

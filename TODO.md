@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.3-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.4-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-19T22:27:36+08:00`（UTC+8）
+更新时间：`2026-08-20T20:37:46+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.3-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.4-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -85,3 +85,15 @@
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.2-a` prerelease 及 Windows zip 资产已上传。
 - [x] `v0.0.0.3-a` 已完成启动器、扩展与 Release workflow 的本地验证；真实 Creator UI 烟测等待安装 Creator 的环境执行。
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.3-a` prerelease 与 Windows zip 资产已上传。
+
+
+
+```log bug日志
+Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-root> [--repo <agent-root>] [--creator <CocosCreator.exe>] [--dry-run]
+```
+
+2. [x] 修复无参数启动 EXE 只显示 Usage：使用 Windows 项目目录选择器，取消选择时正常退出；保留位置参数和 `-ProjectRoot` 自动化入口。
+
+本轮任务 hash：`sha256:918677c76f2c5ad1abd0438d6a1d427a2aeeae30c06f8d4539654d21637d0920`
+
+- [x] `v0.0.0.4-a` 已通过无参数与 `-ProjectRoot` dry-run、Windows 发布构建、CLI 测试和文档检查；真实 Creator UI 烟测仍需安装 Creator 的环境执行。

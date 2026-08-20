@@ -312,3 +312,34 @@
 
 - 结果：远程 `master` 与 `v0.0.0.3-a` 均指向 `df060adf556c8694c6b33a1836f50aea6f95d935`。Release 地址为 `https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.3-a`，资产 `cocos-agent-v0.0.0.3-a-windows.zip` 状态为 `uploaded`，大小 48,792,827 bytes。
 - 后续：真实 Cocos Creator UI 烟测仍需在安装 Creator 的 Windows 环境执行；启动后查看项目 `.cocos-agent/overlay-status.json` 与用户级 `launcher.log`。
+
+### AGT-20260820-012
+
+- TaskHash：`sha256:918677c76f2c5ad1abd0438d6a1d427a2aeeae30c06f8d4539654d21637d0920`
+- 开始：`2026-08-20T20:35:00+08:00`
+- 结束：`2026-08-20T20:37:46+08:00`
+- 请求：继续未完成内容，修复无参数启动 `CocosAgentOverlay.exe` 仅显示 Usage。
+- 推理：TODO 中保留的真实日志表明用户从资源管理器直接启动 EXE。该场景没有命令行参数，单纯显示 Usage 不可用；应使用 Windows 原生目录选择器让用户选择 Cocos 项目，同时保留适合脚本和 CI 的位置参数、`-ProjectRoot` 与 `--dry-run`。取消选择不是异常，应安静成功退出。
+- 计划：
+  1. 将启动器无项目参数分支替换为 STA Windows FolderBrowserDialog。
+  2. 为 `--dry-run` 返回稳定的 `selection-required` 结果，避免自动化中打开 UI。
+  3. 升级版本、补充回归测试、构建单文件 EXE 并验证两种启动方式。
+  4. 更新 TODO 和记忆，提交并发布新 prerelease。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T20:35:00 | 恢复中断任务，确认 TODO 新增无参数 Usage 日志。 |
+| 2026-08-20T20:35:40 | 加入 Windows 项目目录选择器和取消选择正常退出逻辑。 |
+| 2026-08-20T20:36:20 | `dotnet build` 通过；发布版 EXE 无参数 dry-run 返回 `selection-required`。 |
+| 2026-08-20T20:36:50 | 发布版 EXE `-ProjectRoot` dry-run 成功解析 demo 项目。 |
+| 2026-08-20T20:37:30 | `npm run verify` 通过：20/21 测试通过，1 个 WSS 证书测试按环境跳过；文档检查 55/0。 |
+| 2026-08-20T20:37:46 | 更新版本、TODO 和记忆，准备推送 `v0.0.0.4-a`。 |
+
+- 结果：`CocosAgentOverlay.exe` 无参数启动时不再只显示 Usage，而是显示 Cocos 项目目录选择器；用户取消选择时返回 0。显式项目路径和 `-ProjectRoot <项目路径>` 保持兼容，`--dry-run` 可非交互测试。Windows 单文件发布构建、无参数 dry-run、`-ProjectRoot` dry-run、TypeScript/JavaScript 检查、完整 CLI 测试、文档检查与 `git diff --check` 均通过。版本升级为 `v0.0.0.4-a`。没有安装 Cocos Creator，因此实际编辑器 UI 烟测仍不能宣称完成。
+- 文件：
+  - `launcher/Program.cs`、`launcher/CocosAgentOverlay.csproj`
+  - `cli/src/tests/extension.test.ts`
+  - `VERSION`、npm/Cocos manifest、安装与启动脚本
+  - `README.md`、`CHANGELOG.md`、`TODO.md`、`LONG_MEMORY.md`、`SHORT_MEMORY.md`
+- 后续：推送 `v0.0.0.4-a`，核验 GitHub Windows prerelease 资产；真实 Creator 环境中双击 EXE 选择项目后检查面板和 `overlay-status.json`。

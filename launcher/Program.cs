@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
-const string usage = "Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-root> [--repo <agent-root>] [--creator <CocosCreator.exe>] [--dry-run]";
+const string usage = "Usage: CocosAgentOverlay.exe [<cocos-project-root> | -ProjectRoot <cocos-project-root>] [--repo <agent-root>] [--creator <CocosCreator.exe>] [--dry-run]";
 
 var project = string.Empty;
 var repo = AppContext.BaseDirectory;
@@ -13,6 +14,36 @@ static void ShowError(string text)
 {
     Console.Error.WriteLine(text);
     NativeMethods.MessageBoxW(0, text, "Cocos Agent Overlay", 0x10);
+}
+
+static string? SelectProjectRoot()
+{
+    string? selectedPath = null;
+    using var completed = new ManualResetEventSlim(false);
+    var thread = new Thread(() =>
+    {
+        try
+        {
+            using var dialog = new FolderBrowserDialog
+            {
+                Description = "Select a Cocos Creator project folder",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = false,
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                selectedPath = dialog.SelectedPath;
+            }
+        }
+        finally
+        {
+            completed.Set();
+        }
+    });
+    thread.SetApartmentState(ApartmentState.STA);
+    thread.Start();
+    completed.Wait();
+    return selectedPath;
 }
 
 for (var index = 0; index < args.Length; index++)
@@ -61,8 +92,17 @@ for (var index = 0; index < args.Length; index++)
 
 if (string.IsNullOrWhiteSpace(project))
 {
-    ShowError(usage);
-    return 2;
+    if (dryRun)
+    {
+        Console.WriteLine("DRY_RUN project=selection-required");
+        return 0;
+    }
+    project = SelectProjectRoot() ?? string.Empty;
+    if (string.IsNullOrWhiteSpace(project))
+    {
+        Console.WriteLine("Cocos project selection cancelled.");
+        return 0;
+    }
 }
 
 var script = Path.Combine(repo, "scripts", "launch-cocos-agent.ps1");

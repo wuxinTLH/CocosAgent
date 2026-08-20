@@ -1,6 +1,6 @@
 # Cocos Agent
 
-全局版本：`v0.0.0.3-a`
+全局版本：`v0.0.0.4-a`
 
 面向 Cocos Creator 3D 项目的 Agent 工作区。本项目以 WorkFlow 工作流为骨架，统一约束系统、任务管理、记忆体系、Skills、MCP 工具、CLI 接入与 Cocos 编辑器扩展。
 
@@ -68,7 +68,7 @@ powershell -ExecutionPolicy Bypass -File scripts/install-extension.ps1
 bin\cocos-agent-overlay.cmd -ProjectRoot examples\cocos3d-demo
 ```
 
-Release 包提供 `CocosAgentOverlay.exe`。它接受位置项目路径或 `-ProjectRoot <项目路径>`，会等待扩展回执；失败时显示错误窗口，并写入 `%USERPROFILE%\.cocos-agent\launcher.log`。
+Release 包提供 `CocosAgentOverlay.exe`。不传项目路径时会打开 Cocos 项目目录选择器；也接受位置项目路径或 `-ProjectRoot <项目路径>`。它会等待扩展回执，失败时显示错误窗口并写入 `%USERPROFILE%\.cocos-agent\launcher.log`。
 
 完整本地验证：
 

@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>CocosAgentOverlay</AssemblyName>
     <RootNamespace>CocosAgentOverlay</RootNamespace>
   </PropertyGroup>
