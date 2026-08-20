@@ -446,3 +446,31 @@
   - `cli/src/tests/extension.test.ts`
   - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、约束文档、`TODO.md`
 - 后续：安装 `v0.0.0.6-a` release zip 后在 Cocos Creator 中确认 `Cocos Agent -> Open CLI/Overlay` 子菜单可正常点击并打开面板。
+
+### AGT-20260820-017
+
+- TaskHash：`sha256:e2db6c85321cddab37d96b9e0fd0b497bb96c5cf16476f79c9c2e09f038ddf18`
+- 开始：`2026-08-20T21:53:44+08:00`
+- 结束：`2026-08-20T21:56:12+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：TODO 日志显示点击 `Cocos Agent -> Open CLI/Overlay` 报 `Message does not exist: cocos-agent - cocos-agent:open-cli`。Cocos Creator 菜单 `message` 应使用不带扩展名前缀的消息名，由扩展协议自动注册为 `cocos-agent:<message>`；手动加前缀会变成双重命名空间。工作区已具备该修复与回归断言，本轮负责核验、发布与记忆闭环。
+- 计划：
+  1. 核对扩展清单菜单 `message` 与 `contributions.messages` 键一致性及版本升级。
+  2. 运行 CLI 验证、Windows 发布构建和启动器 dry-run。
+  3. 提交、推送并发布 `v0.0.0.7-a` prerelease，核验资产后写入记忆。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T21:53:44 | 确认消息协议根因并生成任务 hash。 |
+| 2026-08-20T21:54:30 | `npm run verify`、Windows 发布构建与 EXE/脚本 dry-run 通过。 |
+| 2026-08-20T21:55:00 | 修复 TODO 日志尾随空格，提交 `dcee166` 并推送 master 与 `v0.0.0.7-a` 标签。 |
+| 2026-08-20T21:56:01 | GitHub Actions Release run `32376999273` 完成，结论 `success`。 |
+| 2026-08-20T21:56:12 | GitHub API 确认 prerelease 与 Windows zip 资产 `uploaded`，更新记忆。 |
+
+- 结果：菜单 `message` 已改为 `open-cli`/`open-overlay`，与 `contributions.messages` 键一致，Cocos Creator 可正确解析为 `cocos-agent:open-cli`/`cocos-agent:open-overlay`，不再报 Message does not exist。`npm run verify`（20 通过、1 个按环境跳过）、文档检查 55/0、Windows 单文件发布构建与 EXE/脚本 dry-run 均通过。远程 `master` 与 `v0.0.0.7-a` 指向 `dcee166`，Release 资产 `cocos-agent-v0.0.0.7-a-windows.zip` 大小 84,878,999 bytes。
+- 文件：
+  - `extensions/cocos-agent/package.json`、`examples/cocos3d-demo/extensions/cocos-agent/package.json`
+  - `cli/src/tests/extension.test.ts`
+  - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、约束文档、`TODO.md`
+- 后续：安装 `v0.0.0.7-a` release zip 后在 Cocos Creator 中确认 `Cocos Agent -> Open CLI/Overlay` 可正常点击并打开对应面板。
