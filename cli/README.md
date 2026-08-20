@@ -2,7 +2,7 @@
 
 TypeScript 实现的 CLI，用于执行 WorkFlow、计算任务 hash、读写记忆、调用 Skills 能力，并提供 MCP 服务与 Cocos 编辑器本地桥接。
 
-全局版本：`v0.0.0.6-a`
+全局版本：`v0.0.0.7-a`
 
 ## 构建
 

@@ -19,7 +19,7 @@ function writeStatus(state, message = '') {
     fs.writeFileSync(file, JSON.stringify({
       state,
       message,
-      version: 'v0.0.0.6-a',
+      version: 'v0.0.0.7-a',
       updatedAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().replace('Z', '+08:00'),
     }, null, 2));
   } catch (error) {

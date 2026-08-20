@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.0.7-a - 2026-08-20
+
+- 修复点击 `Cocos Agent -> Open CLI` 报 `Message does not exist cocos-agent-cocos-agent:open-cli` 的问题。
+- 按官方扩展消息协议，菜单 `message` 改为不带扩展名前缀的 `open-cli` 与 `open-overlay`，由 Cocos Creator 自动注册为 `cocos-agent:open-cli` / `cocos-agent:open-overlay`。
+- 扩展清单测试新增菜单 `message` 与 `contributions.messages` 键一致性断言。
+
 ## v0.0.0.6-a - 2026-08-20
 
 - 修复 Cocos Agent 扩展自定义主菜单二级菜单显示为 `undefined` 的问题：按官方 3.8 规范为 `Open CLI` 与 `Overlay` 菜单项补充必填 `label`。
@@ -39,5 +45,5 @@
 
 ## 发布规则
 
-- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.6-a` 为准。
-- npm 与扩展 manifest 使用合法 semver `0.0.6-a`，并保留 `cocosAgentVersion` 映射。
+- 全局版本以 [VERSION](VERSION) 的 `v0.0.0.7-a` 为准。
+- npm 与扩展 manifest 使用合法 semver `0.0.7-a`，并保留 `cocosAgentVersion` 映射。

@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.6-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.7-a`，根目录 `VERSION` 为唯一来源。
 
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T21:44:37+08:00`（UTC+8）
+更新时间：`2026-08-20T21:51:36+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -28,7 +28,7 @@
 | [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.6-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.7-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -65,7 +65,37 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 虽然通过overlay能正常覆盖原有项目的bar栏,新增cocosagent,但是二级列表或子列表为undefined,导致无法正常使用；已按官方 3.8 菜单规范为 `Open CLI` 与 `Overlay` 补充必填 `label`。
+1. [x] 点击 open cli 报错:
+```log
+Error: Message does not exist: cocos-agent - cocos-agent:open-cli
+at send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\protected\browser\index.ccc:2:356)
+at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\public\browser.ccc:1:284)
+at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\index.ccc:1:517)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\utils.ccc:1:1275
+at MenuItem.click (node:electron/js2c/browser_init:2:34382)
+at EventEmitter.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\index.ccc:1:4820)
+at EventEmitter.emit (node:events:519:28)
+at EventEmitter.emit (node:domain:488:12)
+at IpcMainImpl.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@base\electron-base-ipc\dist\browser.ccc:1:3556)
+at IpcMainImpl.emit (node:events:519:28)
+```
+以及
+```log
+
+ Message does not exist: cocos-agent - cocos-agent:open-overlay
+Error: Message does not exist: cocos-agent - cocos-agent:open-overlay
+at send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\protected\browser\index.ccc:2:356)
+at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\public\browser.ccc:1:284)
+at Object.send (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\message\index.ccc:1:517)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\utils.ccc:1:1275
+at MenuItem.click (node:electron/js2c/browser_init:2:34382)
+at EventEmitter.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\menu\protected\browser\index.ccc:1:4820)
+at EventEmitter.emit (node:events:519:28)
+at EventEmitter.emit (node:domain:488:12)
+at IpcMainImpl.<anonymous> (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@base\electron-base-ipc\dist\browser.ccc:1:3556)
+at IpcMainImpl.emit (node:events:519:28)
+```
+
 
 
 ## 已解决任务（一次性闭环）
@@ -102,6 +132,8 @@ Usage: CocosAgentOverlay.exe <cocos-project-root> | -ProjectRoot <cocos-project-
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.5-a` prerelease 与 Windows zip 资产已上传。
 
 - [x] GitHub Actions Release 已成功完成，`v0.0.0.6-a` prerelease 与 Windows zip 资产已上传。
+
+本轮任务 hash：`sha256:ce05a243d41abd5b966ecfaf9d557a9888e952824d8f16cfd7bfdd821e670fec`
 
 本轮任务 hash：`sha256:c8af21146a574452e25990cb8aef53ba43121a31f9d2011037f062ec1481ab24`
 

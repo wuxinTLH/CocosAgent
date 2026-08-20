@@ -18,9 +18,10 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     contributions?: {
       panels?: Record<string, { main?: string; type?: string }>;
       menu?: Array<{ path?: string; label?: string; message?: string }>;
+      messages?: Record<string, unknown>;
     };
   };
-  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.6-a');
+  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.7-a');
   assert.equal(manifest.contributions?.panels?.cli?.type, 'dockable');
   assert.equal(manifest.contributions?.panels?.cli?.main, './src/panel.js');
   assert.equal(manifest.contributions?.panels?.overlay?.type, 'dockable');
@@ -30,9 +31,10 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
   for (const item of menu) {
     assert.ok(item.path?.startsWith('Cocos Agent/'));
     assert.ok(item.label && item.label.length > 0);
+    assert.ok(item.message && Object.keys(manifest.contributions?.messages ?? {}).includes(item.message));
   }
-  assert.equal(menu.find((item) => item.message === 'cocos-agent:open-cli')?.label, 'Open CLI');
-  assert.equal(menu.find((item) => item.message === 'cocos-agent:open-overlay')?.label, 'Overlay');
+  assert.equal(menu.find((item) => item.message === 'open-cli')?.label, 'Open CLI');
+  assert.equal(menu.find((item) => item.message === 'open-overlay')?.label, 'Overlay');
 
   const previousEditor = globals.Editor;
   const opened: string[] = [];
