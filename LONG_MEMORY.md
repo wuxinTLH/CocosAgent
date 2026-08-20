@@ -392,3 +392,27 @@
   - `cli/src/tests/extension.test.ts`
   - `VERSION`、npm/Cocos manifest、`CHANGELOG.md`、`README.md`、`TODO.md`
 - 后续：推送 `v0.0.0.5-a` 并核验 GitHub Windows prerelease；安装后选择 `C:\Users\13929\NewProject` 应自动启动 Creator 并等待 `overlay-status.json` 为 `ready`。
+
+### AGT-20260820-015
+
+- TaskHash：`sha256:e9b1ac5ccc94cc1a1759e447bcd9560fa6f12213786c48f5a7b58de84a417577`
+- 开始：`2026-08-20T21:06:03+08:00`
+- 结束：`2026-08-20T21:06:47+08:00`
+- 请求：根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理：上一轮已完成 `v0.0.0.5-a` 的本地修复与构建，TODO 剩余发布闭环为推送 master/tag、等待 GitHub Actions Release、核验 Windows zip 资产并同步记忆。
+- 计划：
+  1. 推送 `e5be5d4` 到 master 并创建/推送 `v0.0.0.5-a` 标签。
+  2. 等待 GitHub Actions Release 完成，用 GitHub API 核验 prerelease 与资产。
+  3. 更新 TODO、LONG_MEMORY、SHORT_MEMORY 并提交。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-20T21:03:10 | 推送 `e5be5d4` 到 master，随后推送 `v0.0.0.5-a` 标签。 |
+| 2026-08-20T21:04:22 | GitHub Actions Release run `32372115396` 完成，结论 `success`。 |
+| 2026-08-20T21:06:03 | GitHub API 确认 prerelease 与 Windows zip 资产 `uploaded`。 |
+| 2026-08-20T21:06:47 | 更新 TODO 与长短记忆，准备提交。 |
+
+- 结果：远程 `master` 与 `v0.0.0.5-a` 指向 `e5be5d4`；Release 资产 `cocos-agent-v0.0.0.5-a-windows.zip` 状态 `uploaded`，大小 84,878,860 bytes。
+- 文件：`TODO.md`、`LONG_MEMORY.md`、`SHORT_MEMORY.md`
+- 后续：安装 release zip 后选择 `C:\Users\13929\NewProject`，确认 Overlay 面板显示并等待 `overlay-status.json` 为 `ready`。
