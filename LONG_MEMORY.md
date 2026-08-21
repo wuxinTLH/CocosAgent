@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260821-003
+
+- TaskHash：`sha256:ee430e7a489bd03a3dd61760bbd1d5d8d032484c00f3aa494d55934c9510ef60`
+- 开始：`2026-08-21T22:07:59+08:00`
+- 结束：`2026-08-21T22:18:00+08:00`
+- 请求：修复 Release 构建失败并发布 `v0.0.0.2-a`，解决构建产物仍为旧版本的问题。
+- 推理：仓库只有旧 `v0.0.0.1-a` tag，Release workflow 只响应新 `v*` tag，因此不会自动生成新包；`VERSION`、CLI、扩展和脚本也都固定为旧版本。远程 CI 失败的高风险点是 WSS 测试使用 `localhost`，而测试服务绑定 `127.0.0.1`。应递增版本、统一 manifest/runtime 版本、修正地址，并在 Release 构建前强制校验 tag 与所有版本来源一致。
+- 计划：修复 CI WSS 测试；升级至 `v0.0.0.2-a`；更新 CLI、扩展、示例、脚本和文档版本；加入 Release 版本一致性校验；本地执行 verify、Windows launcher 构建；提交、推送 master 并创建 tag 触发 Release。
+- 时间线：2026-08-21T22:07:59 读取 workflow、版本文件、远程 tags/releases 和 CI 状态；22:10 定位旧版本 tag 与 `localhost` WSS 测试问题；22:14 完成版本升级、workflow 校验和文档同步；22:18 本地 verify 与 Windows launcher 发布通过，写入 TODO 和记忆，准备提交发布。
+- 结果：版本已统一为 `v0.0.0.2-a` / `0.0.2-a`；CI 使用 Node 22 并修复 WSS 测试地址；Release 在构建前校验 tag、`VERSION`、CLI 和扩展 manifest；本地 24 项测试通过、1 项跳过，文档 58/0，Windows launcher publish 成功。旧 `v0.0.0.1-a` 历史 Release 保留。
+
 ### AGT-20260821-002
 
 - TaskHash：`sha256:29c6cbd338c99522105b234a7f82114ce5a4889962b28ee26eedb70ac5184a72`

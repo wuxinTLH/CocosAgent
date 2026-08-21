@@ -62,7 +62,7 @@ test(
     try {
       await waitForMockGateway(server);
       const result = await chatOnce({
-        url: `wss://localhost:${mockPort(server)}/ws`,
+        url: `wss://127.0.0.1:${mockPort(server)}/ws`,
         token: 'test-token',
         chat: 'secure hello',
         memoryContext: 'short-memory-context',

@@ -1,10 +1,10 @@
 # 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.1-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.2-a`，根目录 `VERSION` 为唯一来源。
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-21T22:08:46+08:00`（UTC+8）
+更新时间：`2026-08-21T22:18:00+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -29,7 +29,7 @@
 | [mcp/](mcp/)                                                             | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                    | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)              | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                       | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                       | 全局版本 `v0.0.0.2-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)                | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                   | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -117,10 +117,12 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 ## 已解决任务（一次性闭环）
 
 1. [x] CLI 配置方式改为表单：支持 OpenAI、Anthropic、DeepSeek、Kimi、Qwen、Gateway 的模型和端点配置、默认/回退渠道，以及 cc-switch / ccs 路由诊断与连接；API Key/Token 仅从环境变量读取。
-2. [x] 已删除历史 GitHub Release、资产与 `v0.0.0.1-a` 至 `v0.0.0.8-a` 标签；发布和记忆从新的 `v0.0.0.1-a` 基线重建。
+2. [x] 已删除历史 GitHub Release、资产与 `v0.0.0.1-a` 至 `v0.0.0.8-a` 标签；发布基线当前递增为 `v0.0.0.2-a`。
 
 ## 本轮收尾结果
 
-- [x] 新版 `Open CLI` 表单、`ccs_doctor`、文档和发布基线已完成；完整验证通过，新的唯一 `v0.0.0.1-a` Release 和 Windows zip 资产已核验。
+- [x] 修复 Release 构建失败并发布 `v0.0.0.2-a`：CI WSS 测试地址、版本一致性校验和 Release workflow 已修复；待推送 tag 后核验远程构建与 Windows zip 资产。
 
 本轮任务 hash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`
+
+发布修复任务 hash：`sha256:ee430e7a489bd03a3dd61760bbd1d5d8d032484c00f3aa494d55934c9510ef60`。

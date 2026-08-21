@@ -25,7 +25,7 @@ function Write-OverlayStatus([string]$State, [string]$Message = '') {
     @{
         state = $State
         message = $Message
-        version = 'v0.0.0.1-a'
+        version = 'v0.0.0.2-a'
         updatedAt = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
     } | ConvertTo-Json | Set-Content -LiteralPath $script:overlayStatusFile -Encoding UTF8
 }
@@ -68,17 +68,17 @@ if (Test-Path -LiteralPath $extensionTarget) {
 }
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
 $configFile = Join-Path $configDir 'config.json'
-$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.1-a'; overlay = $true; creatorPath = '' }
+$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' }
 if (Test-Path -LiteralPath $configFile -PathType Leaf) {
     try {
         $loadedConfig = Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
         $existingConfig.cliIndex = if ($loadedConfig.cliIndex) { [string]$loadedConfig.cliIndex } else { [IO.Path]::GetFullPath($cliIndex) }
         $existingConfig.creatorPath = if ($loadedConfig.creatorPath) { [string]$loadedConfig.creatorPath } else { '' }
         if ($loadedConfig.overlay) { $existingConfig.overlay = [bool]$loadedConfig.overlay }
-    } catch { $existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.1-a'; overlay = $true; creatorPath = '' } }
+    } catch { $existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' } }
 }
 $existingConfig.cliIndex = [IO.Path]::GetFullPath($cliIndex)
-$existingConfig.version = 'v0.0.0.1-a'
+$existingConfig.version = 'v0.0.0.2-a'
 $existingConfig.overlay = $true
 $existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8
 
