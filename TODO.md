@@ -87,21 +87,8 @@
 <!-- 原始待办日志 -->
 1.
 ```log
-[Window] Cannot read properties of null (reading 'addEventListener')
-TypeError: Cannot read properties of null (reading 'addEventListener')
-at Object.ready (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:86:36)
-at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4682
-at new Promise (<anonymous>)
-at PanelFrame.emit (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4637)
-at loadPanel (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:7297)
-at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4434
-at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)**
-```
-以及
-```log
- [Window] Cannot read properties of null (reading 'addEventListener')
-TypeError: Cannot read properties of null (reading 'addEventListener')
-at Object.ready (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:60:36)
+TypeError: this.append is not a function
+at Object.ready (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:98:10)
 at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4682
 at new Promise (<anonymous>)
 at PanelFrame.emit (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4637)
@@ -109,8 +96,18 @@ at loadPanel (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@edi
 at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4434
 at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)
 ```
-2. cocosagent最好默认是中文模式,CLI构建的配置项构建困难,参考cc switch的配置项
-3. 添加c/c++库方式,添加高等数学进行代码优化,比如光线transformer等
+以及
+```log
+TypeError: this.connect is not a function
+at Object.ready (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:130:10)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4682
+at new Promise (<anonymous>)
+at PanelFrame.emit (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4637)
+at loadPanel (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:7297)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4434
+at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)
+```
+1. cc switch配置项单独选择应该让其选项成为独立项,连接http://ip:port
 
 
 
@@ -121,10 +118,12 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 
 ## 本轮收尾结果
 
-- [x] 修复 Release 构建失败并发布 `v0.0.0.2-a`：CI WSS 测试地址、版本一致性校验和 Release workflow 已修复；Release 构建成功，Windows zip 资产已上传，后续 CI 稳定性修复已提交。
+- [x] 修复 Release 构建失败并发布 `v0.0.0.2-a`：CI WSS 测试地址、版本一致性校验和 Release workflow 已修复；Release 构建成功，Windows zip 资产已上传，CI workflow 已拆分为可诊断步骤。
 
 本轮任务 hash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`
 
 发布修复任务 hash：`sha256:ee430e7a489bd03a3dd61760bbd1d5d8d032484c00f3aa494d55934c9510ef60`。
 
 CI 修复任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29。
+
+CI 诊断任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29。
