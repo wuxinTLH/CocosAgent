@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-21T22:18:00+08:00`（UTC+8）
+更新时间：$now（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -121,8 +121,10 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 
 ## 本轮收尾结果
 
-- [x] 修复 Release 构建失败并发布 `v0.0.0.2-a`：CI WSS 测试地址、版本一致性校验和 Release workflow 已修复；待推送 tag 后核验远程构建与 Windows zip 资产。
+- [x] 修复 Release 构建失败并发布 `v0.0.0.2-a`：CI WSS 测试地址、版本一致性校验和 Release workflow 已修复；Release 构建成功，Windows zip 资产已上传，后续 CI 稳定性修复已提交。
 
 本轮任务 hash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`
 
 发布修复任务 hash：`sha256:ee430e7a489bd03a3dd61760bbd1d5d8d032484c00f3aa494d55934c9510ef60`。
+
+CI 修复任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29。

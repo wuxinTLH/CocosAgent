@@ -48,25 +48,25 @@ test('gateway keepalive reconnects after server drops', async () => {
   }
 });
 
-test(
-  'gateway WSS validates token and forwards memory context',
-  { skip: !process.env.COCOS_AGENT_TEST_WSS_PFX },
-  async () => {
-    const pfxFile = process.env.COCOS_AGENT_TEST_WSS_PFX as string;
+test('gateway validates token and forwards memory context', async () => {
+    const pfxFile = process.env.COCOS_AGENT_TEST_WSS_PFX;
+    const secure = Boolean(pfxFile);
     const server = startMockGateway(0, {
-      pfx: fs.readFileSync(pfxFile),
-      passphrase: process.env.COCOS_AGENT_TEST_WSS_PASSPHRASE ?? 'cocos-agent-test',
+      ...(secure ? {
+        pfx: fs.readFileSync(pfxFile as string),
+        passphrase: process.env.COCOS_AGENT_TEST_WSS_PASSPHRASE ?? 'cocos-agent-test',
+      } : {}),
       expectedToken: 'test-token',
       echoSystemContext: true,
     });
     try {
       await waitForMockGateway(server);
       const result = await chatOnce({
-        url: `wss://127.0.0.1:${mockPort(server)}/ws`,
+        url: `${secure ? 'wss' : 'ws'}://127.0.0.1:${mockPort(server)}/ws`,
         token: 'test-token',
         chat: 'secure hello',
         memoryContext: 'short-memory-context',
-        allowSelfSigned: true,
+        allowSelfSigned: secure,
         timeoutMs: 5000,
       });
       assert.equal(result.status, 'done');
@@ -76,5 +76,4 @@ test(
     } finally {
       server.close();
     }
-  },
-);
+});

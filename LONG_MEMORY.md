@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260821-004
+
+- TaskHash：`sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29`
+- 开始：`2026-08-21T22:25:00+08:00`
+- 结束：`2026-08-21T22:30:00+08:00`
+- 请求：修复 `v0.0.0.2-a` 发布后的 GitHub CI 失败，保留可选 WSS 测试并恢复默认流水线稳定性。
+- 推理：Release 已成功上传新版本资产，但同提交 CI 仍失败；远程日志下载受权限限制，失败点位于 verify 步骤。证书生成和 WSS 测试是唯一依赖外部 TLS 环境的部分，应让默认 CI 使用本地 WS 鉴权/上下文测试，只有显式设置证书时才覆盖 WSS，避免发布验证被环境差异阻断。
+- 计划：改造 gateway 测试为 WS 默认、WSS 可选；移除 CI 中强制 OpenSSL 证书生成；本地完整验证；更新 TODO/记忆并推送 master；不修改已成功的 `v0.0.0.2-a` Release。
+- 时间线：2026-08-21T22:25:00 读取 CI job 和 check annotation；22:27 修复测试与 CI workflow；22:29 本地 `npm run verify` 通过 25/25、文档 58/0；22:30 写入记忆并准备推送。
+- 结果：CI 默认不再依赖 OpenSSL/WSS 证书；本地 25 项测试全部通过，WSS 仍可通过 `COCOS_AGENT_TEST_WSS_PFX` 显式验证；`v0.0.0.2-a` Release 继续保留，新增提交只修复 master CI。
+
 ### AGT-20260821-003
 
 - TaskHash：`sha256:ee430e7a489bd03a3dd61760bbd1d5d8d032484c00f3aa494d55934c9510ef60`
