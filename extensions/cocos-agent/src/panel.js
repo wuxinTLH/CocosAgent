@@ -1,5 +1,39 @@
 'use strict';
 
+function queryPanelElement(panel, id) {
+  const roots = [panel.shadowRoot, panel.$el, panel.element, panel.root, typeof document !== 'undefined' ? document : null].filter(Boolean);
+  if (typeof panel.$ === 'function') {
+    try {
+      const mapped = panel.$(`#${id}`) || panel.$(id);
+      if (mapped) return mapped;
+    } catch {}
+  } else if (panel.$ && typeof panel.$ === 'object') {
+    const mapped = panel.$[id] || panel.$[`#${id}`];
+    if (mapped) return mapped;
+  }
+  for (const root of roots) {
+    if (typeof root.getElementById === 'function') {
+      const found = root.getElementById(id);
+      if (found) return found;
+    }
+    if (typeof root.querySelector === 'function') {
+      const found = root.querySelector(`#${id}`);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function bindPanelEvent(panel, id, event, handler) {
+  const element = queryPanelElement(panel, id);
+  if (!element || typeof element.addEventListener !== 'function') {
+    if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn(`[panel] missing element: #${id}`);
+    return null;
+  }
+  element.addEventListener(event, handler);
+  return element;
+}
+
 const BRIDGE_URL = 'ws://127.0.0.1:8899/ws';
 
 function parseCommand(line) {
@@ -18,6 +52,7 @@ function parseCommand(line) {
   const twoWords = `${head} ${rest[0] || ''}`;
   if (map[twoWords]) return map[twoWords];
   if (head === 'chat') return { tool: 'workspace_chat', args: { chat: rest.join(' ') } };
+  if (head === 'math' && rest[0] === 'analyze') return { tool: 'math_analyze', args: { path: rest[1] || undefined } };
   if (head === 'provider' && rest[0] === 'select') return { tool: 'provider_select', args: { provider: rest[1] || '' } };
   if (head === 'terminal') return { tool: 'terminal_run', args: { shell: rest[0] || '', command: rest.slice(1).join(' ') } };
   return map[head] || { tool: head, args: {} };
@@ -28,22 +63,23 @@ module.exports = Editor.Panel.define({
     <div class="agent-cli">
       <header class="agent-cli__header"><strong>Cocos Agent</strong><span id="state">offline</span></header>
       <section class="agent-cli__config">
-        <div class="agent-cli__section-title">Model Provider</div>
+        <div class="agent-cli__section-title">模型渠道</div>
+        <label class="agent-cli__locale">界面语言<select id="locale"><option value="zh-CN">简体中文</option><option value="en-US">English</option></select></label>
         <div class="agent-cli__grid">
-          <label>Provider<select id="provider"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option><option value="qwen">Qwen</option><option value="gateway">Cocos Agent Gateway</option></select></label>
-          <label>Model<input id="model" type="text" autocomplete="off" /></label>
-          <label class="agent-cli__wide">Endpoint<input id="endpoint" type="text" autocomplete="off" placeholder="Use provider default" /></label>
+          <label>提供商<select id="provider"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option><option value="qwen">Qwen</option><option value="gateway">Cocos Agent Gateway</option></select></label>
+          <label>模型<input id="model" type="text" autocomplete="off" /></label>
+          <label class="agent-cli__wide">端点<input id="endpoint" type="text" autocomplete="off" placeholder="使用提供商默认端点" /></label>
         </div>
-        <div class="agent-cli__actions"><button id="save-provider">Save Provider</button><button id="select-provider">Use Provider</button><span id="credential"></span></div>
-        <div class="agent-cli__section-title">Workspace</div>
+        <div class="agent-cli__actions"><button id="save-provider">保存渠道</button><button id="select-provider">使用渠道</button><span id="credential"></span></div>
+        <div class="agent-cli__section-title">工作区</div>
         <div class="agent-cli__grid">
-          <label>Default<select id="active-provider"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option><option value="qwen">Qwen</option><option value="gateway">Cocos Agent Gateway</option></select></label>
-          <label class="agent-cli__wide">Fallback<select id="fallback-providers" multiple size="2"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option><option value="qwen">Qwen</option><option value="gateway">Cocos Agent Gateway</option></select></label>
+          <label>默认渠道<select id="active-provider"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option><option value="qwen">Qwen</option><option value="gateway">Cocos Agent Gateway</option></select></label>
+          <label class="agent-cli__wide">回退渠道<select id="fallback-providers" multiple size="2"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="deepseek">DeepSeek</option><option value="kimi">Kimi</option><option value="qwen">Qwen</option><option value="gateway">Cocos Agent Gateway</option></select></label>
         </div>
-        <div class="agent-cli__actions"><button id="save-workspace">Save Workspace</button></div>
+        <div class="agent-cli__actions"><button id="save-workspace">保存工作区</button></div>
         <div class="agent-cli__section-title">cc-switch / ccs</div>
-        <div class="agent-cli__grid"><label class="agent-cli__wide">Route<input id="ccs-route" type="text" autocomplete="off" placeholder="Current cc-switch route" /></label></div>
-        <div class="agent-cli__actions"><button id="ccs-doctor">Check cc-switch</button><button id="ccs-connect">Connect Route</button><span id="ccs-state"></span></div>
+        <div class="agent-cli__grid"><label class="agent-cli__wide">路由<input id="ccs-route" type="text" autocomplete="off" placeholder="当前 cc-switch 路由" /></label></div>
+        <div class="agent-cli__actions"><button id="ccs-doctor">检查 cc-switch</button><button id="ccs-connect">连接路由</button><span id="ccs-state"></span></div>
       </section>
       <section id="output" class="agent-cli__output"></section>
       <form id="form" class="agent-cli__command"><input id="input" autocomplete="off" placeholder="chat 你好 | status | ccs doctor" /><button title="Run command">Run</button></form>
@@ -72,32 +108,33 @@ module.exports = Editor.Panel.define({
     this.messageId = 0;
     this.pending = new Map();
     this.providers = [];
-    this.output = document.getElementById('output');
-    this.input = document.getElementById('input');
-    this.state = document.getElementById('state');
-    this.provider = document.getElementById('provider');
-    this.model = document.getElementById('model');
-    this.endpoint = document.getElementById('endpoint');
-    this.credential = document.getElementById('credential');
-    this.activeProvider = document.getElementById('active-provider');
-    this.fallbackProviders = document.getElementById('fallback-providers');
-    this.ccsRoute = document.getElementById('ccs-route');
-    this.ccsState = document.getElementById('ccs-state');
-    document.getElementById('form').addEventListener('submit', (event) => { event.preventDefault(); this.run(); });
-    this.provider.addEventListener('change', () => this.showProvider(this.provider.value));
-    document.getElementById('save-provider').addEventListener('click', () => this.saveProvider());
-    document.getElementById('select-provider').addEventListener('click', () => this.selectProvider());
-    document.getElementById('save-workspace').addEventListener('click', () => this.saveWorkspace());
-    document.getElementById('ccs-doctor').addEventListener('click', () => this.ccsDoctor());
-    document.getElementById('ccs-connect').addEventListener('click', () => this.ccsConnect());
+    this.getElement = (id) => queryPanelElement(this, id);
+    this.output = this.getElement('output');
+    this.input = this.getElement('input');
+    this.state = this.getElement('state');
+    this.provider = this.getElement('provider');
+    this.model = this.getElement('model');
+    this.endpoint = this.getElement('endpoint');
+    this.credential = this.getElement('credential');
+    this.activeProvider = this.getElement('active-provider');
+    this.fallbackProviders = this.getElement('fallback-providers');
+    this.ccsRoute = this.getElement('ccs-route');
+    this.ccsState = this.getElement('ccs-state');
+    bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
+    bindPanelEvent(this, 'provider', 'change', () => this.showProvider(this.provider?.value));
+    bindPanelEvent(this, 'save-provider', 'click', () => this.saveProvider());
+    bindPanelEvent(this, 'select-provider', 'click', () => this.selectProvider());
+    bindPanelEvent(this, 'save-workspace', 'click', () => this.saveWorkspace());
+    bindPanelEvent(this, 'ccs-doctor', 'click', () => this.ccsDoctor());
+    bindPanelEvent(this, 'ccs-connect', 'click', () => this.ccsConnect());
     this.connect();
   },
   connect() {
     try {
       this.ws = new WebSocket(BRIDGE_URL);
-      this.ws.onopen = () => { this.state.textContent = 'online'; this.refresh(); };
+      this.ws.onopen = () => { if (this.state) this.state.textContent = 'online'; this.refresh(); };
       this.ws.onmessage = (event) => this.handleMessage(event.data);
-      this.ws.onclose = () => { this.state.textContent = 'offline'; setTimeout(() => this.connect(), 3000); };
+      this.ws.onclose = () => { if (this.state) this.state.textContent = 'offline'; setTimeout(() => this.connect(), 3000); };
     } catch (error) { this.append(`[bridge] ${error.message}`); setTimeout(() => this.connect(), 3000); }
   },
   request(tool, args, callback) {
@@ -124,6 +161,8 @@ module.exports = Editor.Panel.define({
       if (!message.ok) { this.append(`[workspace] ${message.error}`); return; }
       const config = message.result.current || message.result;
       if (!config || !config.activeProvider) return;
+      const locale = this.getElement('locale');
+      if (locale) locale.value = config.locale || 'zh-CN';
       this.activeProvider.value = config.activeProvider;
       for (const option of this.fallbackProviders.options) option.selected = (config.fallbackProviders || []).includes(option.value);
     });
@@ -147,7 +186,7 @@ module.exports = Editor.Panel.define({
   },
   saveWorkspace() {
     const fallbacks = Array.from(this.fallbackProviders.selectedOptions).map((option) => option.value).filter((id) => id !== this.activeProvider.value);
-    this.request('agent_config', { activeProvider:this.activeProvider.value, fallbackProviders:fallbacks }, (message) => this.append(message.ok ? { workspace:'saved', activeProvider:this.activeProvider.value, fallbackProviders:fallbacks } : `[workspace] ${message.error}`));
+    this.request('agent_config', { locale:this.getElement('locale')?.value || 'zh-CN', activeProvider:this.activeProvider.value, fallbackProviders:fallbacks }, (message) => this.append(message.ok ? { workspace:'saved', activeProvider:this.activeProvider.value, fallbackProviders:fallbacks } : `[workspace] ${message.error}`));
   },
   ccsDoctor() {
     this.request('ccs_doctor', {}, (message) => {
@@ -172,6 +211,7 @@ module.exports = Editor.Panel.define({
   },
   append(value) {
     const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    if (!this.output) return;
     this.output.textContent += `${text}\n`;
     this.output.scrollTop = this.output.scrollHeight;
   },

@@ -17,6 +17,7 @@ import { providerCatalog, chatWithFallback, resolveProvider } from './providers.
 import { activeSession, appendMessage, conversationContext, createSession, deleteSession, listSessions, switchSession, updateSessionProvider } from './workspace.js';
 import { runTerminal, type TerminalShell } from './terminal.js';
 import { analyzeAnimation, createAnimationController, optimizeAnimation, recognizeAnimationStates } from './animation.js';
+import { analyzeMath } from './math.js';
 
 export interface McpToolDefinition {
   name: string;
@@ -192,6 +193,11 @@ export const MCP_TOOLS: McpToolDefinition[] = [
     name: 'animation_create_controller',
     description: '生成使用 Cocos Animation 公开 API 的状态控制器脚本',
     inputSchema: { type: 'object', properties: { path: { type: 'string' }, className: { type: 'string' }, definition: { type: 'object' } }, required: ['path', 'className', 'definition'] },
+  },
+  {
+    name: 'math_analyze',
+    description: '只读分析当前 Cocos 项目内 TypeScript、JavaScript、C/C++ 的 Transform、Ray 与向量计算',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } } },
   },
   {
     name: 'task_hash',
@@ -376,6 +382,8 @@ export async function dispatchTool(
         String(args.className ?? ''),
         args.definition,
       );
+    case 'math_analyze':
+      return analyzeMath(ctx.root, args.path ? String(args.path) : undefined);
     case 'memory_write':
       return writeExecution(ctx.root, args as unknown as ExecutionRecord);
     default:

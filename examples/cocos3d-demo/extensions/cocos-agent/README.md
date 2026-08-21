@@ -30,7 +30,8 @@ bin\cocos-agent-overlay.cmd -ProjectRoot examples\cocos3d-demo
 - 菜单：`Cocos Agent -> Open CLI`。
 - 菜单：`Cocos Agent -> Overlay`，可重新打开浮动覆盖层。
 - Overlay 使用官方 `dockable` 面板协议自动打开，不修改 Cocos 原生资源或私有 UI 文件。Cocos Creator 不提供将第三方扩展强制覆盖整个原生工作区的公开 API。
-- 面板内可直接输入：`status`、`providers`、`sessions`、`chat <文本>`、`session new <名称>`、`session switch <id>`、`provider select <id>`、`locale zh-CN|en-US`、`permission only-access|only-safe|full-access`。`terminal <cmd|powershell|wt> <命令>` 仅在 `full-access` 可用。
+- 面板默认使用简体中文，并读取/保存工作区的 `locale` 设置。可直接输入：`status`、`providers`、`sessions`、`chat <文本>`、`session new <名称>`、`session switch <id>`、`provider select <id>`、`locale zh-CN|en-US`、`math analyze <项目内路径>`、`permission only-access|only-safe|full-access`。`terminal <cmd|powershell|wt> <命令>` 仅在 `full-access` 可用。
+- 面板控件通过 Creator panel 根节点、`$` 映射与兼容回退查询；延迟挂载时只记录诊断，不会抛出空节点监听错误。
 
 ## 说明
 

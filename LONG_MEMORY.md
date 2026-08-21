@@ -14,6 +14,28 @@
 
 ## 执行记录
 
+### AGT-20260821-002
+
+- TaskHash：`sha256:29c6cbd338c99522105b234a7f82114ce5a4889962b28ee26eedb70ac5184a72`
+- 开始：`2026-08-21T22:07:59+08:00`
+- 结束：`2026-08-21T22:08:46+08:00`
+- 请求：根据 TODO.md 完成剩余任务并收口上一轮 Cocos Agent 面板、中文配置、C/C++ 与数学优化实现。
+- 推理：TODO 的功能项已经闭环，但代码和文档仍未提交。应按 WorkFlow 重新审查当前 diff，验证 CLI、扩展契约、文档、安全和实际 math_analyze 命令，再把成果提交到现有 master；不修改外部测试项目或历史 Release。
+- 计划：读取约束与 TODO；执行代码审查和完整验证；更新 TODO、LONG_MEMORY、SHORT_MEMORY；提交并推送 master；核验远程状态。
+- 时间线：2026-08-21T22:07:59 读取约束、TODO 和工作区状态；22:08:20 运行完整 CLI 验证、数学分析命令和敏感信息扫描；22:08:46 生成任务 hash 并完成账本更新，准备提交推送。
+- 结果：当前 TODO 无新增待办；上一轮三项任务成果已完成最终审查。`npm run verify` 通过，24 项测试通过、1 项按环境跳过，文档检查 58/0；`math analyze --path cli/src/math.ts` 实际返回 Transform/Ray 分析结果；敏感信息扫描通过。代码审查结论：P0=0、P1=0、P2=0、P3=0。
+
+### AGT-20260821-001
+
+- TaskHash：`sha256:5eb48e7504266f091968712c98433291ee9ba8a623044162a258cf940b76d5de`
+- 开始：`2026-08-21T21:44:00+08:00`
+- 结束：`2026-08-21T22:00:52+08:00`
+- 请求：根据 TODO.md 的约束一次性完成剩余任务：修复 Cocos Creator 面板初始化错误，默认中文配置，增加 C/C++ 接入和 Transform/Ray 等高等数学代码优化能力。
+- 推理：Creator 面板 DOM 不应依赖全局 document；需要优先使用面板提供的 `$` 映射和 panel/shadow 根节点，并在延迟挂载时保护事件绑定。中文配置应沿用现有 `agent_config.locale`，避免引入第二套状态。数学优化应采用当前项目内只读扫描，输出可审查建议而不是自动改写 Cocos 引擎或用户代码；C/C++ 接入必须限于项目目录并遵循 Cocos Native/CMake 官方路径。
+- 计划：修复根扩展与 demo 扩展；加入中文 locale；新增 native-math-optimization Skill、math_analyze CLI/MCP 工具和测试；更新约束、TODO 与记忆并验证。
+- 时间线：2026-08-21T21:44:00 读取约束；21:48 完成面板根节点查询保护并同步 demo；21:51 完成中文 locale 与 math analyze 命令；21:55 完成数学模块、MCP、Skill 和 C/C++ 接入文档；21:58 通过类型检查和扩展测试；22:00:52 完成 verify、TODO 和记忆收口。
+- 结果：三项剩余 TODO 已闭环。面板不再直接调用 `document.getElementById`，缺失节点不会触发 `addEventListener` 空引用；Open CLI 默认中文并持久化 locale；`math_analyze` 扫描当前项目 `assets/`、`native/`、`plugins/` 中的 TypeScript、JavaScript、C/C++，报告 Transform、Mat4 求逆、Ray/AABB、向量、normalize、sqrt 优化候选。验证为 24 通过、1 跳过，文档检查 56/0，未发现 P0/P1。
+
 ### AGT-20260820-001
 
 - TaskHash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`

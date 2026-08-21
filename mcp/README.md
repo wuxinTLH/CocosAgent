@@ -52,6 +52,7 @@ env = { COCOS_AGENT_PROJECT_ROOT = "E:/code/Cocos Agent" }
 | `animation_optimize` | 生成非破坏性动画优化建议 | cocos-animation |
 | `animation_ocr_states` | OCR 提取编辑器截图中的状态候选 | cocos-animation + cocos-ocr |
 | `animation_create_controller` | 生成使用公开 Animation API 的 TypeScript 控制器 | cocos-animation |
+| `math_analyze` | 只读分析项目内 Transform、Ray、向量与 C/C++ 数学性能候选 | native-math-optimization |
 
 所有工具自动执行 sandbox 校验，越界路径返回 `SANDBOX_VIOLATION`。
 

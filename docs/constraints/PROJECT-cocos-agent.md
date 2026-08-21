@@ -29,7 +29,7 @@ Cocos Creator 版本：`3.8.x`
 
 ## Skills 与 MCP
 
-- 启用 `cocos-ocr`、`cocos-scene`、`cocos-assets`、`cc-switch-connect`、`chat-longlink`；每个工具必须经过 sandbox 校验。
+- 启用 `cocos-ocr`、`cocos-scene`、`cocos-assets`、`cc-switch-connect`、`chat-longlink`、`native-math-optimization`；每个工具必须经过 sandbox 校验。
 - MCP 仅调用已登记工具，写入 Scene/Prefab 前自动备份到当前项目 `temp/agent-backup/`。
 - 网关仅允许 `wss://` 地址；Token 只从环境变量读取，禁止写入项目、记忆、日志和 git。
 
@@ -38,6 +38,7 @@ Cocos Creator 版本：`3.8.x`
 - 禁止越界访问、符号链接逃逸、未授权导入和删除。
 - 禁止破坏资源 UUID、`__type__`、Scene/Prefab JSON 结构。
 - 禁止提交密钥、Token、鉴权文件和编辑器生成目录。
+- C/C++ 原生库仅可放入项目内 `native/` 或 `plugins/`，必须使用 Cocos Native/CMake 官方接入路径；不得修改 Cocos 安装目录或引擎私有头文件。
 
 ## 验证方式
 

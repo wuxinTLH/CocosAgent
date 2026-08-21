@@ -1,5 +1,39 @@
 'use strict';
 
+function queryPanelElement(panel, id) {
+  const roots = [panel.shadowRoot, panel.$el, panel.element, panel.root, typeof document !== 'undefined' ? document : null].filter(Boolean);
+  if (typeof panel.$ === 'function') {
+    try {
+      const mapped = panel.$(`#${id}`) || panel.$(id);
+      if (mapped) return mapped;
+    } catch {}
+  } else if (panel.$ && typeof panel.$ === 'object') {
+    const mapped = panel.$[id] || panel.$[`#${id}`];
+    if (mapped) return mapped;
+  }
+  for (const root of roots) {
+    if (typeof root.getElementById === 'function') {
+      const found = root.getElementById(id);
+      if (found) return found;
+    }
+    if (typeof root.querySelector === 'function') {
+      const found = root.querySelector(`#${id}`);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function bindPanelEvent(panel, id, event, handler) {
+  const element = queryPanelElement(panel, id);
+  if (!element || typeof element.addEventListener !== 'function') {
+    if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn(`[overlay] missing element: #${id}`);
+    return null;
+  }
+  element.addEventListener(event, handler);
+  return element;
+}
+
 const BRIDGE_URL = 'ws://127.0.0.1:8899/ws';
 
 function commandFor(line) {
@@ -21,6 +55,7 @@ function commandFor(line) {
     'animation analyze': ['animation_analyze', { path: rest[1] || '' }],
   };
   if (head === 'chat') return { tool: 'workspace_chat', args: { chat: rest.join(' ') } };
+  if (head === 'math' && rest[0] === 'analyze') return { tool: 'math_analyze', args: { path: rest[1] || undefined } };
   if (head === 'session' && rest[0] === 'new') return { tool: 'workspace_create', args: { name: rest.slice(1).join(' ') } };
   if (head === 'session' && rest[0] === 'switch') return { tool: 'workspace_switch', args: { id: rest[1] || '' } };
   if (head === 'provider' && rest[0] === 'select') return { tool: 'provider_select', args: { provider: rest[1] || '' } };
@@ -54,11 +89,12 @@ module.exports = Editor.Panel.define({
   ready() {
     this.ws = null;
     this.messageId = 0;
-    this.output = document.getElementById('output');
-    this.input = document.getElementById('input');
-    this.state = document.getElementById('state');
-    document.getElementById('form').addEventListener('submit', (event) => { event.preventDefault(); this.run(); });
-    document.getElementById('close').addEventListener('click', () => this.close());
+    this.getElement = (id) => queryPanelElement(this, id);
+    this.output = this.getElement('output');
+    this.input = this.getElement('input');
+    this.state = this.getElement('state');
+    bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
+    bindPanelEvent(this, 'close', 'click', () => this.close());
     this.append('overlay ready');
     this.connect();
   },
@@ -69,9 +105,9 @@ module.exports = Editor.Panel.define({
   connect() {
     try {
       this.ws = new WebSocket(BRIDGE_URL);
-      this.ws.onopen = () => { this.state.textContent = 'online'; };
+      this.ws.onopen = () => { if (this.state) this.state.textContent = 'online'; };
       this.ws.onmessage = (event) => this.append(event.data);
-      this.ws.onclose = () => { this.state.textContent = 'offline'; };
+      this.ws.onclose = () => { if (this.state) this.state.textContent = 'offline'; };
     } catch (error) { this.append(`[bridge] ${error.message}`); }
   },
   run() {
@@ -86,6 +122,7 @@ module.exports = Editor.Panel.define({
   },
   append(value) {
     const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    if (!this.output) return;
     this.output.textContent += `${text}\n`;
     this.output.scrollTop = this.output.scrollHeight;
   },

@@ -1,36 +1,37 @@
 # 版本约束
 
 - MUST: 全局版本设置为 `v0.0.0.1-a`，根目录 `VERSION` 为唯一来源。
-
+- MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-20T22:37:12+08:00`（UTC+8）
+更新时间：`2026-08-21T22:08:46+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
 
 本文件作为全局任务执行器，覆盖以下全部 `.md` 文档中的约束。任何任务不得违反下表约束。
 
-| 文档                                                                   | 必须覆盖的约束                                                                                                    |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| [WORKFLOW.md](WORKFLOW.md)                                             | WF-00 至 WF-07 阶段与门禁；任务 hash；记忆写入；收尾汇报                                                          |
-| [CONSTRAINTS.md](CONSTRAINTS.md)                                       | 官方规范优先；UTC+8；访问范围；WorkFlow；hash；记忆；TODO；审查；语言；项目结构；安全；Skills/MCP；编辑纪律；验证 |
-| [CODE_REVIEW.md](CODE_REVIEW.md)                                       | P0-P3 分级；审查清单；审查输出；门禁                                                                              |
-| [HASH.md](HASH.md)                                                     | SHA-256 规范；规范化 JSON；hash 记录                                                                              |
-| [LONG_MEMORY.md](LONG_MEMORY.md)                                       | 每次执行追加；包含推理、计划、时间线、hash                                                                        |
-| [SHORT_MEMORY.md](SHORT_MEMORY.md)                                     | 保持最近 10 次；最新在前                                                                                          |
-| [docs/constraints/cocos-creator.md](docs/constraints/cocos-creator.md) | 官方资源结构；组件生命周期；编辑器扩展协议；构建流程                                                              |
-| [docs/constraints/typescript.md](docs/constraints/typescript.md)       | strict；禁止 any；命名；Cocos 装饰器；测试                                                                        |
-| [docs/constraints/javascript.md](docs/constraints/javascript.md)       | 现代语法；严格模式；JSDoc；扩展模板                                                                               |
-| [docs/constraints/project-scope.md](docs/constraints/project-scope.md) | 当前项目判定；sandbox；越界拒绝                                                                                   |
-| [templates/PROJECT_CONSTRAINTS.md](templates/PROJECT_CONSTRAINTS.md)   | 新项目必须生成独立约束                                                                                            |
-| [skills/](skills/) 各 SKILL.md                                         | 各 Skill 的输入、输出、范围与集成方式                                                                             |
-| [mcp/](mcp/)                                                           | MCP 服务启动、工具列表、sandbox                                                                                   |
-| [cli/](cli/README.md)                                                  | CLI 构建、运行、验证                                                                                              |
-| [extensions/cocos-agent/](extensions/cocos-agent/README.md)            | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                     | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
-| [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)              | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
-| [launcher/](launcher/)                                                 | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
+| 文档                                                                     | 必须覆盖的约束                                                                                                    |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| [WORKFLOW.md](WORKFLOW.md)                                               | WF-00 至 WF-07 阶段与门禁；任务 hash；记忆写入；收尾汇报                                                          |
+| [CONSTRAINTS.md](CONSTRAINTS.md)                                         | 官方规范优先；UTC+8；访问范围；WorkFlow；hash；记忆；TODO；审查；语言；项目结构；安全；Skills/MCP；编辑纪律；验证 |
+| [CODE_REVIEW.md](CODE_REVIEW.md)                                         | P0-P3 分级；审查清单；审查输出；门禁                                                                              |
+| [HASH.md](HASH.md)                                                       | SHA-256 规范；规范化 JSON；hash 记录                                                                              |
+| [LONG_MEMORY.md](LONG_MEMORY.md)                                         | 每次执行追加；包含推理、计划、时间线、hash                                                                        |
+| [SHORT_MEMORY.md](SHORT_MEMORY.md)                                       | 保持最近 10 次；最新在前                                                                                          |
+| [docs/constraints/cocos-creator.md](docs/constraints/cocos-creator.md)   | 官方资源结构；组件生命周期；编辑器扩展协议；构建流程                                                              |
+| [docs/constraints/typescript.md](docs/constraints/typescript.md)         | strict；禁止 any；命名；Cocos 装饰器；测试                                                                        |
+| [docs/constraints/javascript.md](docs/constraints/javascript.md)         | 现代语法；严格模式；JSDoc；扩展模板                                                                               |
+| [docs/constraints/project-scope.md](docs/constraints/project-scope.md)   | 当前项目判定；sandbox；越界拒绝                                                                                   |
+| [templates/PROJECT_CONSTRAINTS.md](templates/PROJECT_CONSTRAINTS.md)     | 新项目必须生成独立约束                                                                                            |
+| [docs/native-library-integration.md](docs/native-library-integration.md) | C/C++ 原生库、CMake、平台架构与数值验证约束                                                                       |
+| [skills/](skills/) 各 SKILL.md                                           | 各 Skill 的输入、输出、范围与集成方式                                                                             |
+| [mcp/](mcp/)                                                             | MCP 服务启动、工具列表、sandbox                                                                                   |
+| [cli/](cli/README.md)                                                    | CLI 构建、运行、验证                                                                                              |
+| [extensions/cocos-agent/](extensions/cocos-agent/README.md)              | Cocos 扩展安装、CLI 窗口连接                                                                                      |
+| [VERSION](VERSION)                                                       | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
+| [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)                | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
+| [launcher/](launcher/)                                                   | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
 ## 全局任务队列
 
@@ -65,10 +66,51 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 点击 open cli 报错：已将扩展 `panels` 从 `contributions` 移到 manifest 顶层，确保 `cocos-agent.cli` 与 `cocos-agent.overlay` 在 Creator 启动时注册。
+
+本轮开始时的三项待办已全部闭环，原始日志保留如下，便于审计历史问题。
+
+### 已完成任务
+
+1. [x] 修复 Cocos Creator 面板与 Overlay 的空节点 `addEventListener` 崩溃。查询顺序为 Creator `$` 映射、`shadowRoot`/panel root、最后兼容回退到 `document`；缺失节点只输出诊断，不中断扩展加载。根扩展与 `examples/cocos3d-demo` 已同步。
+2. [x] Open CLI 默认简体中文，新增 `locale` 选择控件；工作区刷新读取 `agent_config.locale`，保存工作区时写回 `locale`，并保留 `en-US` 选项。面板命令可直接调用 `math analyze`。
+3. [x] 新增 `native-math-optimization` Skill、`math_analyze` CLI/MCP 工具及 C/C++ 原生库接入约束。只读扫描当前项目 `assets/`、`native/`、`plugins/`，覆盖 Transform、Mat4 求逆、Ray/AABB、Vec3/Vec4、normalize、sqrt 等优化候选；不触碰 Cocos 私有引擎文件或项目外资源。
+
+### 本轮验证
+
+- [x] `cd cli; npm run verify`：24 项通过、1 项按环境跳过，JavaScript 检查通过，文档链接 `58/0`。
+- [x] TypeScript strict 类型检查通过。
+- [x] 扩展契约测试覆盖中文默认文本、locale 控件、panel root 查询和无全局 `document.getElementById`。
+- [x] C/C++ 接入说明已写入 [docs/native-library-integration.md](docs/native-library-integration.md)，并纳入本 TODO 约束覆盖表。
+
+本轮任务 hash：`sha256:29c6cbd338c99522105b234a7f82114ce5a4889962b28ee26eedb70ac5184a72`。
+
+<!-- 原始待办日志 -->
+1.
 ```log
-Panel(cocos-agent.cli) is not defined.
+[Window] Cannot read properties of null (reading 'addEventListener')
+TypeError: Cannot read properties of null (reading 'addEventListener')
+at Object.ready (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:86:36)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4682
+at new Promise (<anonymous>)
+at PanelFrame.emit (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4637)
+at loadPanel (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:7297)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4434
+at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)**
 ```
+以及
+```log
+ [Window] Cannot read properties of null (reading 'addEventListener')
+TypeError: Cannot read properties of null (reading 'addEventListener')
+at Object.ready (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:60:36)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4682
+at new Promise (<anonymous>)
+at PanelFrame.emit (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4637)
+at loadPanel (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:7297)
+at E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@editor\panel\lib\element.ccc:1:4434
+at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)
+```
+2. cocosagent最好默认是中文模式,CLI构建的配置项构建困难,参考cc switch的配置项
+3. 添加c/c++库方式,添加高等数学进行代码优化,比如光线transformer等
 
 
 

@@ -30,6 +30,7 @@ workspace list|new|switch|delete|chat  管理模型工作区、多会话和对�
 terminal run                在 full-access 下运行 cmd/PowerShell/Windows Terminal
 animation analyze|optimize 分析和优化当前项目内 .anim 动画
 animation ocr|controller   OCR 提取状态或生成 Animation 控制器
+math analyze [--path]      只读分析 Transform、Ray、向量与 C/C++ 数学热路径
 docs check                  校验文档链接
 project init                生成项目独立约束
 mcp                    启动 stdio MCP 服务
@@ -84,6 +85,7 @@ node dist/index.js terminal run --shell powershell --command "Get-ChildItem asse
 node dist/index.js animation analyze --path assets/animations/locomotion.anim
 node dist/index.js animation optimize --path assets/animations/locomotion.anim
 node dist/index.js animation controller --path assets/scripts/PlayerAnimation.ts --class PlayerAnimation --definition-file animation-state.json
+node dist/index.js math analyze --path assets/scripts/Player.ts
 ```
 
 ## 多模型、工作区与权限

@@ -281,6 +281,10 @@ async function main(): Promise<void> {
         throw new Error(`UNKNOWN_SUBCOMMAND: animation ${sub ?? ''}`);
       }
       break;
+    case 'math':
+      if (sub !== 'analyze') throw new Error(`UNKNOWN_SUBCOMMAND: math ${sub ?? ''}`);
+      console.log(JSON.stringify(await dispatchTool(ctx, 'math_analyze', { path: args.flags.path ? String(args.flags.path) : undefined }), null, 2));
+      break;
     case 'terminal':
       if (sub !== 'run') throw new Error(`UNKNOWN_SUBCOMMAND: terminal ${sub ?? ''}`);
       console.log(JSON.stringify(await dispatchTool(ctx, 'terminal_run', {
