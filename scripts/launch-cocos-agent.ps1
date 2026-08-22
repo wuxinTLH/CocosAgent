@@ -57,8 +57,26 @@ if (-not (Test-Path -LiteralPath $cliIndex -PathType Leaf)) {
     throw "CLI build missing: $cliIndex"
 }
 
-New-Item -ItemType Directory -Force -Path (Split-Path -Parent $extensionTarget) | Out-Null
 $projectRootForCheck = [IO.Path]::GetFullPath($project).TrimEnd([char[]]@([char]92, [char]47))
+$projectCliRoot = Join-Path $project '.cocos-agent\cli'
+$projectCliRootForCheck = [IO.Path]::GetFullPath($projectCliRoot).TrimEnd([char[]]@([char]92, [char]47))
+if (-not $projectCliRootForCheck.StartsWith($projectRootForCheck + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "CLI runtime target escaped project root: $projectCliRootForCheck"
+}
+New-Item -ItemType Directory -Force -Path $projectCliRoot | Out-Null
+$cliRoot = Split-Path -Parent (Split-Path -Parent $cliIndex)
+foreach ($runtimeDir in @('dist', 'node_modules')) {
+    $sourceRuntimeDir = Join-Path $cliRoot $runtimeDir
+    $targetRuntimeDir = Join-Path $projectCliRoot $runtimeDir
+    if (-not (Test-Path -LiteralPath $sourceRuntimeDir -PathType Container)) {
+        throw "CLI runtime directory missing: $sourceRuntimeDir"
+    }
+    if (Test-Path -LiteralPath $targetRuntimeDir) { Remove-Item -LiteralPath $targetRuntimeDir -Recurse -Force }
+    Copy-Item -LiteralPath $sourceRuntimeDir -Destination $projectCliRoot -Recurse -Force
+}
+Copy-Item -LiteralPath (Join-Path $cliRoot 'package.json') -Destination $projectCliRoot -Force
+
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $extensionTarget) | Out-Null
 $extensionTargetForCheck = [IO.Path]::GetFullPath($extensionTarget).TrimEnd([char[]]@([char]92, [char]47))
 if (-not $extensionTargetForCheck.StartsWith($projectRootForCheck + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Extension target escaped project root: $extensionTargetForCheck"
@@ -68,16 +86,16 @@ if (Test-Path -LiteralPath $extensionTarget) {
 }
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
 $configFile = Join-Path $configDir 'config.json'
-$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' }
+$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js')); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' }
 if (Test-Path -LiteralPath $configFile -PathType Leaf) {
     try {
         $loadedConfig = Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
-        $existingConfig.cliIndex = if ($loadedConfig.cliIndex) { [string]$loadedConfig.cliIndex } else { [IO.Path]::GetFullPath($cliIndex) }
+        $existingConfig.cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js'))
         $existingConfig.creatorPath = if ($loadedConfig.creatorPath) { [string]$loadedConfig.creatorPath } else { '' }
         if ($loadedConfig.overlay) { $existingConfig.overlay = [bool]$loadedConfig.overlay }
     } catch { $existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' } }
 }
-$existingConfig.cliIndex = [IO.Path]::GetFullPath($cliIndex)
+$existingConfig.cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js'))
 $existingConfig.version = 'v0.0.0.2-a'
 $existingConfig.overlay = $true
 $existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8

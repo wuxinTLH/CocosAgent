@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260822-008
+
+- TaskHash：`sha256:85a32c08907eefa8564da80e1d3ef4db2fceb47b4cafc88a6969909ace7db20f`
+- 开始：`2026-08-22T13:44:00+08:00`
+- 结束：`2026-08-22T13:52:11+08:00`
+- 请求：根据 TODO 修复 Creator 报错：`package_version is not defined`、CLI 未构建以及面板控件 missing element，并让 Cocos Agent 可直接使用。
+- 推理：manifest 缺少 Creator 扩展所需 `package_version`；Panel/Overlay `ready()` 早于模板挂载，立即绑定会产生误导性 missing-element 警告；手动打开 Creator 时 CLI 可能只有源码而无 dist。应补 manifest 字段，延迟重试控件绑定，启动/安装脚本自动构建 CLI，并将 dist/node_modules 复制到当前项目 `.cocos-agent/cli`，扩展优先使用项目内入口。
+- 计划：同步根扩展与 demo；更新脚本和契约测试；修复启动器路径；同步 `C:\Users\13929\NewProject`；运行 `npm run verify` 与启动器 DryRun；更新账本并提交推送。
+- 时间线：2026-08-22T13:44:00+08:00 分析 TODO 新日志和 Creator 运行记录；13:47 补齐 manifest、延迟绑定、项目 CLI 运行时复制；13:49 修复 `cli\dist\dist` 路径错误；13:50 DryRun 构建 CLI 并成功同步测试项目；13:52:11 完成 25/25 测试、文档 58/0 和任务 hash。
+- 结果：根扩展和 demo manifest 均加入 `package_version: 2`；Panel/Overlay 延迟到模板挂载后绑定，2 秒后才输出单条最终诊断；启动器自动构建并同步项目私有 CLI，测试项目 `.cocos-agent/cli/dist/index.js` 存在，配置已指向该路径。`npm run verify` 通过，DryRun 通过，扩展契约检查通过。代码审查结论：P0=0、P1=0、P2=0、P3=0。未创建新 Release。
+
 ### AGT-20260822-007
 
 - TaskHash：`sha256:b9795dd22b79ef5a3d2528038ce0ad51a146a48174628a2d98896bd5fa38b397`

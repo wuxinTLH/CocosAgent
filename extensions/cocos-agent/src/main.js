@@ -37,6 +37,7 @@ function resolveCliIndex() {
   }
   const candidates = [
     process.env.COCOS_AGENT_CLI_INDEX,
+    path.join(projectRoot(), '.cocos-agent', 'cli', 'dist', 'index.js'),
     configuredCliIndex,
     path.join(projectRoot(), 'cli', 'dist', 'index.js'),
     path.join(__dirname, '..', '..', '..', 'cli', 'dist', 'index.js'),

@@ -14,6 +14,7 @@ const globals = globalThis as typeof globalThis & { Editor?: unknown };
 
 test('Cocos Creator extension manifest and panel contract are valid', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(extensionRoot, 'package.json'), 'utf8')) as {
+    package_version?: number;
     cocosAgentVersion?: string;
     panels?: Record<string, { main?: string; type?: string }>;
     contributions?: {
@@ -22,6 +23,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     };
   };
   assert.equal(manifest.cocosAgentVersion, 'v0.0.0.2-a');
+  assert.equal(manifest.package_version, 2);
   assert.equal(manifest.panels?.cli?.type, 'dockable');
   assert.equal(manifest.panels?.cli?.main, './src/panel.js');
   assert.equal(manifest.panels?.overlay?.type, 'dockable');
@@ -91,6 +93,9 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(launchScript, /cocos editor/);
     assert.match(launchScript, /ExtensionTimeoutSeconds/);
     assert.match(launchScript, /overlay-status\.json/);
+    assert.match(launchScript, /projectCliRoot/);
+    assert.match(launchScript, /npm run build/);
+    assert.match(mainSource, /\.cocos-agent', 'cli', 'dist', 'index\.js/);
     main.methods?.openCli?.();
     assert.deepEqual(opened, ['cocos-agent.cli']);
   } finally {

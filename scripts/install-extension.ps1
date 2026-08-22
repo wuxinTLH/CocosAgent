@@ -15,6 +15,9 @@ if (-not (Test-Path -LiteralPath $sourceDir)) {
 if (-not $CliIndex) {
     $CliIndex = Join-Path $repoRoot 'cli\dist\index.js'
 }
+Push-Location (Join-Path $repoRoot 'cli')
+try { npm run build | Out-Host }
+finally { Pop-Location }
 if (-not (Test-Path -LiteralPath $CliIndex -PathType Leaf)) {
     throw "CLI is not built: $CliIndex. Run 'cd cli; npm run build' first."
 }

@@ -26,10 +26,7 @@ function queryPanelElement(panel, id) {
 
 function bindPanelEvent(panel, id, event, handler) {
   const element = queryPanelElement(panel, id);
-  if (!element || typeof element.addEventListener !== 'function') {
-    if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn(`[panel] missing element: #${id}`);
-    return null;
-  }
+  if (!element || typeof element.addEventListener !== 'function') return null;
   element.addEventListener(event, handler);
   return element;
 }
@@ -107,12 +104,14 @@ const panelDefinition = {
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['connect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'run', 'append']) {
+    for (const name of ['bindElements', 'connect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'run', 'append']) {
       this[name] = (...args) => panelDefinition[name].apply(this, args);
     }
     this.messageId = 0;
     this.pending = new Map();
     this.providers = [];
+    this.eventsBound = false;
+    this.bindAttempts = 0;
     this.getElement = (id) => queryPanelElement(this, id);
     this.output = this.getElement('output');
     this.input = this.getElement('input');
@@ -125,14 +124,39 @@ const panelDefinition = {
     this.fallbackProviders = this.getElement('fallback-providers');
     this.ccsRoute = this.getElement('ccs-route');
     this.ccsState = this.getElement('ccs-state');
-    bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
-    bindPanelEvent(this, 'provider', 'change', () => this.showProvider(this.provider?.value));
-    bindPanelEvent(this, 'save-provider', 'click', () => this.saveProvider());
-    bindPanelEvent(this, 'select-provider', 'click', () => this.selectProvider());
-    bindPanelEvent(this, 'save-workspace', 'click', () => this.saveWorkspace());
-    bindPanelEvent(this, 'ccs-doctor', 'click', () => this.ccsDoctor());
-    bindPanelEvent(this, 'ccs-connect', 'click', () => this.ccsConnect());
+    this.bindElements();
     this.connect();
+  },
+  bindElements() {
+    const ids = ['output', 'input', 'state', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
+    const elements = Object.fromEntries(ids.map((id) => [id, this.getElement(id)]));
+    const ready = ids.every((id) => elements[id] && (id === 'output' || typeof elements[id].addEventListener === 'function'));
+    if (ready && !this.eventsBound) {
+      this.output = elements.output;
+      this.input = elements.input;
+      this.state = elements.state;
+      this.provider = elements.provider;
+      this.model = elements.model;
+      this.endpoint = elements.endpoint;
+      this.credential = elements.credential;
+      this.activeProvider = elements['active-provider'];
+      this.fallbackProviders = elements['fallback-providers'];
+      this.ccsRoute = elements['ccs-route'];
+      this.ccsState = elements['ccs-state'];
+      bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
+      bindPanelEvent(this, 'provider', 'change', () => this.showProvider(this.provider?.value));
+      bindPanelEvent(this, 'save-provider', 'click', () => this.saveProvider());
+      bindPanelEvent(this, 'select-provider', 'click', () => this.selectProvider());
+      bindPanelEvent(this, 'save-workspace', 'click', () => this.saveWorkspace());
+      bindPanelEvent(this, 'ccs-doctor', 'click', () => this.ccsDoctor());
+      bindPanelEvent(this, 'ccs-connect', 'click', () => this.ccsConnect());
+      this.eventsBound = true;
+      return true;
+    }
+    this.bindAttempts += 1;
+    if (this.bindAttempts < 40) setTimeout(() => this.bindElements(), 50);
+    else if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn('[panel] template elements were not mounted');
+    return false;
   },
   connect() {
     try {

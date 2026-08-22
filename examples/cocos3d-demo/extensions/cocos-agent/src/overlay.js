@@ -26,10 +26,7 @@ function queryPanelElement(panel, id) {
 
 function bindPanelEvent(panel, id, event, handler) {
   const element = queryPanelElement(panel, id);
-  if (!element || typeof element.addEventListener !== 'function') {
-    if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn(`[overlay] missing element: #${id}`);
-    return null;
-  }
+  if (!element || typeof element.addEventListener !== 'function') return null;
   element.addEventListener(event, handler);
   return element;
 }
@@ -89,19 +86,40 @@ const panelDefinition = {
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['close', 'connect', 'run', 'append']) {
+    for (const name of ['bindElements', 'close', 'connect', 'run', 'append']) {
       this[name] = (...args) => panelDefinition[name].apply(this, args);
     }
     this.ws = null;
     this.messageId = 0;
+    this.eventsBound = false;
+    this.bindAttempts = 0;
     this.getElement = (id) => queryPanelElement(this, id);
     this.output = this.getElement('output');
     this.input = this.getElement('input');
     this.state = this.getElement('state');
-    bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
-    bindPanelEvent(this, 'close', 'click', () => this.close());
+    this.bindElements();
     this.append('overlay ready');
     this.connect();
+  },
+  bindElements() {
+    const form = this.getElement('form');
+    const close = this.getElement('close');
+    const output = this.getElement('output');
+    const input = this.getElement('input');
+    const state = this.getElement('state');
+    if (form && close && output && input && state && typeof form.addEventListener === 'function' && typeof close.addEventListener === 'function') {
+      this.output = output;
+      this.input = input;
+      this.state = state;
+      bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
+      bindPanelEvent(this, 'close', 'click', () => this.close());
+      this.eventsBound = true;
+      return true;
+    }
+    this.bindAttempts += 1;
+    if (this.bindAttempts < 40) setTimeout(() => this.bindElements(), 50);
+    else if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn('[overlay] template elements were not mounted');
+    return false;
   },
   close() {
     if (this.ws) this.ws.close();
