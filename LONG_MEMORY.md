@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260822-004
+
+- TaskHash：`sha256:50b2b8a0be9d14f1c4a2c5f7c54a5dac2ad13dc43ee183e53726fbba877150c0`
+- 开始：`2026-08-22T10:30:00+08:00`
+- 结束：`2026-08-22T10:32:37+08:00`
+- 请求：继续获取 GitHub CI Test suite 的具体失败输出并完成剩余任务验证。
+- 推理：逐文件执行和 Step Summary 已生效但远程日志/artifact 仍因当前 API 权限不可读取；GitHub check annotations 可公开查询，因此把 test-output.log 前 80 行转为 workflow command error annotations，下一次 run 可直接通过 check-runs API 暴露失败文件和堆栈。
+- 计划：增加 annotation 输出；生成 hash；更新 TODO/记忆；提交推送；读取最新 check annotations。
+- 时间线：2026-08-22T10:30:00+08:00 确认 run `32546481161` 仍在 Test suite 失败；10:32:37 完成 annotation 诊断改动和 hash。
+- 结果：诊断改动尚未推送；无业务代码变化，Release `v0.0.0.2-a` 不变。代码审查结论：P0=0、P1=0、P2=0、P3=0。
+
 ### AGT-20260822-003
 
 - TaskHash：`sha256:2194d58332d605ccbdab1c45e9920e52045347b091bb3ef89d8f9319485d2718`

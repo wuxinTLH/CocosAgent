@@ -52,6 +52,12 @@ jobs:
               sed -n '1,400p' test-output.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+            line=0
+            while IFS= read -r output_line && [ "$line" -lt 80 ]; do
+              line=$((line + 1))
+              escaped_line=$(printf '%s' "$output_line" | tr '%' '_' | tr '\r\n' '  ')
+              echo "::error file=cli/test-output.log,line=$line,title=CI test output::$escaped_line"
+            done < test-output.log
           fi
       - name: Upload test output
         if: always()
