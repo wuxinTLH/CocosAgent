@@ -14,7 +14,38 @@
 
 ## 执行记录
 
+### AGT-20260822-011
+
+- TaskHash：`sha256:e482127b602167c22bdd0df48230958754ccdb977117877b041e4c22588f35c5`
+- 开始：`2026-08-22T14:10:00+08:00`
+- 结束：`2026-08-22T14:28:35+08:00`
+- 请求：根据 TODO.md 将全局版本回退到 v0.0.0.1-a，并重新构建 GitHub Release。
+- 推理：TODO 明确要求回退版本并重建 Release。必须以 VERSION 为唯一来源，同步 CLI、扩展、示例、项目约束、文档和 npm metadata；历史 LONG_MEMORY/CHANGELOG 只保留审计事实。
+- 计划：
+  1. 检查版本引用、Release workflow、远程 release/tag 与指定测试项目。
+  2. 回退当前代码和 manifest 到 v0.0.0.1-a / 0.0.1-a。
+  3. 运行 verify、PowerShell 解析、NewProject 本地测试。
+  4. 推送 master，删除旧 v0.0.0.2-a release/tag，创建 v0.0.0.1-a tag，核验 workflow 和资产。
+  5. 更新 TODO、LONG_MEMORY、SHORT_MEMORY。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-22T14:10:00+08:00 | 发现 TODO 新增版本回退与 Release 重建待办，生成任务 hash |
+| 2026-08-22T14:13:00+08:00 | 同步 VERSION、CLI、扩展、示例、约束文档和 package metadata 到 v0.0.0.1-a |
+| 2026-08-22T14:18:00+08:00 | npm run verify 通过：14 个测试文件，文档 58/0；PowerShell 解析通过 |
+| 2026-08-22T14:20:00+08:00 | C:\Users\13929\NewProject 本地项目同步和 CLI status/version/path 验证通过 |
+| 2026-08-22T14:22:00+08:00 | 提交 df0c753 推送 master；删除旧 v0.0.0.2-a Release/tag |
+| 2026-08-22T14:24:00+08:00 | 创建并推送 v0.0.0.1-a tag，触发 Release workflow 32557022637 |
+| 2026-08-22T14:28:35+08:00 | workflow success，Release 和 Windows zip 资产核验通过 |
+
+- 结果：全局当前版本已恢复为 v0.0.0.1-a，npm semver 为 0.0.1-a；Release URL 为 https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.1-a，Windows 资产大小 84,880,609 bytes。
+- 文件：VERSION、CONSTRAINTS.md、README.md、cli/、extensions/cocos-agent/、examples/cocos3d-demo/、docs/constraints/、templates/PROJECT_CONSTRAINTS.md、TODO.md。
+- 后续：保留旧 v0.0.0.2-a 的历史记忆作为审计记录；当前远程仅保留 v0.0.0.1-a tag/release。
+- 代码审查：P0=0，P1=0，P2=0，P3=0。
+
 ### AGT-20260822-010
+
 
 - TaskHash：`sha256:0dd355cc3a8ef80a016fb5395eae7379bdf978679c851cb214fad1fed91024c3`
 - 开始：`2026-08-22T14:00:00+08:00`
