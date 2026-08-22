@@ -14,7 +14,8 @@
     "lint": "npm run typecheck && node scripts/check-javascript.mjs",
     "test": "npm run build && node scripts/run-tests.mjs",
     "docs:check": "npm run build && node dist/index.js docs check",
-    "verify": "npm run lint && npm run test && npm run docs:check"
+    "verify": "npm run lint && npm run test && npm run docs:check",
+    "test:local-project": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ../scripts/test-local-project.ps1"
   },
   "engines": {
     "node": ">=20.0.0"

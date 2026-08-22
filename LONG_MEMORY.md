@@ -14,7 +14,43 @@
 
 ## 执行记录
 
+### AGT-20260822-010
+
+- TaskHash：`sha256:0dd355cc3a8ef80a016fb5395eae7379bdf978679c851cb214fad1fed91024c3`
+- 开始：`2026-08-22T14:00:00+08:00`
+- 结束：`2026-08-22T14:08:15+08:00`
+- 请求：根据 TODO.md 的约束，一次性完成“允许直接调用本地项目进行测试”和“测试当前版本的代码”。
+- 推理：现有启动器已能同步扩展与项目内 CLI，但没有可重复的项目本地测试闭环；同时启动器和安装脚本存在硬编码版本，可能让旧版本继续进入项目。应新增项目范围测试入口，以 VERSION 为唯一来源，先校验项目标志和版本，再同步、执行项目本地 status 并核对路径。
+- 计划：
+  1. 检查 TODO、WorkFlow、版本源、启动器、扩展契约与 NewProject。
+  2. 新增项目本地测试脚本和 npm 入口，修复启动/安装脚本硬编码版本。
+  3. 增加扩展契约测试，运行完整 verify、PowerShell 解析检查和 NewProject 闭环。
+  4. 更新 TODO、LONG_MEMORY、SHORT_MEMORY，审查后提交推送。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-22T14:00:00+08:00 | 检查现有脚本、CLI status、版本源与用户 TODO 改动 |
+| 2026-08-22T14:03:00+08:00 | 新增 test-local-project.ps1，加入 npm 入口，启动/安装脚本改读 VERSION |
+| 2026-08-22T14:05:00+08:00 | npm run verify 通过：14 个测试文件全通过，文档 58/0 |
+| 2026-08-22T14:06:00+08:00 | 针对 C:\Users\13929\NewProject 完成 DryRun 同步和项目本地 CLI status/version/path 校验 |
+| 2026-08-22T14:08:15+08:00 | 完成 TODO、记忆账本和收尾审查，未创建 Release |
+
+- 结果：两个待办均已完成；根 VERSION、CLI、扩展、项目副本均为 v0.0.0.2-a，本地项目测试入口可复现执行。
+- 文件：
+  - scripts/test-local-project.ps1
+  - scripts/launch-cocos-agent.ps1
+  - scripts/install-extension.ps1
+  - cli/package.json
+  - cli/src/tests/extension.test.ts
+  - TODO.md
+  - LONG_MEMORY.md
+  - SHORT_MEMORY.md
+- 后续：保留远程 CI 的既有诊断风险记录；本任务未请求 Release，因此不创建或修改 Release。
+- 代码审查：P0=0，P1=0，P2=0，P3=0。
+
 ### AGT-20260822-009
+
 
 - TaskHash：`sha256:231856d765f17be56129fdb0078de34894dcfd9b8e8407f3e12917b0dd677d0d`
 - 开始：`2026-08-22T13:53:00+08:00`

@@ -1,10 +1,10 @@
-# 版本约束
+﻿# 版本约束
 
 - MUST: 全局版本设置为 `v0.0.0.2-a`，根目录 `VERSION` 为唯一来源。
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T13:54:20+08:00`（UTC+8）
+更新时间：`2026-08-22T14:08:15+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,36 +69,16 @@
 # 任务队列
 
 ## 代办列表
-- [x] 修复 Creator `package_version` 缺失、CLI 未构建/运行时路径错误和模板延迟挂载导致的控件警告；启动时构建 CLI 并同步到当前项目 `.cocos-agent/cli`。
-```log
- [Package] cocos-agent: package_version is not defined
- [cocos-agent] CLI not built. Run: cd cli && npm install && npm run build
+- [x] 允许直接调用本地项目进行测试：新增 `scripts/test-local-project.ps1` 和 `npm run test:local-project -- --ProjectRoot <path>`；会校验 Cocos 项目标志、同步项目内 CLI/扩展、执行项目本地 `status`，并核对项目根路径。
+- [x] 测试当前版本的代码：以根目录 `VERSION` 为唯一来源，校验 CLI、扩展和项目副本版本一致，并完成 `npm run verify` 与测试项目闭环验证。
 
- [Window] [panel] missing element: #form
+本轮验证：
 
- [Window] [panel] missing element: #provider
+- [x] `cd cli; npm run verify`：TypeScript strict、JavaScript 检查、14 个测试文件全部通过，文档链接 `58/0`。
+- [x] `scripts/test-local-project.ps1 -ProjectRoot C:\Users\13929\NewProject`：DryRun 同步成功，项目本地 CLI `status` 返回 `v0.0.0.2-a`，项目根路径校验通过。
+- [x] PowerShell 脚本解析检查通过；未创建或修改 Release。
 
- [Window] [panel] missing element: #save-provider
-
- [Window] [panel] missing element: #select-provider
-
- [Window] [panel] missing element: #save-workspace
-
- [Window] [panel] missing element: #ccs-doctor
-
- [Window] [panel] missing element: #ccs-connect
-
- [Window] [overlay] missing element: #form
-
- [Window] [overlay] missing element: #close
-
- [Window] [overlay] missing element: #form
-
- [Window] [overlay] missing element: #close
-```
-考虑直接将cocos agent进行build操作,以便于在creator中直接使用.
-
-以上为本轮修复前的历史日志，当前问题已由上方已完成任务闭环。
+本轮任务 hash：`sha256:0dd355cc3a8ef80a016fb5395eae7379bdf978679c851cb214fad1fed91024c3`。
 
 
 ### 已完成任务

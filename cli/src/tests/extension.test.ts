@@ -95,6 +95,11 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(launchScript, /overlay-status\.json/);
     assert.match(launchScript, /projectCliRoot/);
     assert.match(launchScript, /npm run build/);
+    assert.match(launchScript, /VERSION/);
+    const localProjectTest = fs.readFileSync(path.join(repoRoot, 'scripts', 'test-local-project.ps1'), 'utf8');
+    assert.match(localProjectTest, /COCOS_AGENT_PROJECT_ROOT/);
+    assert.match(localProjectTest, /status/);
+    assert.match(localProjectTest, /Project-local CLI version mismatch/);
     assert.match(mainSource, /\.cocos-agent', 'cli', 'dist', 'index\.js/);
     main.methods?.openCli?.();
     assert.deepEqual(opened, ['cocos-agent.cli']);

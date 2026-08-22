@@ -10,6 +10,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
+$versionFile = Join-Path $repoRoot 'VERSION'
+if (-not (Test-Path -LiteralPath $versionFile -PathType Leaf)) {
+    throw "Version source not found: $versionFile"
+}
+$agentVersion = (Get-Content -LiteralPath $versionFile -Raw).Trim()
+if ($agentVersion -notmatch '^v\d+\.\d+\.\d+\.\d+-[0-9A-Za-z.-]+$') {
+    throw "Invalid Cocos Agent version in VERSION: $agentVersion"
+}
 $configDir = Join-Path $env:USERPROFILE '.cocos-agent'
 New-Item -ItemType Directory -Force -Path $configDir | Out-Null
 $launcherLog = Join-Path $configDir 'launcher.log'
@@ -25,7 +33,7 @@ function Write-OverlayStatus([string]$State, [string]$Message = '') {
     @{
         state = $State
         message = $Message
-        version = 'v0.0.0.2-a'
+        version = $agentVersion
         updatedAt = (Get-Date).ToUniversalTime().AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss+08:00')
     } | ConvertTo-Json | Set-Content -LiteralPath $script:overlayStatusFile -Encoding UTF8
 }
@@ -86,17 +94,17 @@ if (Test-Path -LiteralPath $extensionTarget) {
 }
 Copy-Item -LiteralPath $extensionSource -Destination $extensionTarget -Recurse -Force
 $configFile = Join-Path $configDir 'config.json'
-$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js')); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' }
+$existingConfig = @{ cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js')); version = $agentVersion; overlay = $true; creatorPath = '' }
 if (Test-Path -LiteralPath $configFile -PathType Leaf) {
     try {
         $loadedConfig = Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
         $existingConfig.cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js'))
         $existingConfig.creatorPath = if ($loadedConfig.creatorPath) { [string]$loadedConfig.creatorPath } else { '' }
         if ($loadedConfig.overlay) { $existingConfig.overlay = [bool]$loadedConfig.overlay }
-    } catch { $existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = 'v0.0.0.2-a'; overlay = $true; creatorPath = '' } }
+    } catch { $existingConfig = @{ cliIndex = [IO.Path]::GetFullPath($cliIndex); version = $agentVersion; overlay = $true; creatorPath = '' } }
 }
 $existingConfig.cliIndex = [IO.Path]::GetFullPath((Join-Path $projectCliRoot 'dist\index.js'))
-$existingConfig.version = 'v0.0.0.2-a'
+$existingConfig.version = $agentVersion
 $existingConfig.overlay = $true
 $existingConfig | ConvertTo-Json | Set-Content -LiteralPath $configFile -Encoding UTF8
 
