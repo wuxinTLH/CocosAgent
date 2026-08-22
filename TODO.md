@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T14:28:35+08:00`（UTC+8）
+更新时间：`2026-08-22T14:45:00+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,18 +69,15 @@
 # 任务队列
 
 ## 代办列表
-- [x] 版本号已全部回到 `v0.0.0.1-a`，CLI/扩展/示例/文档与项目测试副本已同步；GitHub Release 已按该版本重新构建。
+- [x] 修复 Overlay 和 CLI 顶部按钮点击无反应：面板使用根节点事件委托并保留无根节点时的单元素回退绑定，Overlay 覆盖关闭与命令提交，CLI 覆盖保存渠道、使用渠道、保存工作区、cc-switch 检查/连接和命令提交；根扩展与 examples demo 已同步。
 
 ### 本轮验证
 
 - [x] `cd cli; npm run verify`：14 个测试文件全部通过，TypeScript strict、JavaScript 检查和文档链接 `58/0` 通过。
-- [x] `scripts/test-local-project.ps1 -ProjectRoot C:\Users\13929\NewProject`：同步、项目本地 CLI status、版本和路径校验通过。
-- [x] 根 `VERSION`、CLI、扩展、示例、约束文档与项目副本均为 `v0.0.0.1-a`；npm semver 均为 `0.0.1-a`。
-- [x] GitHub Release tag `v0.0.0.1-a` 已重新创建并完成资产构建。
+- [x] `npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject`：项目同步、CLI status、版本和路径校验通过。
+- [x] PowerShell 三个脚本解析通过，`git diff --check` 无问题。
 
-本轮任务 hash：`sha256:e482127b602167c22bdd0df48230958754ccdb977117877b041e4c22588f35c5`。
-
-
+本轮任务 hash：`sha256:d644489138fa252c5c5f0aff3508df53e74887c7ea88fcb96dccd93b17cf3dd4`。
 ### 已完成任务
 
 1. [x] 修复 Cocos Creator 面板与 Overlay 的空节点 `addEventListener` 崩溃。查询顺序为 Creator `$` 映射、`shadowRoot`/panel root、最后兼容回退到 `document`；缺失节点只输出诊断，不中断扩展加载。根扩展与 `examples/cocos3d-demo` 已同步。

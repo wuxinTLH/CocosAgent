@@ -14,7 +14,29 @@
 
 ## 执行记录
 
-### AGT-20260822-011
+### AGT-20260822-012
+### AGT-20260822-012
+
+- TaskHash：`sha256:d644489138fa252c5c5f0aff3508df53e74887c7ea88fcb96dccd93b17cf3dd4`
+- 开始：`2026-08-22T14:35:00+08:00`
+- 结束：`2026-08-22T14:45:00+08:00`
+- 请求：根据 TODO.md 修复 Overlay 和 CLI 顶部按钮点击无反应，并完成指定项目验证。
+- 推理：原实现依赖每个按钮在 ready 时被单独查询并绑定；Creator 延迟挂载、shadow root 或元素代理会导致界面存在但监听器没有稳定挂上。应在面板根节点使用事件委托处理 click/submit，并保留无根节点环境的回退绑定。
+- 计划：检查两个扩展面板、同步 demo、增加扩展契约断言，运行完整 verify 和 NewProject 本地测试，更新账本并推送。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-22T14:35:00+08:00 | 检查 TODO 新增待办和 panel/overlay 事件绑定实现 |
+| 2026-08-22T14:38:00+08:00 | 为 CLI 和 Overlay 增加面板根节点 click/submit 事件委托及回退绑定 |
+| 2026-08-22T14:40:00+08:00 | 同步 examples/cocos3d-demo 扩展并增加事件契约测试 |
+| 2026-08-22T14:43:00+08:00 | npm run verify、PowerShell 解析和 NewProject 测试通过 |
+| 2026-08-22T14:45:00+08:00 | 更新 TODO 和记忆，准备提交 |
+- 结果：Overlay 关闭/运行按钮与 CLI 保存/选择/工作区/ccs/命令按钮均有根委托处理；14 个测试文件通过，文档 58/0，NewProject 验证通过。
+- 文件：extensions/cocos-agent/src/panel.js、extensions/cocos-agent/src/overlay.js、examples/cocos3d-demo/extensions/cocos-agent/src/panel.js、examples/cocos3d-demo/extensions/cocos-agent/src/overlay.js、cli/src/tests/extension.test.ts、TODO.md。
+- 后续：无；本轮未涉及 Release。
+- 代码审查：P0=0，P1=0，P2=0，P3=0。
+
 
 - TaskHash：`sha256:e482127b602167c22bdd0df48230958754ccdb977117877b041e4c22588f35c5`
 - 开始：`2026-08-22T14:10:00+08:00`

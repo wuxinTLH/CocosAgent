@@ -31,6 +31,21 @@ function bindPanelEvent(panel, id, event, handler) {
   return element;
 }
 
+function panelEventRoot(panel) {
+  return panel.shadowRoot || panel.$el || panel.element || panel.root || null;
+}
+
+function eventTargetId(event) {
+  const target = event && event.target;
+  if (!target) return '';
+  if (target.id) return target.id;
+  if (typeof target.closest === 'function') {
+    const button = target.closest('button');
+    return button ? button.id : '';
+  }
+  return '';
+}
+
 const BRIDGE_URL = 'ws://127.0.0.1:8899/ws';
 
 function commandFor(line) {
@@ -111,8 +126,14 @@ const panelDefinition = {
       this.output = output;
       this.input = input;
       this.state = state;
-      bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
-      bindPanelEvent(this, 'close', 'click', () => this.close());
+      const root = panelEventRoot(this);
+      if (root && typeof root.addEventListener === 'function') {
+        root.addEventListener('click', (event) => { if (eventTargetId(event) === 'close') { event.preventDefault(); this.close(); } });
+        root.addEventListener('submit', (event) => { if (event.target?.id === 'form') { event.preventDefault(); this.run(); } });
+      } else {
+        bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
+        bindPanelEvent(this, 'close', 'click', () => this.close());
+      }
       this.eventsBound = true;
       return true;
     }
