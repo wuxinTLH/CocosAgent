@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260822-006
+
+- TaskHash：`sha256:72d9cd1b1d84d2cff92252104c4d9754fa0cb25fa41bf4399af28898780fb2df`
+- 开始：`2026-08-22T13:20:00+08:00`
+- 结束：`2026-08-22T13:34:21+08:00`
+- 请求：根据 TODO 清除当前 Release 列表；全局版本未变动时按根目录 VERSION 重新设置并发布。
+- 推理：TODO 新增待办明确要求清理旧发布并重建，且当前 VERSION 已是 `v0.0.0.2-a`，不应擅自递增版本。远程存在 `v0.0.0.1-a` 与 `v0.0.0.2-a` 两个 prerelease 及对应 tags，应先用已认证 GitHub API 删除 Release 和 tags，再以当前 master 提交触发同版本 Release workflow。
+- 计划：读取 release workflow 与版本来源；认证后删除所有 Release/tags；更新 TODO/记忆；提交 master；创建 `v0.0.0.2-a` tag；验证 workflow 和资产。
+- 时间线：2026-08-22T13:20:00+08:00 读取 TODO、Release workflow 和远程发布列表；13:27 确认两个 prerelease 与两个 tags；13:31 删除全部 Release/tags；13:34:21 生成任务 hash并登记重建任务，准备提交。
+- 结果：GitHub 当前 Release 与 tags 已清空，VERSION 保持 `v0.0.0.2-a`；重建任务进行中，尚未创建新 tag。代码审查结论：P0=0、P1=0、P2=0、P3=0。
+
 ### AGT-20260822-005
 
 - TaskHash：`sha256:8eae9c0ea9afee18f3551188079888385698e4eb2b731efbcda46ba0fe09d54a`
