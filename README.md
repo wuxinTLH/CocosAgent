@@ -1,6 +1,6 @@
 # Cocos Agent
 
-全局版本：`v0.0.0.2-a`
+全局版本：`v0.0.0.1-a`
 
 面向 Cocos Creator 3D 项目的 Agent 工作区。本项目以 WorkFlow 工作流为骨架，统一约束系统、任务管理、记忆体系、Skills、MCP 工具、CLI 接入与 Cocos 编辑器扩展。
 

@@ -1,7 +1,7 @@
 {
   "name": "cocos-agent-cli",
-  "version": "0.0.2-a",
-  "cocosAgentVersion": "v0.0.0.2-a",
+  "version": "0.0.1-a",
+  "cocosAgentVersion": "v0.0.0.1-a",
   "description": "Cocos Agent CLI: WorkFlow, memory, skills, MCP and Cocos Creator bridge",
   "type": "module",
   "bin": {

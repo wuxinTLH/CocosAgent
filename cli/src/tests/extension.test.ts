@@ -22,7 +22,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
       messages?: Record<string, unknown>;
     };
   };
-  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.2-a');
+  assert.equal(manifest.cocosAgentVersion, 'v0.0.0.1-a');
   assert.equal(manifest.package_version, 2);
   assert.equal(manifest.panels?.cli?.type, 'dockable');
   assert.equal(manifest.panels?.cli?.main, './src/panel.js');

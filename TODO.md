@@ -1,10 +1,10 @@
 ﻿# 版本约束
 
-- MUST: 全局版本设置为 `v0.0.0.2-a`，根目录 `VERSION` 为唯一来源。
+- MUST: 全局版本设置为 `v0.0.0.1-a`，根目录 `VERSION` 为唯一来源。
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T14:08:15+08:00`（UTC+8）
+更新时间：`2026-08-22T14:32:00+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -29,7 +29,7 @@
 | [mcp/](mcp/)                                                             | MCP 服务启动、工具列表、sandbox                                                                                   |
 | [cli/](cli/README.md)                                                    | CLI 构建、运行、验证                                                                                              |
 | [extensions/cocos-agent/](extensions/cocos-agent/README.md)              | Cocos 扩展安装、CLI 窗口连接                                                                                      |
-| [VERSION](VERSION)                                                       | 全局版本 `v0.0.0.2-a` 与 manifest 映射                                                                            |
+| [VERSION](VERSION)                                                       | 全局版本 `v0.0.0.1-a` 与 manifest 映射                                                                            |
 | [examples/cocos3d-demo/](examples/cocos3d-demo/README.md)                | 独立 Cocos 项目约束、Scene 与素材库验证                                                                           |
 | [launcher/](launcher/)                                                   | Windows 一键启动、项目扩展安装、Overlay 打开与 Creator 探测                                                       |
 
@@ -69,16 +69,16 @@
 # 任务队列
 
 ## 代办列表
-- [x] 允许直接调用本地项目进行测试：新增 `scripts/test-local-project.ps1` 和 `npm run test:local-project -- --ProjectRoot <path>`；会校验 Cocos 项目标志、同步项目内 CLI/扩展、执行项目本地 `status`，并核对项目根路径。
-- [x] 测试当前版本的代码：以根目录 `VERSION` 为唯一来源，校验 CLI、扩展和项目副本版本一致，并完成 `npm run verify` 与测试项目闭环验证。
+- [x] 版本号已全部回到 `v0.0.0.1-a`，CLI/扩展/示例/文档与项目测试副本已同步；GitHub Release 已按该版本重新构建。
 
-本轮验证：
+### 本轮验证
 
-- [x] `cd cli; npm run verify`：TypeScript strict、JavaScript 检查、14 个测试文件全部通过，文档链接 `58/0`。
-- [x] `scripts/test-local-project.ps1 -ProjectRoot C:\Users\13929\NewProject`：DryRun 同步成功，项目本地 CLI `status` 返回 `v0.0.0.2-a`，项目根路径校验通过。
-- [x] PowerShell 脚本解析检查通过；未创建或修改 Release。
+- [x] `cd cli; npm run verify`：14 个测试文件全部通过，TypeScript strict、JavaScript 检查和文档链接 `58/0` 通过。
+- [x] `scripts/test-local-project.ps1 -ProjectRoot C:\Users\13929\NewProject`：同步、项目本地 CLI status、版本和路径校验通过。
+- [x] 根 `VERSION`、CLI、扩展、示例、约束文档与项目副本均为 `v0.0.0.1-a`；npm semver 均为 `0.0.1-a`。
+- [x] GitHub Release tag `v0.0.0.1-a` 已重新创建并完成资产构建。
 
-本轮任务 hash：`sha256:0dd355cc3a8ef80a016fb5395eae7379bdf978679c851cb214fad1fed91024c3`。
+本轮任务 hash：`sha256:e482127b602167c22bdd0df48230958754ccdb977117877b041e4c22588f35c5`。
 
 
 ### 已完成任务

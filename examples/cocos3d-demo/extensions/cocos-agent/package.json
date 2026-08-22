@@ -1,8 +1,8 @@
 {
   "package_version": 2,
   "name": "cocos-agent",
-  "version": "0.0.2-a",
-  "cocosAgentVersion": "v0.0.0.2-a",
+  "version": "0.0.1-a",
+  "cocosAgentVersion": "v0.0.0.1-a",
   "description": "Cocos Agent CLI window: connects to the local bridge and invokes agent tools.",
   "author": "Cocos Agent",
   "main": "./src/main.js",
