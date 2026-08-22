@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260822-003
+
+- TaskHash：`sha256:2194d58332d605ccbdab1c45e9920e52045347b091bb3ef89d8f9319485d2718`
+- 开始：`2026-08-22T10:23:00+08:00`
+- 结束：`2026-08-22T10:29:40+08:00`
+- 请求：继续处理 GitHub CI Test suite 失败，获取可读诊断并完成 TODO 剩余任务验证。
+- 推理：新提交的 CI 仍在 Test suite 极早失败，typecheck/lint 通过，artifact 能生成但当前 API 账户无法下载日志或 artifact。将自定义 runner 改为 Ubuntu 直接逐个执行 `dist/tests/*.test.js`，并将最多 400 行测试输出写入 `$GITHUB_STEP_SUMMARY`，可降低 spawnSync 环境差异并让失败文件直接显示在 Actions 页面。
+- 计划：修改 CI 测试步骤；保留 artifact；生成任务 hash；检查 YAML diff；提交推送；观察新 run。
+- 时间线：2026-08-22T10:23:00+08:00 读取 run/job/annotation/artifact 元数据；10:26 确认 Test suite 失败、后续诊断步骤成功；10:29:40 完成逐文件执行与 Step Summary 改动并生成 hash。
+- 结果：CI 诊断 workflow 已更新，尚未推送；本地 CLI 验证仍由上一条记录覆盖，下一步提交并检查远程 run。代码审查结论：P0=0、P1=0、P2=0、P3=0。
+
 ### AGT-20260822-002
 
 - TaskHash：`sha256:2678686cf61da7495bacb8768d5eb073777dafacdb4695cd0e459beb746942cb`

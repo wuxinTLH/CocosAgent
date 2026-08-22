@@ -31,13 +31,27 @@ jobs:
         working-directory: cli
         run: |
           set -o pipefail
-          npm test 2>&1 | tee test-output.log
+          npm run build 2>&1 | tee test-output.log
+          failed=0
+          for test_file in dist/tests/*.test.js; do
+            printf '\n[test] %s\n' "$test_file" | tee -a test-output.log
+            if ! node --test --test-concurrency=1 "$test_file" 2>&1 | tee -a test-output.log; then
+              failed=1
+            fi
+          done
+          exit "$failed"
       - name: Publish test output
         if: always()
         working-directory: cli
         run: |
           if [ -f test-output.log ]; then
             sed -n '1,400p' test-output.log
+            {
+              echo '## CI test output'
+              echo '```text'
+              sed -n '1,400p' test-output.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Upload test output
         if: always()

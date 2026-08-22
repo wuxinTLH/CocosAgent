@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T10:22:45+08:00`（UTC+8）
+更新时间：`2026-08-22T10:29:40+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -134,3 +134,5 @@ CI 诊断任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b
 CI 测试隔离任务 hash：sha256:e5df0f57d3f1788739092aa13c9f927116386459ee881084193992e8d1124bf3。
 
 AI 面板修复与 CI 诊断任务 hash：`sha256:2678686cf61da7495bacb8768d5eb073777dafacdb4695cd0e459beb746942cb`。
+
+CI 逐文件诊断任务 hash：`sha256:2194d58332d605ccbdab1c45e9920e52045347b091bb3ef89d8f9319485d2718`。
