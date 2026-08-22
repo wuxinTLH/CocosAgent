@@ -11,8 +11,18 @@ if (tests.length === 0) {
   throw new Error('NO_COMPILED_TESTS');
 }
 
-const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', ...tests], {
-  stdio: 'inherit',
-  env: process.env,
-});
-process.exit(result.status ?? 1);
+for (const testFile of tests) {
+  console.log(`\n[test] ${testFile}`);
+  const result = spawnSync(process.execPath, ['--test', '--test-concurrency=1', testFile], {
+    stdio: 'inherit',
+    env: process.env,
+  });
+  if (result.error) {
+    console.error(`[test] unable to start ${testFile}: ${result.error.message}`);
+    process.exit(1);
+  }
+  if ((result.status ?? 1) !== 0) {
+    process.exit(result.status ?? 1);
+  }
+}
+console.log(`\n[test] passed ${tests.length} test files`);

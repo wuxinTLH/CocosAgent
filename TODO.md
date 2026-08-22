@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：$now（UTC+8）
+更新时间：`2026-08-22T09:54:50+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -62,12 +62,14 @@
 - 长期记忆：[LONG_MEMORY.md](LONG_MEMORY.md)
 - 短期记忆：[SHORT_MEMORY.md](SHORT_MEMORY.md)
 
+## 任务约束
+- MUST: 只有提到需要提交release时才提交release,否则只提交版本
+- MUST: 每次任务完成时,根据"测试项目位置"进行验证代码可行性
 
 # 任务队列
 
 ## 代办列表
-
-本轮开始时的三项待办已全部闭环，原始日志保留如下，便于审计历史问题。
+1. 目前无法正常使用cocosagent的Ai功能
 
 ### 已完成任务
 
@@ -127,3 +129,5 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 CI 修复任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29。
 
 CI 诊断任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29。
+
+CI 测试隔离任务 hash：sha256:e5df0f57d3f1788739092aa13c9f927116386459ee881084193992e8d1124bf3。
