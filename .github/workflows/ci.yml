@@ -29,7 +29,23 @@ jobs:
         run: node scripts/check-javascript.mjs
       - name: Test suite
         working-directory: cli
-        run: npm test
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test-output.log
+      - name: Publish test output
+        if: always()
+        working-directory: cli
+        run: |
+          if [ -f test-output.log ]; then
+            sed -n '1,400p' test-output.log
+          fi
+      - name: Upload test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-test-output
+          path: cli/test-output.log
+          if-no-files-found: warn
       - name: Documentation links
         working-directory: cli
         run: npm run docs:check

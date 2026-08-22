@@ -67,12 +67,16 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.equal(typeof panel.ready, 'function');
     assert.equal(typeof panel.run, 'function');
     assert.match(fs.readFileSync(panelPath, 'utf8'), /queryPanelElement/);
+    assert.match(fs.readFileSync(panelPath, 'utf8'), /const panelDefinition =/);
+    assert.match(fs.readFileSync(panelPath, 'utf8'), /panelDefinition\[name\]\.apply\(this, args\)/);
     assert.doesNotMatch(fs.readFileSync(panelPath, 'utf8'), /document\.getElementById/);
     assert.match(overlay.template ?? '', /Cocos Agent/);
     assert.match(overlay.template ?? '', /chat/);
     assert.match(overlay.style ?? '', /agent-overlay/);
     assert.equal(typeof overlay.ready, 'function');
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /queryPanelElement/);
+    assert.match(fs.readFileSync(overlayPath, 'utf8'), /const panelDefinition =/);
+    assert.match(fs.readFileSync(overlayPath, 'utf8'), /panelDefinition\[name\]\.apply\(this, args\)/);
     assert.doesNotMatch(fs.readFileSync(overlayPath, 'utf8'), /document\.getElementById/);
     assert.match(mainSource, /ELECTRON_RUN_AS_NODE/);
     assert.match(mainSource, /overlay-status\.json/);

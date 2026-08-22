@@ -66,7 +66,7 @@ function commandFor(line) {
   return { tool: selected[0], args: selected[1] };
 }
 
-module.exports = Editor.Panel.define({
+const panelDefinition = {
   template: `
     <div class="agent-overlay">
       <div class="agent-overlay__bar"><strong>Cocos Agent</strong><span id="state">offline</span><button id="close" title="Close overlay">x</button></div>
@@ -87,6 +87,11 @@ module.exports = Editor.Panel.define({
     .agent-overlay__form button { color: #071018; background: #7ed6ff; border: 0; padding: 0 13px; cursor: pointer; font-weight: 700; }
   `,
   ready() {
+    // Creator may invoke lifecycle callbacks with a panel instance that does
+    // not inherit methods from this definition object.
+    for (const name of ['close', 'connect', 'run', 'append']) {
+      this[name] = (...args) => panelDefinition[name].apply(this, args);
+    }
     this.ws = null;
     this.messageId = 0;
     this.getElement = (id) => queryPanelElement(this, id);
@@ -126,4 +131,6 @@ module.exports = Editor.Panel.define({
     this.output.textContent += `${text}\n`;
     this.output.scrollTop = this.output.scrollHeight;
   },
-});
+};
+
+module.exports = Editor.Panel.define(panelDefinition);

@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T09:54:50+08:00`（UTC+8）
+更新时间：`2026-08-22T10:22:45+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,7 +69,7 @@
 # 任务队列
 
 ## 代办列表
-1. 目前无法正常使用cocosagent的Ai功能
+- [x] 修复 Cocos Agent AI 面板因 Creator 生命周期上下文不继承定义对象方法而导致的 `this.connect` / `this.append` 错误；同步根扩展、demo 扩展及测试项目 `C:\Users\13929\NewProject`。
 
 ### 已完成任务
 
@@ -121,6 +121,7 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 ## 本轮收尾结果
 
 - [x] 修复 Release 构建失败并发布 `v0.0.0.2-a`：CI WSS 测试地址、版本一致性校验和 Release workflow 已修复；Release 构建成功，Windows zip 资产已上传，CI workflow 已拆分为可诊断步骤。
+- [x] 修复 Cocos Agent AI 功能不可用：CLI 面板与 Overlay 显式绑定生命周期辅助方法，避免 Cocos Creator `Editor.Panel.define` 回调上下文缺少 `connect` / `append`；同步 `examples/cocos3d-demo` 与 `C:\Users\13929\NewProject`，并加入扩展契约断言。
 
 本轮任务 hash：`sha256:9a1ccc6e8a4c31c95dd7aabfd70cd2008fd0a4f4fbf85824a2fcf83b7b8f574e`
 
@@ -131,3 +132,5 @@ CI 修复任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b
 CI 诊断任务 hash：sha256:5993a064ace7e3b76296e78f6eac6c833db1aad48aecd1438b0a4f30a4dadd29。
 
 CI 测试隔离任务 hash：sha256:e5df0f57d3f1788739092aa13c9f927116386459ee881084193992e8d1124bf3。
+
+AI 面板修复与 CI 诊断任务 hash：`sha256:2678686cf61da7495bacb8768d5eb073777dafacdb4695cd0e459beb746942cb`。

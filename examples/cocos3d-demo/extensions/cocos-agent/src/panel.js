@@ -58,7 +58,7 @@ function parseCommand(line) {
   return map[head] || { tool: head, args: {} };
 }
 
-module.exports = Editor.Panel.define({
+const panelDefinition = {
   template: `
     <div class="agent-cli">
       <header class="agent-cli__header"><strong>Cocos Agent</strong><span id="state">offline</span></header>
@@ -105,6 +105,11 @@ module.exports = Editor.Panel.define({
     .agent-cli__command input { flex:1; min-width:0; }
   `,
   ready() {
+    // Creator may invoke lifecycle callbacks with a panel instance that does
+    // not inherit methods from this definition object.
+    for (const name of ['connect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'run', 'append']) {
+      this[name] = (...args) => panelDefinition[name].apply(this, args);
+    }
     this.messageId = 0;
     this.pending = new Map();
     this.providers = [];
@@ -215,4 +220,6 @@ module.exports = Editor.Panel.define({
     this.output.textContent += `${text}\n`;
     this.output.scrollTop = this.output.scrollHeight;
   },
-});
+};
+
+module.exports = Editor.Panel.define(panelDefinition);
