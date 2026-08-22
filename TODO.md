@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T13:34:21+08:00`（UTC+8）
+更新时间：`2026-08-22T13:37:55+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,7 +69,7 @@
 # 任务队列
 
 ## 代办列表
-- [ ] 清除当前 Release 列表并按全局版本 `v0.0.0.2-a` 重建发布；删除旧 tags 后等待新 Release workflow 完成。
+- [x] 清除当前 Release 列表并按全局版本 `v0.0.0.2-a` 重建发布；删除旧 tags 后等待新 Release workflow 完成。新 Release 已发布，tag 指向 `41ae379`，资产大小 `84,880,182` bytes。
 
 ### 已完成任务
 
@@ -142,3 +142,5 @@ CI check annotation 诊断任务 hash：`sha256:50b2b8a0be9d14f1c4a2c5f7c54a5dac
 CI 诊断提交收口 hash：`sha256:8eae9c0ea9afee18f3551188079888385698e4eb2b731efbcda46ba0fe09d54a`。
 
 Release 重建任务 hash：`sha256:72d9cd1b1d84d2cff92252104c4d9754fa0cb25fa41bf4399af28898780fb2df`。
+
+Release 验证收口任务 hash：`sha256:b9795dd22b79ef5a3d2528038ce0ad51a146a48174628a2d98896bd5fa38b397`。

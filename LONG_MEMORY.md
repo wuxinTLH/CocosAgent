@@ -14,6 +14,17 @@
 
 ## 执行记录
 
+### AGT-20260822-007
+
+- TaskHash：`sha256:b9795dd22b79ef5a3d2528038ce0ad51a146a48174628a2d98896bd5fa38b397`
+- 开始：`2026-08-22T13:35:00+08:00`
+- 结束：`2026-08-22T13:37:55+08:00`
+- 请求：完成 TODO 中 Release 清理与全局版本重建任务，并核验发布结果。
+- 推理：Release workflow `32554762196` 已成功，远程仅保留 `v0.0.0.2-a`，tag 指向本轮提交 `41ae379`，资产元数据为 84,880,182 bytes。API 元数据足以确认发布成功；本机下载大文件因 TLS 接收中断，不能伪造本地 hash。
+- 计划：核对 Release/tag/资产；核对测试项目扩展；更新 TODO 和记忆；提交最终账本。
+- 时间线：2026-08-22T13:35:00+08:00 查询 Release run 与 job；13:36 确认 workflow success、唯一 tag 与资产；13:37:55 生成验证 hash 并完成账本更新。
+- 结果：Release 清理与重建任务完成。当前唯一 prerelease 为 `v0.0.0.2-a`，URL 为 `https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.2-a`，Windows zip 资产大小 `84,880,182` bytes；本地 `npm run verify` 25/25、文档 58/0，测试项目扩展哈希一致。下载资产受本机 TLS 限制未完成。代码审查结论：P0=0、P1=0、P2=0、P3=0。
+
 ### AGT-20260822-006
 
 - TaskHash：`sha256:72d9cd1b1d84d2cff92252104c4d9754fa0cb25fa41bf4399af28898780fb2df`
