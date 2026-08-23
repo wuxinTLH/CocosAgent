@@ -69,19 +69,7 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 按钮依旧无法生效：已依据 Cocos Creator 3.8.8 官方 HTML Panel 模板补充 `$` 元素映射，Panel/Overlay 改为控件级直接事件绑定，根事件委托仅保留为兼容回退。
-```log
- [Window] [overlay] template elements are unavailable; reopen the Cocos Agent overlay
-Error: [Window] [overlay] template elements are unavailable; reopen the Cocos Agent overlay
-at console.warn (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\core\build\cjs\utils-hoist\instrument\console.js:38:14)
-at Object.bindElements (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:151:152)
-at Object.bindElements (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:105:55)
-at C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:170:69
-at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)
-
- [Window] [panel] template elements were not mounted
-```
-需要从 Cocos Creator 官方扩展模板获取相应信息并重新构建验证。
+1. 每次完成代码直接注入测试项目中,方便直接测试
 
 ### 本轮解决方案与验证
 
