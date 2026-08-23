@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-23T16:18:15+08:00`（UTC+8）
+更新时间：`2026-08-23T17:34:11+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,9 +69,15 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 每次完成代码直接注入测试项目中，方便直接测试：已将根扩展源码同步到 `C:\Users\13929\NewProject\extensions\cocos-agent\src`，并通过 SHA-256 文件一致性校验和 `test:local-project` 验证。
+1. [x] 设置 Cocos Agent 独立 cc-switch 端点，默认显示并连接 `http://127.0.0.1:15721`；支持 CLI/MCP 参数覆盖、`ws://ip:port/ws`，并保留环境变量覆盖。
 
 ### 本轮解决方案与验证
+
+- [x] Panel/Overlay 改为 Cocos Creator 官方 `methods` + `ready/beforeClose/close` 生命周期结构，避免回调上下文缺少 `append`、`connect`。
+- [x] 增加 `ccs-url` 独立输入，HTTP 端点使用 HTTP 探测，WebSocket 端点使用 WSS/WS 探测。
+- [x] `npm run verify`：14 个测试文件、58 项文档链接检查通过；`test:local-project`、JavaScript 语法检查、`git diff --check` 通过。
+
+本轮任务 hash：`sha256:c313d8349c8dbcfef9e5c547bbb1b50b8e84e7132c04be46b495e5064e90a92c`。
 
 - [x] 参考 Cocos Creator 3.8.8 官方 `html-panel` 模板：使用 `Editor.Panel.define({ $, ready, beforeClose, close })` 生命周期和 `$` 控件映射。
 - [x] Panel/Overlay 使用控件级 `click`、`submit`、`change` 监听；根节点委托只作为没有可靠控件映射时的回退。

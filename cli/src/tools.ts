@@ -94,7 +94,7 @@ export const MCP_TOOLS: McpToolDefinition[] = [
     description: '按 ccs 路由模式建立直连',
     inputSchema: {
       type: 'object',
-      properties: { route: { type: 'string' } },
+      properties: { route: { type: 'string' }, url: { type: 'string', description: '独立的 http://ip:port 或 ws://ip:port/ws 端点' } },
     },
   },
   {
@@ -297,7 +297,7 @@ export async function dispatchTool(
     case 'ccs_resolve':
       return resolveRoute(args.route ? String(args.route) : undefined);
     case 'ccs_connect':
-      return connectRoute(args.route ? String(args.route) : undefined);
+      return connectRoute(args.route ? String(args.route) : undefined, args.url ? String(args.url) : undefined);
     case 'ccs_doctor':
       return ccsDoctor(ctx.root);
     case 'gateway_chat': {

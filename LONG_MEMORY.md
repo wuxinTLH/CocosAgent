@@ -14,6 +14,18 @@
 
 ## 执行记录
 
+### AGT-20260823-016
+
+- TaskHash: `sha256:c313d8349c8dbcfef9e5c547bbb1b50b8e84e7132c04be46b495e5064e90a92c`
+- 开始: `2026-08-23T17:16:06+08:00`
+- 结束: `2026-08-23T17:34:11+08:00`
+- 请求: 修复 Cocos Creator Panel/Overlay 生命周期错误，并完成 cc-switch 独立 HTTP 端点配置。
+- 推理: Creator 官方模板将业务方法放入 `methods`，生命周期钩子负责初始化和销毁；cc-switch 路由与端点需要分离，HTTP 地址不能误当 WebSocket 地址。
+- 计划: 重构扩展生命周期；增加独立 `ccs-url` 与 CLI/MCP URL 参数；补测试；同步示例和 `C:\Users\13929\NewProject`；完成验证。
+- 时间线: `2026-08-23T17:16:06+08:00` 读取约束并生成 hash；`2026-08-23T17:27:00+08:00` 完成代码和测试；`2026-08-23T17:31:00+08:00` 增加默认 `http://127.0.0.1:15721`；`2026-08-23T17:34:11+08:00` 完成验证与同步。
+- 结果: TODO 已闭环；`npm run verify`、`test:local-project`、语法检查和 diff 检查通过；三处 Panel/Overlay SHA-256 一致；未重建 Release。
+- 审查: P0=0, P1=0, P2=0, P3=0；实际 Creator GUI 与 cc-switch 服务仍需现场确认健康响应。
+
 ### AGT-20260823-015
 
 - TaskHash：`sha256:6bb3e7ddd191ba500fd026b032f9d50893364079620a41f2d67c63ab2bb74e36`

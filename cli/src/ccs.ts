@@ -5,6 +5,8 @@ import path from 'node:path';
 import { detectEditors, projectCreatorVersion } from './editor.js';
 import { pingWebSocket } from './gateway.js';
 
+export const DEFAULT_CCS_URL = 'http://127.0.0.1:15721';
+
 export interface CcsRoute {
   route: string;
   source: string;
@@ -12,16 +14,33 @@ export interface CcsRoute {
   url?: string;
 }
 
+export function normalizeCcsUrl(value: string): string {
+  const candidate = value.trim();
+  if (!candidate) throw new Error('CCS_ROUTE_URL_EMPTY: provide http://ip:port');
+  let parsed: URL;
+  try {
+    parsed = new URL(candidate);
+  } catch {
+    throw new Error(`CCS_ROUTE_URL_INVALID: ${candidate}`);
+  }
+  if (!['http:', 'https:', 'ws:', 'wss:'].includes(parsed.protocol)) {
+    throw new Error(`CCS_ROUTE_URL_INVALID_PROTOCOL: ${parsed.protocol}`);
+  }
+  if ((parsed.protocol === 'ws:' || parsed.protocol === 'wss:') && (parsed.pathname === '' || parsed.pathname === '/')) {
+    parsed.pathname = '/ws';
+  }
+  return parsed.toString().replace(/\/$/, '');
+}
+
 export function ccsSettingsPath(): string {
   return process.env.CC_SWITCH_CONFIG ?? path.join(os.homedir(), '.cc-switch', 'settings.json');
 }
 
-export function resolveRoute(route?: string): CcsRoute {
+export function resolveRoute(route?: string, url?: string): CcsRoute {
   const settingsPath = ccsSettingsPath();
-  if (!fs.existsSync(settingsPath)) {
-    throw new Error(`CC_SWITCH_CONFIG_NOT_FOUND: ${settingsPath}`);
-  }
-  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8')) as Record<string, unknown>;
+  const settings = fs.existsSync(settingsPath)
+    ? JSON.parse(fs.readFileSync(settingsPath, 'utf8')) as Record<string, unknown>
+    : {};
   const current =
     typeof settings.currentProviderCodex === 'string' ? settings.currentProviderCodex : 'current';
   const selected = route ?? process.env.COCOS_AGENT_CCS_ROUTE ?? current;
@@ -30,13 +49,23 @@ export function resolveRoute(route?: string): CcsRoute {
     source: settingsPath,
     provider:
       typeof settings.currentProviderCodex === 'string' ? settings.currentProviderCodex : undefined,
-    url: process.env.COCOS_AGENT_CCS_URL,
+    url: normalizeCcsUrl(url ?? process.env.COCOS_AGENT_CCS_URL ?? DEFAULT_CCS_URL),
   };
 }
 
-export async function connectRoute(route?: string): Promise<Record<string, unknown>> {
-  const resolved = resolveRoute(route);
+export async function connectRoute(route?: string, url?: string): Promise<Record<string, unknown>> {
+  const explicitUrl = url ?? process.env.COCOS_AGENT_CCS_URL;
+  const resolved = resolveRoute(route, url);
   const bin = process.env.COCOS_AGENT_CCS_BIN;
+  if (resolved.url && (explicitUrl || !bin)) {
+    if (resolved.url.startsWith('http://') || resolved.url.startsWith('https://')) {
+      const response = await fetch(resolved.url, { signal: AbortSignal.timeout(5000) });
+      if (!response.ok) throw new Error(`CCS_HTTP_ERROR: ${response.status}`);
+    } else {
+      await pingWebSocket(resolved.url, 5000, process.env.COCOS_AGENT_GATEWAY_TOKEN, process.env.COCOS_AGENT_CCS_INSECURE === 'true');
+    }
+    return { route: resolved.route, url: resolved.url, status: 'connected' };
+  }
   if (bin) {
     const output = execFileSync(bin, ['route', 'connect', resolved.route], {
       encoding: 'utf8',
@@ -49,17 +78,17 @@ export async function connectRoute(route?: string): Promise<Record<string, unkno
       ccsOutput: output.trim(),
     };
   }
-  const url = resolved.url ?? process.env.COCOS_AGENT_GATEWAY_URL;
-  if (!url) {
+  const gatewayUrl = process.env.COCOS_AGENT_GATEWAY_URL;
+  if (!gatewayUrl) {
     throw new Error('CCS_ROUTE_URL_NOT_CONFIGURED: set COCOS_AGENT_CCS_URL or COCOS_AGENT_GATEWAY_URL');
   }
   await pingWebSocket(
-    url,
+    gatewayUrl,
     5000,
     process.env.COCOS_AGENT_GATEWAY_TOKEN,
     process.env.COCOS_AGENT_CCS_INSECURE === 'true',
   );
-  return { route: resolved.route, url, status: 'connected' };
+  return { route: resolved.route, url: gatewayUrl, status: 'connected' };
 }
 
 export function ccsDoctor(projectRoot?: string): Record<string, unknown> {
@@ -71,8 +100,8 @@ export function ccsDoctor(projectRoot?: string): Record<string, unknown> {
       value: process.env.COCOS_AGENT_CCS_BIN ?? null,
     },
     ccsUrl: {
-      ok: Boolean(process.env.COCOS_AGENT_CCS_URL),
-      value: process.env.COCOS_AGENT_CCS_URL ?? null,
+      ok: true,
+      value: process.env.COCOS_AGENT_CCS_URL ?? DEFAULT_CCS_URL,
     },
     gatewayUrl: {
       ok: Boolean(process.env.COCOS_AGENT_GATEWAY_URL),

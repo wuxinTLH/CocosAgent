@@ -9,7 +9,7 @@ description: 集成 cc-switch 与 ccs 路由模式，读取本机 cc-switch 配�
 
 - 读取 `~/.cc-switch/settings.json` 与 `CC_SWITCH_CONFIG` 指定配置。
 - 解析当前路由：`COCOS_AGENT_CCS_ROUTE`、配置中的 provider/route 字段或项目约束。
-- 以 ccs 路由模式建立 WebSocket 直连。
+- 以 ccs 路由模式建立直连；端点可独立填写 `http://ip:port`，默认 `http://127.0.0.1:15721`，WebSocket 端点使用 `ws://ip:port/ws`。
 - 验证连接健康状态与重连能力。
 
 ## 输入

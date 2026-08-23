@@ -169,7 +169,7 @@ async function main(): Promise<void> {
       if (sub === 'resolve') {
         console.log(JSON.stringify(resolveRoute(args.flags.route ? String(args.flags.route) : undefined), null, 2));
       } else if (sub === 'connect') {
-        console.log(JSON.stringify(await connectRoute(args.flags.route ? String(args.flags.route) : undefined), null, 2));
+        console.log(JSON.stringify(await connectRoute(args.flags.route ? String(args.flags.route) : undefined, args.flags.url ? String(args.flags.url) : undefined), null, 2));
       } else if (sub === 'doctor') {
         console.log(JSON.stringify(ccsDoctor(ctx.root), null, 2));
       } else {

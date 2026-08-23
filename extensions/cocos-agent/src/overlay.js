@@ -102,8 +102,8 @@ const panelDefinition = {
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'connect', 'scheduleReconnect', 'run', 'append', 'dispose', 'beforeClose', 'close']) {
-      this[name] = (...args) => panelDefinition[name].apply(this, args);
+    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'connect', 'scheduleReconnect', 'run', 'append', 'dispose', 'close']) {
+      this[name] = (...args) => panelDefinition.methods[name].apply(this, args);
     }
     this.ws = null;
     this.messageId = 0;
@@ -123,6 +123,7 @@ const panelDefinition = {
     this.append('overlay ready');
     this.connect();
   },
+  methods: {
   bindElements() {
     if (this.destroyed) return false;
     const form = this.getElement('form');
@@ -196,9 +197,6 @@ const panelDefinition = {
       try { socket.close(); } catch {}
     }
   },
-  beforeClose() {
-    this.dispose();
-  },
   connect() {
     if (this.destroyed) return;
     try {
@@ -229,6 +227,13 @@ const panelDefinition = {
     if (!output) return;
     output.textContent += `${text}\n`;
     output.scrollTop = output.scrollHeight;
+  },
+  },
+  beforeClose() {
+    if (typeof this.dispose === 'function') this.dispose();
+  },
+  close() {
+    if (typeof this.dispose === 'function') this.dispose();
   },
 };
 

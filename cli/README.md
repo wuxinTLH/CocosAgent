@@ -54,7 +54,7 @@ bridge start           启动本地桥接服务
 | `DEEPSEEK_API_KEY` / `COCOS_AGENT_DEEPSEEK_API_KEY` | DeepSeek 凭据 |
 | `KIMI_API_KEY` / `COCOS_AGENT_KIMI_API_KEY` | Kimi/Moonshot 凭据 |
 | `DASHSCOPE_API_KEY` / `COCOS_AGENT_QWEN_API_KEY` | Qwen/DashScope 凭据 |
-| `COCOS_AGENT_CCS_URL` | ccs 路由直连地址 |
+| `COCOS_AGENT_CCS_URL` | ccs 路由直连地址，默认 `http://127.0.0.1:15721`；CLI 面板也可单独填写 `http://ip:port` |
 | `COCOS_AGENT_CCS_ROUTE` | 默认 ccs 路由 |
 | `COCOS_AGENT_CCS_BIN` | ccs CLI 可执行文件路径 |
 | `COCOS_AGENT_CCS_INSECURE` | 仅本地自签名 ccs 测试时设为 `true` |
@@ -78,7 +78,7 @@ node dist/index.js provider configure --provider deepseek --model deepseek-chat
 node dist/index.js provider configure --provider qwen --endpoint https://dashscope.aliyuncs.com/compatible-mode/v1 --model qwen-plus
 node dist/index.js agent config --locale en-US --permission only-safe --provider deepseek --fallback gateway
 node dist/index.js ccs doctor
-node dist/index.js ccs connect --route current
+node dist/index.js ccs connect --route current --url http://127.0.0.1:15721
 node dist/index.js workspace new --name "Level design" --provider qwen
 node dist/index.js workspace chat --chat "为主场景创建 3D 光照方案"
 node dist/index.js terminal run --shell powershell --command "Get-ChildItem assets" --dry-run

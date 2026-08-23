@@ -10,6 +10,7 @@
 
 | # | TaskHash | UTC+8 | 摘要 | 状态 |
 | --- | --- | --- | --- | --- |
+| 11 | `sha256:c313d834...` | 2026-08-23T17:16:06+08:00 | 按 Creator 官方 methods 生命周期修复 Panel/Overlay；增加独立 cc-switch `http://127.0.0.1:15721` 端点与 CLI/MCP URL 参数；验证和 NewProject 同步通过 | 完成 |
 | 10 | `sha256:6bb3e7dd...` | 2026-08-23T16:18:15+08:00 | 将代码直接注入 NewProject，Panel/Overlay SHA-256 一致，完整验证通过 | 完成 |
 | 9 | `sha256:ce0d7aab...` | 2026-08-23T16:35:00+08:00 | 按 Cocos Creator 官方 `$` Panel 模板修复按钮绑定，Bridge 请求和完整验证通过 | 完成 |
 | 8 | `sha256:ad18547f...` | 2026-08-23T15:34:10+08:00 | 修复 Panel/Overlay 异步 DOM 空引用、按钮无效和销毁后定时器；验证通过并重建 v0.0.0.1-a Release | 完成 |

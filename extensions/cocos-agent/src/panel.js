@@ -73,7 +73,7 @@ function parseCommand(line) {
 const panelDefinition = {
   $: {
     output: '#output', input: '#input', state: '#state', locale: '#locale', provider: '#provider', model: '#model', endpoint: '#endpoint', credential: '#credential',
-    'active-provider': '#active-provider', 'fallback-providers': '#fallback-providers', 'ccs-route': '#ccs-route', 'ccs-state': '#ccs-state', form: '#form',
+    'active-provider': '#active-provider', 'fallback-providers': '#fallback-providers', 'ccs-route': '#ccs-route', 'ccs-url': '#ccs-url', 'ccs-state': '#ccs-state', form: '#form',
     'save-provider': '#save-provider', 'select-provider': '#select-provider', 'save-workspace': '#save-workspace', 'ccs-doctor': '#ccs-doctor', 'ccs-connect': '#ccs-connect',
   },
   template: `
@@ -95,7 +95,7 @@ const panelDefinition = {
         </div>
         <div class="agent-cli__actions"><button id="save-workspace">保存工作区</button></div>
         <div class="agent-cli__section-title">cc-switch / ccs</div>
-        <div class="agent-cli__grid"><label class="agent-cli__wide">路由<input id="ccs-route" type="text" autocomplete="off" placeholder="当前 cc-switch 路由" /></label></div>
+        <div class="agent-cli__grid"><label>路由<input id="ccs-route" type="text" autocomplete="off" placeholder="当前 cc-switch 路由" /></label><label>HTTP 端点<input id="ccs-url" type="text" value="http://127.0.0.1:15721" autocomplete="off" placeholder="http://127.0.0.1:15721" /></label></div>
         <div class="agent-cli__actions"><button id="ccs-doctor">检查 cc-switch</button><button id="ccs-connect">连接路由</button><span id="ccs-state"></span></div>
       </section>
       <section id="output" class="agent-cli__output"></section>
@@ -124,8 +124,8 @@ const panelDefinition = {
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'currentElement', 'reportUnavailable', 'connect', 'scheduleReconnect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'run', 'append', 'dispose', 'beforeClose', 'close']) {
-      this[name] = (...args) => panelDefinition[name].apply(this, args);
+    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'currentElement', 'reportUnavailable', 'connect', 'scheduleReconnect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'run', 'append', 'dispose', 'close']) {
+      this[name] = (...args) => panelDefinition.methods[name].apply(this, args);
     }
     this.messageId = 0;
     this.pending = new Map();
@@ -149,13 +149,15 @@ const panelDefinition = {
     this.activeProvider = this.getElement('active-provider');
     this.fallbackProviders = this.getElement('fallback-providers');
     this.ccsRoute = this.getElement('ccs-route');
+    this.ccsUrl = this.getElement('ccs-url');
     this.ccsState = this.getElement('ccs-state');
     this.bindElements();
     this.connect();
   },
+  methods: {
   bindElements() {
     if (this.destroyed) return false;
-    const ids = ['output', 'input', 'state', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
+    const ids = ['output', 'input', 'state', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-url', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
     const elements = Object.fromEntries(ids.map((id) => [id, this.getElement(id)]));
     const ready = ids.every((id) => elements[id] && (id === 'output' || typeof elements[id].addEventListener === 'function'));
     const root = panelEventRoot(this);
@@ -171,6 +173,7 @@ const panelDefinition = {
       this.activeProvider = elements['active-provider'];
       this.fallbackProviders = elements['fallback-providers'];
       this.ccsRoute = elements['ccs-route'];
+      this.ccsUrl = elements['ccs-url'];
       this.ccsState = elements['ccs-state'];
         this.bindEvent(elements.form, 'submit', (event) => { event.preventDefault(); this.run(); });
         this.bindEvent(elements['save-provider'], 'click', (event) => { event.preventDefault(); this.saveProvider(); });
@@ -257,9 +260,6 @@ const panelDefinition = {
       try { socket.close(); } catch {}
     }
   },
-  beforeClose() {
-    this.dispose();
-  },
   request(tool, args, callback) {
     if (this.destroyed) return;
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) { this.append('[bridge] offline; start the local bridge and retry'); return; }
@@ -345,16 +345,20 @@ const panelDefinition = {
       const checks = result.checks && typeof result.checks === 'object' ? result.checks : {};
       const config = checks.ccSwitchConfig || {};
       const ccsRoute = this.currentElement('ccs-route');
+      const ccsUrl = this.currentElement('ccs-url');
       if (result.route && result.route.route && ccsRoute) ccsRoute.value = result.route.route;
+      if (result.route && result.route.url && ccsUrl) ccsUrl.value = result.route.url;
       ccsState.textContent = config.ok ? `Config: ${config.path}` : `cc-switch config missing: ${config.path}`;
       this.append({ ccs:result });
     });
   },
   ccsConnect() {
     const ccsRoute = this.currentElement('ccs-route');
-    if (!ccsRoute) { this.reportUnavailable('cc-switch controls'); return; }
+    const ccsUrl = this.currentElement('ccs-url');
+    if (!ccsRoute || !ccsUrl) { this.reportUnavailable('cc-switch controls'); return; }
     const route = ccsRoute.value.trim();
-    this.request('ccs_connect', { route }, (message) => this.append(message.ok ? { ccs:message.result } : `[ccs] ${message.error}`));
+    const url = ccsUrl.value.trim();
+    this.request('ccs_connect', { route, url }, (message) => this.append(message.ok ? { ccs:message.result } : `[ccs] ${message.error}`));
   },
   run() {
     const input = this.currentElement('input');
@@ -378,6 +382,13 @@ const panelDefinition = {
     this.panelClosed = true;
     this.dispose();
     if (typeof Editor !== 'undefined' && Editor.Panel) Editor.Panel.close('cocos-agent.cli');
+  },
+  },
+  beforeClose() {
+    if (typeof this.dispose === 'function') this.dispose();
+  },
+  close() {
+    if (typeof this.dispose === 'function') this.dispose();
   },
 };
 

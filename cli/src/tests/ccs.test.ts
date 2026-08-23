@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { ccsDoctor, connectRoute, resolveRoute } from '../ccs.js';
+import { ccsDoctor, connectRoute, normalizeCcsUrl, resolveRoute } from '../ccs.js';
 import { mockPort, startMockGateway, waitForMockGateway } from '../gateway-mock.js';
 
 test('ccs route resolves from CC_SWITCH_CONFIG', () => {
@@ -59,5 +59,23 @@ test('ccs route connection validates the configured local route', async () => {
       process.env.COCOS_AGENT_CCS_URL = previousUrl;
     }
     server.close();
+  }
+});
+
+test('ccs accepts an independent http ip:port endpoint and converts it to websocket', () => {
+  assert.equal(normalizeCcsUrl('http://127.0.0.1:8787'), 'http://127.0.0.1:8787');
+  assert.equal(normalizeCcsUrl('ws://127.0.0.1:8787'), 'ws://127.0.0.1:8787/ws');
+  assert.equal(normalizeCcsUrl('https://example.test:9443/ccs'), 'https://example.test:9443/ccs');
+});
+
+test('ccs endpoint remains independently resolvable when cc-switch settings are absent', () => {
+  const previous = process.env.CC_SWITCH_CONFIG;
+  process.env.CC_SWITCH_CONFIG = path.join(os.tmpdir(), 'missing-cc-switch-settings.json');
+  try {
+    const route = resolveRoute(undefined, 'http://127.0.0.1:15721');
+    assert.equal(route.route, 'current');
+    assert.equal(route.url, 'http://127.0.0.1:15721');
+  } finally {
+    if (previous === undefined) delete process.env.CC_SWITCH_CONFIG; else process.env.CC_SWITCH_CONFIG = previous;
   }
 });
