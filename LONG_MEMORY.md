@@ -14,6 +14,32 @@
 
 ## 执行记录
 
+### AGT-20260823-015
+
+- TaskHash：`sha256:6bb3e7ddd191ba500fd026b032f9d50893364079620a41f2d67c63ab2bb74e36`
+- 开始：`2026-08-23T16:18:15+08:00`
+- 结束：`2026-08-23T16:24:00+08:00`
+- 请求：根据 TODO.md 将每次完成代码直接注入测试项目 `C:\Users\13929\NewProject`，完成同步、验证、记忆和推送收口。
+- 推理：TODO 的新增要求是将代码变更立即注入测试项目，避免根目录验证与实际 Creator 项目内容不一致。现有 `test-local-project.ps1` 会调用 launcher 的同步流程，但还需要单独核对 Panel/Overlay 与测试项目的文件 hash，确保扩展源码逐字节一致。
+- 计划：
+  1. 读取同步脚本并确认注入路径及版本门禁。
+  2. 核对根扩展、示例扩展和 NewProject 的 Panel/Overlay 文件一致性。
+  3. 运行完整 verify、NewProject 本地测试、脚本解析和 diff 检查。
+  4. 更新 TODO/长期记忆/短期记忆并推送。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-23T16:18:15+08:00 | 读取最新 TODO，确认待办为代码完成后直接注入 NewProject |
+| 2026-08-23T16:19:00+08:00 | 检查 `test-local-project.ps1`，确认 launcher 会同步项目扩展和 CLI，并执行版本/status 门禁 |
+| 2026-08-23T16:20:00+08:00 | 校验根扩展、examples 和 NewProject 的 Panel/Overlay SHA-256 均一致 |
+| 2026-08-23T16:23:00+08:00 | 完整 verify、NewProject 本地测试、PowerShell 解析和 `git diff --check` 通过 |
+| 2026-08-23T16:24:00+08:00 | 更新 TODO 与记忆，准备提交推送 |
+
+- 结果：新增 TODO 已闭环。Panel SHA-256 为 `C60DFFFC68173E424CAD4D41373597F051CE8DFC85CB289F3D1E960A58D62DB0`，Overlay SHA-256 为 `A672DD58740828BC634C8E5F1F5C72C5636C393B1B250420CB7257126A41F0A5`，根扩展、示例扩展与 `C:\Users\13929\NewProject` 均一致。`npm run verify` 的 14 个测试文件、TypeScript strict、JavaScript 检查、文档链接 `58/0`、本地项目验证全部通过。本轮未重建 Release，因为 TODO 未要求发布。
+- 文件：`TODO.md`、`LONG_MEMORY.md`、`SHORT_MEMORY.md`。
+- 后续：无 P0/P1/P2。
+
 ### AGT-20260823-014
 
 - TaskHash：`sha256:ce0d7aab906524c0cdda54bd3191feb5e22343174ab6247425098a1af499ae66`

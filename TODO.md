@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-23T16:35:00+08:00`（UTC+8）
+更新时间：`2026-08-23T16:18:15+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,7 +69,7 @@
 # 任务队列
 
 ## 代办列表
-1. 每次完成代码直接注入测试项目中,方便直接测试
+1. [x] 每次完成代码直接注入测试项目中，方便直接测试：已将根扩展源码同步到 `C:\Users\13929\NewProject\extensions\cocos-agent\src`，并通过 SHA-256 文件一致性校验和 `test:local-project` 验证。
 
 ### 本轮解决方案与验证
 
@@ -81,7 +81,7 @@
 - [x] `npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` 通过。
 - [x] PowerShell 解析、JavaScript 语法检查和 `git diff --check` 通过。
 
-本轮任务 hash：`sha256:ce0d7aab906524c0cdda54bd3191feb5e22343174ab6247425098a1af499ae66`。
+本轮任务 hash：`sha256:6bb3e7ddd191ba500fd026b032f9d50893364079620a41f2d67c63ab2bb74e36`。
 
 ### 本轮验证
 
