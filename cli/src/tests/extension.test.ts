@@ -35,6 +35,11 @@ class FakeElement {
   removeEventListener(event: string, handler: (event: { target?: FakeElement; preventDefault?: () => void }) => void) {
     this.listeners.get(event)?.delete(handler);
   }
+
+  dispatch(event: string) {
+    const payload = { target: this, preventDefault: () => undefined };
+    for (const handler of this.listeners.get(event) ?? []) handler(payload);
+  }
 }
 
 class FakeRoot {
@@ -138,6 +143,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(fs.readFileSync(panelPath, 'utf8'), /queryPanelElement/);
     assert.match(fs.readFileSync(panelPath, 'utf8'), /const panelDefinition =/);
     assert.match(fs.readFileSync(panelPath, 'utf8'), /panelDefinition\[name\]\.apply\(this, args\)/);
+    assert.match(fs.readFileSync(panelPath, 'utf8'), /\$:\s*\{/);
     assert.match(fs.readFileSync(panelPath, 'utf8'), /panelEventRoot/);
     assert.match(fs.readFileSync(panelPath, 'utf8'), /bindEvent\(root, 'click'/);
     assert.match(panel.template ?? '', /id="save-provider"/);
@@ -148,6 +154,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(overlay.style ?? '', /agent-overlay/);
     assert.equal(typeof overlay.ready, 'function');
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /queryPanelElement/);
+    assert.match(fs.readFileSync(overlayPath, 'utf8'), /\$:\s*\{/);
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /const panelDefinition =/);
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /panelDefinition\[name\]\.apply\(this, args\)/);
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /panelEventRoot/);
@@ -197,12 +204,15 @@ test('extension callbacks tolerate unloaded DOM and dispose bridge resources', (
     };
     const ids = ['output', 'input', 'state', 'locale', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
     const root = new FakeRoot(ids);
-    const instance = { shadowRoot: root } as Record<string, unknown>;
+    const mapped = Object.fromEntries(ids.map((id) => [id, root.nodes[id]]));
+    const instance = { $: mapped } as Record<string, unknown>;
     panelDefinition.ready?.call(instance as never);
     const socket = instance.ws as FakeWebSocket;
     assert.ok(socket);
     socket.onopen?.();
-    delete root.nodes.provider;
+    root.nodes['save-provider'].dispatch('click');
+    assert.ok(socket.sent.some((payload) => JSON.parse(payload).tool === 'provider_configure'));
+    instance.$ = { ...mapped, provider: null };
     assert.doesNotThrow(() => socket.onmessage?.({ data: JSON.stringify({ id: 1, ok: true, result: [{ id: 'openai', model: 'gpt-4.1', endpoint: '', configured: false, credentialEnvironment: 'OPENAI_API_KEY' }] }) }));
     panelDefinition.close?.call(instance as never);
     assert.equal(instance.destroyed, true);
@@ -212,10 +222,11 @@ test('extension callbacks tolerate unloaded DOM and dispose bridge resources', (
     const overlayPath = path.join(extensionRoot, 'src', 'overlay.js');
     delete require.cache[require.resolve(overlayPath)];
     const overlayDefinition = require(overlayPath) as { ready?: () => void; close?: () => void };
-    const emptyRoot = new FakeRoot([]);
-    const overlay = { shadowRoot: emptyRoot } as Record<string, unknown>;
+    const overlayRoot = new FakeRoot(['output', 'input', 'state', 'form', 'close']);
+    const overlay = { $: Object.fromEntries(Object.entries(overlayRoot.nodes)) } as Record<string, unknown>;
     overlayDefinition.ready?.call(overlay as never);
     const overlaySocket = overlay.ws as FakeWebSocket;
+    overlayRoot.nodes.close.dispatch('click');
     overlayDefinition.close?.call(overlay as never);
     assert.equal(overlay.destroyed, true);
     assert.equal(overlay.bindTimer, null);

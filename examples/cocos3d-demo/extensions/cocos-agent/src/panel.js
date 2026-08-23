@@ -71,6 +71,11 @@ function parseCommand(line) {
 }
 
 const panelDefinition = {
+  $: {
+    output: '#output', input: '#input', state: '#state', locale: '#locale', provider: '#provider', model: '#model', endpoint: '#endpoint', credential: '#credential',
+    'active-provider': '#active-provider', 'fallback-providers': '#fallback-providers', 'ccs-route': '#ccs-route', 'ccs-state': '#ccs-state', form: '#form',
+    'save-provider': '#save-provider', 'select-provider': '#select-provider', 'save-workspace': '#save-workspace', 'ccs-doctor': '#ccs-doctor', 'ccs-connect': '#ccs-connect',
+  },
   template: `
     <div class="agent-cli">
       <header class="agent-cli__header"><strong>Cocos Agent</strong><span id="state">offline</span></header>
@@ -167,22 +172,21 @@ const panelDefinition = {
       this.fallbackProviders = elements['fallback-providers'];
       this.ccsRoute = elements['ccs-route'];
       this.ccsState = elements['ccs-state'];
-       if (root && typeof root.addEventListener === 'function') {
+        this.bindEvent(elements.form, 'submit', (event) => { event.preventDefault(); this.run(); });
+        this.bindEvent(elements['save-provider'], 'click', (event) => { event.preventDefault(); this.saveProvider(); });
+        this.bindEvent(elements['select-provider'], 'click', (event) => { event.preventDefault(); this.selectProvider(); });
+        this.bindEvent(elements['save-workspace'], 'click', (event) => { event.preventDefault(); this.saveWorkspace(); });
+        this.bindEvent(elements['ccs-doctor'], 'click', (event) => { event.preventDefault(); this.ccsDoctor(); });
+        this.bindEvent(elements['ccs-connect'], 'click', (event) => { event.preventDefault(); this.ccsConnect(); });
+        this.bindEvent(elements.provider, 'change', () => this.showProvider(this.getElement('provider')?.value));
+        if (!this.eventBindings.length && root && typeof root.addEventListener === 'function') {
           this.bindEvent(root, 'click', (event) => {
             const actions = { 'save-provider': () => this.saveProvider(), 'select-provider': () => this.selectProvider(), 'save-workspace': () => this.saveWorkspace(), 'ccs-doctor': () => this.ccsDoctor(), 'ccs-connect': () => this.ccsConnect() };
             const action = actions[eventTargetId(event)];
             if (action) { event.preventDefault(); action(); }
           });
           this.bindEvent(root, 'submit', (event) => { if (event.target?.id === 'form') { event.preventDefault(); this.run(); } });
-        } else {
-          this.bindEvent(this.getElement('form'), 'submit', (event) => { event.preventDefault(); this.run(); });
-          this.bindEvent(this.getElement('save-provider'), 'click', () => this.saveProvider());
-          this.bindEvent(this.getElement('select-provider'), 'click', () => this.selectProvider());
-          this.bindEvent(this.getElement('save-workspace'), 'click', () => this.saveWorkspace());
-          this.bindEvent(this.getElement('ccs-doctor'), 'click', () => this.ccsDoctor());
-          this.bindEvent(this.getElement('ccs-connect'), 'click', () => this.ccsConnect());
         }
-       this.bindEvent(this.getElement('provider'), 'change', () => this.showProvider(this.getElement('provider')?.value));
        this.eventRoot = root;
        this.eventsBound = true;
        return true;

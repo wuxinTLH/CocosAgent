@@ -79,6 +79,7 @@ function commandFor(line) {
 }
 
 const panelDefinition = {
+  $: { output: '#output', input: '#input', state: '#state', form: '#form', close: '#close' },
   template: `
     <div class="agent-overlay">
       <div class="agent-overlay__bar"><strong>Cocos Agent</strong><span id="state">offline</span><button id="close" title="Close overlay">x</button></div>
@@ -135,12 +136,11 @@ const panelDefinition = {
       this.output = output;
       this.input = input;
       this.state = state;
-      if (root && typeof root.addEventListener === 'function') {
+      this.bindEvent(form, 'submit', (event) => { event.preventDefault(); this.run(); });
+      this.bindEvent(close, 'click', (event) => { event.preventDefault(); this.close(); });
+      if (!this.eventBindings.length && root && typeof root.addEventListener === 'function') {
         this.bindEvent(root, 'click', (event) => { if (eventTargetId(event) === 'close') { event.preventDefault(); this.close(); } });
         this.bindEvent(root, 'submit', (event) => { if (event.target?.id === 'form') { event.preventDefault(); this.run(); } });
-      } else {
-        this.bindEvent(form, 'submit', (event) => { event.preventDefault(); this.run(); });
-        this.bindEvent(close, 'click', () => this.close());
       }
       this.eventRoot = root;
       this.eventsBound = true;

@@ -14,6 +14,38 @@
 
 ## 执行记录
 
+### AGT-20260823-014
+
+- TaskHash：`sha256:ce0d7aab906524c0cdda54bd3191feb5e22343174ab6247425098a1af499ae66`
+- 开始：`2026-08-23T16:35:00+08:00`
+- 结束：`2026-08-23T16:48:00+08:00`
+- 请求：根据 TODO.md 修复 Cocos Creator Panel/Overlay 按钮无效问题，依据官方扩展模板重新构建验证。
+- 推理：本机 Cocos Creator 3.8.8 官方 `html-panel` 模板通过 `Editor.Panel.define` 的 `$` 映射暴露控件，并在 `ready` 生命周期中直接使用 `this.$.<control>`。现有实现主要依赖自定义 root 查询和根事件委托，Creator 实例中控件映射不稳定，导致 Panel/Overlay 进入未挂载分支，按钮没有可靠监听器。应采用官方 `$` 映射，控件级绑定作为主路径，根委托保留为兼容回退。
+- 计划：
+  1. 检查 TODO、Creator 3.8.8 本地官方扩展模板和现有扩展代码。
+  2. 为 Panel/Overlay 增加 `$` 映射，改为直接绑定表单和按钮控件。
+  3. 增加真实按钮 dispatch 与 Bridge 请求回归测试，同步示例和 NewProject。
+  4. 运行 verify、本地项目验证、PowerShell/JavaScript 检查，更新任务记忆并提交。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-23T16:35:00+08:00 | 读取用户更新的 TODO，确认新待办为按钮无效和官方模板重建 |
+| 2026-08-23T16:38:00+08:00 | 检查 Cocos Creator 3.8.8 本地官方 `html-panel` 模板，确认 `$`、`ready`、`beforeClose`、`close` 约定 |
+| 2026-08-23T16:42:00+08:00 | Panel/Overlay 增加 `$` 控件映射并改为控件级事件绑定；同步示例与 NewProject |
+| 2026-08-23T16:45:00+08:00 | 新增按钮 dispatch 和 Bridge 请求测试，定向扩展测试通过 |
+| 2026-08-23T16:48:00+08:00 | 完整 verify、本地项目验证和脚本检查通过，更新 TODO |
+
+- 结果：Panel 和 Overlay 现在遵循 Creator 官方 HTML Panel 控件映射方式；按钮、表单提交和渠道切换事件直接绑定到当前控件，避免依赖不稳定的根节点事件委托。新增测试确认按钮点击会实际发送 `provider_configure` Bridge 请求。14 个测试文件、TypeScript strict、JavaScript 检查、文档链接 `58/0`、PowerShell 解析、JavaScript 语法、`git diff --check` 和 `C:\Users\13929\NewProject` 本地校验全部通过。未重建 Release，因为本轮 TODO 未要求提交 Release。
+- 文件：
+  - `extensions/cocos-agent/src/panel.js`
+  - `extensions/cocos-agent/src/overlay.js`
+  - `examples/cocos3d-demo/extensions/cocos-agent/src/panel.js`
+  - `examples/cocos3d-demo/extensions/cocos-agent/src/overlay.js`
+  - `cli/src/tests/extension.test.ts`
+  - `TODO.md`
+- 后续：无 P0/P1/P2；待实际 Creator 窗口重新加载扩展后进行人工点击确认。
+
 ### AGT-20260823-013
 
 - TaskHash：`sha256:ad18547f9321bbbcf88acb8b0ea8cd349938b641d0b7e3d27fca94095b05b0d0`
