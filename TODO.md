@@ -122,6 +122,7 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 - [x] 根扩展、`examples/cocos3d-demo` 与 `C:\Users\13929\NewProject` 的 Panel/Overlay 源码已同步。
 - [x] 最终 Release workflow `32626332873` 成功；`v0.0.0.1-a` 指向提交 `21f6f1b`，Release `375146749` 的 Windows zip 资产状态为 `uploaded`，大小 `84,884,231` bytes。
 - [x] 发布账本最终校正：workflow `32626506631` 已对最终提交 `e2865b6` 成功，Release `375147432` 的 Windows zip 资产状态为 `uploaded`，大小 `84,884,739` bytes。
+- [x] 最终发布确认：workflow `32626676068` 对提交 `dc93bbe` 成功，Release `375148277` 的 Windows zip 资产状态为 `uploaded`，大小 `84,884,050` bytes。
 
 本轮任务 hash：`sha256:ad18547f9321bbbcf88acb8b0ea8cd349938b641d0b7e3d27fca94095b05b0d0`。
 

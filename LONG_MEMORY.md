@@ -39,6 +39,7 @@
 | 2026-08-23T16:04:00+08:00 | 首次 Release workflow `32626167117` 成功；随后将标签重定向到最终提交 |
 | 2026-08-23T16:08:00+08:00 | 最终 Release workflow `32626332873` 成功，Release `375146749` 资产已上传 |
 | 2026-08-23T16:14:00+08:00 | 发布账本最终校正：workflow `32626506631` 成功，Release `375147432` 资产已上传 |
+| 2026-08-23T16:18:00+08:00 | 最终发布确认：workflow `32626676068` 成功，Release `375148277` 资产已上传 |
 
 - 结果：Panel 异步响应不再直接写入失效缓存控件；Overlay/Panel 关闭后不再处理 WebSocket 消息或运行重试定时器；按钮使用根事件委托并支持 DOM 重载后重新绑定；离线、控件缺失和挂载失败均输出明确提示。验证通过：14 个测试文件、TypeScript strict、JavaScript 检查、文档链接 `58/0`、PowerShell 脚本解析、`C:\Users\13929\NewProject` 本地项目检查。
 - 文件：
@@ -50,6 +51,7 @@
   - `TODO.md`
 - 结果补充：提交 `28fa2f5` 已推送到 `master`，随后账本记录提交 `21f6f1b` 也已推送；旧 `v0.0.0.1-a` Release/标签已删除并按最终提交 `21f6f1b` 重建。Release 地址：https://github.com/wuxinTLH/CocosAgent/releases/tag/v0.0.0.1-a；资产 `cocos-agent-v0.0.0.1-a-windows.zip`，状态 `uploaded`，大小 `84,884,231` bytes；workflow：`32626332873`。
 - 发布结果最终校正：最终仓库提交 `e2865b6` 已推送，`v0.0.0.1-a` Release 已验证为 `375147432`，workflow `32626506631` 成功，资产 `cocos-agent-v0.0.0.1-a-windows.zip` 状态 `uploaded`，大小 `84,884,739` bytes。
+- 最终发布结果：仓库当前提交 `dc93bbe` 已推送，`v0.0.0.1-a` 标签与其一致；Release `375148277`、workflow `32626676068` 均成功，资产 `cocos-agent-v0.0.0.1-a-windows.zip` 状态 `uploaded`，大小 `84,884,050` bytes。
 
 ### AGT-20260822-012
 
