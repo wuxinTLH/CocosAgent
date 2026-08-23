@@ -1,7 +1,7 @@
 'use strict';
 
 function queryPanelElement(panel, id) {
-  const roots = [panel.shadowRoot, panel.$el, panel.element, panel.root, typeof document !== 'undefined' ? document : null].filter(Boolean);
+  const roots = [panel.shadowRoot, panel.$el, panel.element, panel.root].filter(Boolean);
   if (typeof panel.$ === 'function') {
     try {
       const mapped = panel.$(`#${id}`) || panel.$(id);
@@ -101,13 +101,19 @@ const panelDefinition = {
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['bindElements', 'close', 'connect', 'run', 'append']) {
+    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'connect', 'scheduleReconnect', 'run', 'append', 'dispose', 'beforeClose', 'close']) {
       this[name] = (...args) => panelDefinition[name].apply(this, args);
     }
     this.ws = null;
     this.messageId = 0;
     this.eventsBound = false;
+    this.destroyed = false;
+    this.panelClosed = false;
     this.bindAttempts = 0;
+    this.bindTimer = null;
+    this.reconnectTimer = null;
+    this.eventRoot = null;
+    this.eventBindings = [];
     this.getElement = (id) => queryPanelElement(this, id);
     this.output = this.getElement('output');
     this.input = this.getElement('input');
@@ -117,58 +123,112 @@ const panelDefinition = {
     this.connect();
   },
   bindElements() {
+    if (this.destroyed) return false;
     const form = this.getElement('form');
     const close = this.getElement('close');
     const output = this.getElement('output');
     const input = this.getElement('input');
     const state = this.getElement('state');
-    if (form && close && output && input && state && typeof form.addEventListener === 'function' && typeof close.addEventListener === 'function') {
+    const root = panelEventRoot(this);
+    if (form && close && output && input && state && typeof form.addEventListener === 'function' && typeof close.addEventListener === 'function' && (!this.eventsBound || this.eventRoot !== root)) {
+      this.removeEventBindings();
       this.output = output;
       this.input = input;
       this.state = state;
-      const root = panelEventRoot(this);
       if (root && typeof root.addEventListener === 'function') {
-        root.addEventListener('click', (event) => { if (eventTargetId(event) === 'close') { event.preventDefault(); this.close(); } });
-        root.addEventListener('submit', (event) => { if (event.target?.id === 'form') { event.preventDefault(); this.run(); } });
+        this.bindEvent(root, 'click', (event) => { if (eventTargetId(event) === 'close') { event.preventDefault(); this.close(); } });
+        this.bindEvent(root, 'submit', (event) => { if (event.target?.id === 'form') { event.preventDefault(); this.run(); } });
       } else {
-        bindPanelEvent(this, 'form', 'submit', (event) => { event.preventDefault(); this.run(); });
-        bindPanelEvent(this, 'close', 'click', () => this.close());
+        this.bindEvent(form, 'submit', (event) => { event.preventDefault(); this.run(); });
+        this.bindEvent(close, 'click', () => this.close());
       }
+      this.eventRoot = root;
       this.eventsBound = true;
       return true;
     }
     this.bindAttempts += 1;
-    if (this.bindAttempts < 40) setTimeout(() => this.bindElements(), 50);
-    else if (typeof console !== 'undefined' && typeof console.warn === 'function') console.warn('[overlay] template elements were not mounted');
+    if (this.bindAttempts < 40) this.scheduleBind();
+    else if (!this.mountWarningShown && typeof console !== 'undefined' && typeof console.warn === 'function') { this.mountWarningShown = true; console.warn('[overlay] template elements are unavailable; reopen the Cocos Agent overlay'); }
     return false;
   },
+  bindEvent(element, event, handler) {
+    if (!element || typeof element.addEventListener !== 'function') return null;
+    element.addEventListener(event, handler);
+    this.eventBindings.push([element, event, handler]);
+    return element;
+  },
+  removeEventBindings() {
+    for (const [element, event, handler] of this.eventBindings || []) {
+      if (typeof element.removeEventListener === 'function') element.removeEventListener(event, handler);
+    }
+    this.eventBindings = [];
+    this.eventsBound = false;
+    this.eventRoot = null;
+  },
+  scheduleBind() {
+    if (this.destroyed || this.bindTimer) return;
+    this.bindTimer = setTimeout(() => { this.bindTimer = null; this.bindElements(); }, 50);
+  },
+  scheduleReconnect() {
+    if (this.destroyed || this.reconnectTimer) return;
+    this.reconnectTimer = setTimeout(() => { this.reconnectTimer = null; this.connect(); }, 3000);
+  },
   close() {
-    if (this.ws) this.ws.close();
+    if (this.panelClosed) return;
+    this.panelClosed = true;
+    this.dispose();
     if (typeof Editor !== 'undefined' && Editor.Panel) Editor.Panel.close('cocos-agent.overlay');
   },
+  dispose() {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    if (this.bindTimer) clearTimeout(this.bindTimer);
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.bindTimer = null;
+    this.reconnectTimer = null;
+    this.removeEventBindings();
+    const socket = this.ws;
+    this.ws = null;
+    if (socket) {
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onclose = null;
+      try { socket.close(); } catch {}
+    }
+  },
+  beforeClose() {
+    this.dispose();
+  },
   connect() {
+    if (this.destroyed) return;
     try {
-      this.ws = new WebSocket(BRIDGE_URL);
-      this.ws.onopen = () => { if (this.state) this.state.textContent = 'online'; };
-      this.ws.onmessage = (event) => this.append(event.data);
-      this.ws.onclose = () => { if (this.state) this.state.textContent = 'offline'; };
-    } catch (error) { this.append(`[bridge] ${error.message}`); }
+      const socket = new WebSocket(BRIDGE_URL);
+      this.ws = socket;
+      socket.onopen = () => { if (this.destroyed || this.ws !== socket) return; const state = this.getElement('state'); if (state) state.textContent = 'online'; };
+      socket.onmessage = (event) => { if (!this.destroyed && this.ws === socket) this.append(event.data); };
+      socket.onclose = () => { if (this.ws !== socket) return; this.ws = null; const state = this.getElement('state'); if (state) state.textContent = 'offline'; this.scheduleReconnect(); };
+    } catch (error) { this.append(`[bridge] ${error.message}; start the local bridge and retry`); this.scheduleReconnect(); }
   },
   run() {
-    const line = this.input.value.trim();
+    if (this.destroyed) return;
+    const input = this.getElement('input');
+    if (!input) { this.append('[overlay] command input is unavailable; reopen the overlay'); return; }
+    const line = input.value.trim();
     if (!line) return;
-    this.input.value = '';
+    input.value = '';
     this.append(`> ${line}`);
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) { this.append('[bridge] offline'); return; }
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) { this.append('[bridge] offline; start the local bridge and retry'); return; }
     const command = commandFor(line);
     this.messageId += 1;
     this.ws.send(JSON.stringify({ type: 'tool', id: this.messageId, tool: command.tool, args: command.args }));
   },
   append(value) {
     const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-    if (!this.output) return;
-    this.output.textContent += `${text}\n`;
-    this.output.scrollTop = this.output.scrollHeight;
+    if (this.destroyed) return;
+    const output = this.getElement('output');
+    if (!output) return;
+    output.textContent += `${text}\n`;
+    output.scrollTop = output.scrollHeight;
   },
 };
 

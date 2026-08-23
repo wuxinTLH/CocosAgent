@@ -14,6 +14,38 @@
 
 ## 执行记录
 
+### AGT-20260823-013
+
+- TaskHash：`sha256:ad18547f9321bbbcf88acb8b0ea8cd349938b641d0b7e3d27fca94095b05b0d0`
+- 开始：`2026-08-23T15:34:10+08:00`
+- 结束：`2026-08-23T15:52:00+08:00`
+- 请求：根据 TODO.md 完成 Panel/Overlay 异步 DOM 空引用、Agent 按钮无效和提示信息问题，并删除旧 Release 后重建当前版本。
+- 推理：报错来自 Cocos Creator 面板重载/销毁后，WebSocket 异步响应继续访问旧 DOM 引用；Overlay 的延迟挂载与重连定时器也会在窗口销毁后继续运行。需要以当前面板根节点重新解析控件、对所有异步回调增加销毁门禁，并在销毁时清理资源。
+- 计划：
+  1. 检查 TODO、Panel/Overlay 生命周期和现有扩展契约测试。
+  2. 增加当前元素解析、事件绑定清理、WebSocket/定时器销毁与用户可见诊断。
+  3. 同步示例和测试项目，增加 DOM 卸载回归测试。
+  4. 运行 verify、PowerShell 解析和 NewProject 校验，更新 TODO/记忆并重建 Release。
+- 时间线：
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-23T15:34:10+08:00 | 读取 TODO、约束、Panel/Overlay 源码，确认异步旧引用和销毁后回调为根因 |
+| 2026-08-23T15:40:00+08:00 | 实现 Panel/Overlay 生命周期门禁、事件绑定清理、重连与挂载定时器清理 |
+| 2026-08-23T15:46:00+08:00 | 新增 DOM 卸载和销毁回归测试，同步 examples 与 NewProject |
+| 2026-08-23T15:49:00+08:00 | `npm run verify`、PowerShell 解析和 NewProject 本地校验通过 |
+| 2026-08-23T15:52:00+08:00 | 更新 TODO 与记忆，准备提交并重建当前 Release |
+
+- 结果：Panel 异步响应不再直接写入失效缓存控件；Overlay/Panel 关闭后不再处理 WebSocket 消息或运行重试定时器；按钮使用根事件委托并支持 DOM 重载后重新绑定；离线、控件缺失和挂载失败均输出明确提示。验证通过：14 个测试文件、TypeScript strict、JavaScript 检查、文档链接 `58/0`、PowerShell 脚本解析、`C:\Users\13929\NewProject` 本地项目检查。
+- 文件：
+  - `extensions/cocos-agent/src/panel.js`
+  - `extensions/cocos-agent/src/overlay.js`
+  - `examples/cocos3d-demo/extensions/cocos-agent/src/panel.js`
+  - `examples/cocos3d-demo/extensions/cocos-agent/src/overlay.js`
+  - `cli/src/tests/extension.test.ts`
+  - `TODO.md`
+- 后续：提交 `master`，删除旧 `v0.0.0.1-a` Release/标签，按当前提交重新创建同名标签并验证 Windows zip 资产。
+
 ### AGT-20260822-012
 
 - TaskHash：`sha256:d644489138fa252c5c5f0aff3508df53e74887c7ea88fcb96dccd93b17cf3dd4`

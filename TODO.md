@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-22T14:45:00+08:00`（UTC+8）
+更新时间：`2026-08-23T15:34:10+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,9 +69,61 @@
 # 任务队列
 
 ## 代办列表
-- [x] 修复 Overlay 和 CLI 顶部按钮点击无反应：面板使用根节点事件委托并保留无根节点时的单元素回退绑定，Overlay 覆盖关闭与命令提交，CLI 覆盖保存渠道、使用渠道、保存工作区、cc-switch 检查/连接和命令提交；根扩展与 examples demo 已同步。
+1. [x] 修复 Panel 异步回调在 DOM 卸载后写入空控件的问题：所有异步 UI 写入重新查询当前面板元素，面板销毁时清空 WebSocket、待处理请求、事件监听器、重连与挂载定时器；增加明确的离线/控件不可用提示。
+```log
+ [Window] Cannot set properties of null (setting 'value')
+TypeError: Cannot set properties of null (setting 'value')
+at C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:225:83
+at Object.handleMessage (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:179:54)
+at Object.handleMessage (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:108:55)
+at WebSocket.<anonymous> (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:165:43)
+
+ [Window] Cannot set properties of null (setting 'value')
+TypeError: Cannot set properties of null (setting 'value')
+at C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:195:33
+at Object.handleMessage (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:179:54)
+at Object.handleMessage (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:108:55)
+at WebSocket.<anonymous> (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:165:43)
+
+ [Window] Cannot read properties of null (reading 'value')
+TypeError: Cannot read properties of null (reading 'value')
+at C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:186:80
+at Array.find (<anonymous>)
+at C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:186:39
+at Object.handleMessage (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:179:54)
+at Object.handleMessage (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:108:55)
+at WebSocket.<anonymous> (C:\Users\13929\NewProject\extensions\cocos-agent\src\panel.js:165:43)
+
+TypeError: Object has been destroyed
+at WebContents._.send (node:electron/js2c/browser_init:2:74130)
+at WindowSender.immediately (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@base\electron-base-ipc\dist\sender.ccc:1:2082)
+at Immediate._onImmediate (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@base\electron-base-ipc\dist\sender.ccc:1:2008)
+at processImmediate (node:internal/timers:478:21)
+
+[Window] [overlay] template elements were not mounted
+Error: [Window] [overlay] template elements were not mounted
+at console.warn (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\core\build\cjs\utils-hoist\instrument\console.js:38:14)
+at Object.bindElements (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:121:92)
+at Object.bindElements (C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:90:55)
+at C:\Users\13929\NewProject\extensions\cocos-agent\src\overlay.js:120:55
+at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\@sentry\browser\build\npm\cjs\helpers.js:95:17)
+```
+修复错误
+2. [x] 删除旧 Release 并按当前 `VERSION` 重新构建发布资产。
+3. [x] 修正 Agent 按钮无效问题：Panel/Overlay 统一使用根事件委托和回退绑定，且重载后可重新绑定；增加 bridge 离线、控件卸载和 Overlay 未挂载诊断。
+
+
 
 ### 本轮验证
+
+- [x] `cd cli; npm run verify`：14 个测试文件全部通过，新增 DOM 卸载/销毁回归测试通过，TypeScript strict、JavaScript 检查和文档链接 `58/0` 通过。
+- [x] `npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject`：项目同步、CLI status、版本和路径校验通过。
+- [x] PowerShell 脚本解析、JavaScript 语法检查和 `git diff --check` 通过。
+- [x] 根扩展、`examples/cocos3d-demo` 与 `C:\Users\13929\NewProject` 的 Panel/Overlay 源码已同步。
+
+本轮任务 hash：`sha256:ad18547f9321bbbcf88acb8b0ea8cd349938b641d0b7e3d27fca94095b05b0d0`。
+
+### 已完成任务
 
 - [x] `cd cli; npm run verify`：14 个测试文件全部通过，TypeScript strict、JavaScript 检查和文档链接 `58/0` 通过。
 - [x] `npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject`：项目同步、CLI status、版本和路径校验通过。

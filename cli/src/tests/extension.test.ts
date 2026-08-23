@@ -10,7 +10,74 @@ const repoRoot = path.resolve(__dirname, '..', '..', '..');
 const extensionRoot = path.join(repoRoot, 'extensions', 'cocos-agent');
 const launcherRoot = path.join(repoRoot, 'launcher');
 const require = createRequire(import.meta.url);
-const globals = globalThis as typeof globalThis & { Editor?: unknown };
+const globals = globalThis as typeof globalThis & { Editor?: unknown; WebSocket?: unknown };
+
+class FakeElement {
+  id: string;
+  value = '';
+  textContent = '';
+  scrollTop = 0;
+  scrollHeight = 0;
+  options: FakeElement[] = [];
+  selectedOptions: FakeElement[] = [];
+  private listeners = new Map<string, Set<(event: { target?: FakeElement; preventDefault?: () => void }) => void>>();
+
+  constructor(id: string) {
+    this.id = id;
+  }
+
+  addEventListener(event: string, handler: (event: { target?: FakeElement; preventDefault?: () => void }) => void) {
+    const handlers = this.listeners.get(event) ?? new Set();
+    handlers.add(handler);
+    this.listeners.set(event, handlers);
+  }
+
+  removeEventListener(event: string, handler: (event: { target?: FakeElement; preventDefault?: () => void }) => void) {
+    this.listeners.get(event)?.delete(handler);
+  }
+}
+
+class FakeRoot {
+  nodes: Record<string, FakeElement>;
+  listeners = new Map<string, Set<(event: { target?: FakeElement; preventDefault?: () => void }) => void>>();
+
+  constructor(ids: string[]) {
+    this.nodes = Object.fromEntries(ids.map((id) => [id, new FakeElement(id)]));
+  }
+
+  querySelector(selector: string) {
+    return this.nodes[selector.replace(/^#/, '')] ?? null;
+  }
+
+  addEventListener(event: string, handler: (event: { target?: FakeElement; preventDefault?: () => void }) => void) {
+    const handlers = this.listeners.get(event) ?? new Set();
+    handlers.add(handler);
+    this.listeners.set(event, handlers);
+  }
+
+  removeEventListener(event: string, handler: (event: { target?: FakeElement; preventDefault?: () => void }) => void) {
+    this.listeners.get(event)?.delete(handler);
+  }
+}
+
+class FakeWebSocket {
+  static readonly OPEN = 1;
+  readyState = FakeWebSocket.OPEN;
+  onopen: (() => void) | null = null;
+  onmessage: ((event: { data: string }) => void) | null = null;
+  onclose: (() => void) | null = null;
+  sent: string[] = [];
+  closeCount = 0;
+
+  send(payload: string) {
+    this.sent.push(payload);
+  }
+
+  close() {
+    this.closeCount += 1;
+    this.readyState = 3;
+  }
+}
 
 test('Cocos Creator extension manifest and panel contract are valid', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(extensionRoot, 'package.json'), 'utf8')) as {
@@ -72,7 +139,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(fs.readFileSync(panelPath, 'utf8'), /const panelDefinition =/);
     assert.match(fs.readFileSync(panelPath, 'utf8'), /panelDefinition\[name\]\.apply\(this, args\)/);
     assert.match(fs.readFileSync(panelPath, 'utf8'), /panelEventRoot/);
-    assert.match(fs.readFileSync(panelPath, 'utf8'), /root\.addEventListener\('click'/);
+    assert.match(fs.readFileSync(panelPath, 'utf8'), /bindEvent\(root, 'click'/);
     assert.match(panel.template ?? '', /id="save-provider"/);
     assert.match(panel.template ?? '', /id="ccs-connect"/);
     assert.doesNotMatch(fs.readFileSync(panelPath, 'utf8'), /document\.getElementById/);
@@ -84,7 +151,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /const panelDefinition =/);
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /panelDefinition\[name\]\.apply\(this, args\)/);
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /panelEventRoot/);
-    assert.match(fs.readFileSync(overlayPath, 'utf8'), /root\.addEventListener\('click'/);
+    assert.match(fs.readFileSync(overlayPath, 'utf8'), /bindEvent\(root, 'click'/);
     assert.match(overlay.template ?? '', /id="close"/);
     assert.doesNotMatch(fs.readFileSync(overlayPath, 'utf8'), /document\.getElementById/);
     assert.match(mainSource, /ELECTRON_RUN_AS_NODE/);
@@ -112,5 +179,50 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.deepEqual(opened, ['cocos-agent.cli']);
   } finally {
     globals.Editor = previousEditor;
+  }
+});
+
+test('extension callbacks tolerate unloaded DOM and dispose bridge resources', () => {
+  const previousEditor = globals.Editor;
+  const previousWebSocket = globals.WebSocket;
+  const closedPanels: string[] = [];
+  globals.Editor = { Panel: { define: (definition: unknown) => definition, close: (name: string) => closedPanels.push(name) } };
+  globals.WebSocket = FakeWebSocket as unknown as typeof WebSocket;
+  try {
+    const panelPath = path.join(extensionRoot, 'src', 'panel.js');
+    delete require.cache[require.resolve(panelPath)];
+    const panelDefinition = require(panelPath) as {
+      ready?: () => void;
+      close?: () => void;
+    };
+    const ids = ['output', 'input', 'state', 'locale', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
+    const root = new FakeRoot(ids);
+    const instance = { shadowRoot: root } as Record<string, unknown>;
+    panelDefinition.ready?.call(instance as never);
+    const socket = instance.ws as FakeWebSocket;
+    assert.ok(socket);
+    socket.onopen?.();
+    delete root.nodes.provider;
+    assert.doesNotThrow(() => socket.onmessage?.({ data: JSON.stringify({ id: 1, ok: true, result: [{ id: 'openai', model: 'gpt-4.1', endpoint: '', configured: false, credentialEnvironment: 'OPENAI_API_KEY' }] }) }));
+    panelDefinition.close?.call(instance as never);
+    assert.equal(instance.destroyed, true);
+    assert.equal(socket.closeCount, 1);
+    assert.deepEqual(closedPanels, ['cocos-agent.cli']);
+
+    const overlayPath = path.join(extensionRoot, 'src', 'overlay.js');
+    delete require.cache[require.resolve(overlayPath)];
+    const overlayDefinition = require(overlayPath) as { ready?: () => void; close?: () => void };
+    const emptyRoot = new FakeRoot([]);
+    const overlay = { shadowRoot: emptyRoot } as Record<string, unknown>;
+    overlayDefinition.ready?.call(overlay as never);
+    const overlaySocket = overlay.ws as FakeWebSocket;
+    overlayDefinition.close?.call(overlay as never);
+    assert.equal(overlay.destroyed, true);
+    assert.equal(overlay.bindTimer, null);
+    assert.equal(overlaySocket.closeCount, 1);
+    assert.deepEqual(closedPanels, ['cocos-agent.cli', 'cocos-agent.overlay']);
+  } finally {
+    globals.Editor = previousEditor;
+    globals.WebSocket = previousWebSocket;
   }
 });
