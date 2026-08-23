@@ -120,6 +120,7 @@ at sentryWrapped (E:\cocos editor\Creator\3.8.8\resources\app.asar\node_modules\
 - [x] `npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject`：项目同步、CLI status、版本和路径校验通过。
 - [x] PowerShell 脚本解析、JavaScript 语法检查和 `git diff --check` 通过。
 - [x] 根扩展、`examples/cocos3d-demo` 与 `C:\Users\13929\NewProject` 的 Panel/Overlay 源码已同步。
+- [x] Release workflow `32626167117` 成功；`v0.0.0.1-a` 已指向提交 `28fa2f5`，Release `375146073` 的 Windows zip 资产状态为 `uploaded`，大小 `84,884,049` bytes。
 
 本轮任务 hash：`sha256:ad18547f9321bbbcf88acb8b0ea8cd349938b641d0b7e3d27fca94095b05b0d0`。
 
