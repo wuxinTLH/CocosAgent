@@ -59,8 +59,19 @@ export async function connectRoute(route?: string, url?: string): Promise<Record
   const bin = process.env.COCOS_AGENT_CCS_BIN;
   if (resolved.url && (explicitUrl || !bin)) {
     if (resolved.url.startsWith('http://') || resolved.url.startsWith('https://')) {
-      const response = await fetch(resolved.url, { signal: AbortSignal.timeout(5000) });
-      if (!response.ok) throw new Error(`CCS_HTTP_ERROR: ${response.status}`);
+      let response: Response;
+      try {
+        response = await fetch(resolved.url, { signal: AbortSignal.timeout(5000) });
+      } catch (error) {
+        throw new Error(`CCS_HTTP_UNREACHABLE: ${(error as Error).message}`);
+      }
+      return {
+        route: resolved.route,
+        url: resolved.url,
+        status: 'connected',
+        transport: 'http',
+        httpStatus: response.status,
+      };
     } else {
       await pingWebSocket(resolved.url, 5000, process.env.COCOS_AGENT_GATEWAY_TOKEN, process.env.COCOS_AGENT_CCS_INSECURE === 'true');
     }

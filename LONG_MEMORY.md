@@ -14,6 +14,19 @@
 
 ## 执行记录
 
+### AGT-20260824-018
+
+- TaskHash: `sha256:f6311ea8994564b5159151dde3d7b87688a7f66e130778b57cace0bb47012ab6`
+- 开始: `2026-08-24T18:31:49+08:00`
+- 结束: `2026-08-24T18:31:49+08:00`
+- 请求: 修复 TODO 中 cc-switch HTTP 端点返回 404 被误报为 `CCS_HTTP_ERROR` 的问题。
+- 推理: 实测 `http://127.0.0.1:15721` 返回 404，TCP/HTTP 服务实际可达；404 表示根路径不存在，不能等同于未配置或网络失败。
+- 计划: 将 HTTP 连接分为可达响应与网络异常；返回 `connected`、`transport`、`httpStatus`；补回归测试并运行完整验证、测试项目同步和记忆收口。
+- 时间线: `2026-08-24T18:08:27+08:00` 读取 TODO；`2026-08-24T18:20:00+08:00` 定位 404 根因并实现 HTTP 可达性语义；`2026-08-24T18:25:00+08:00` 新增 404 回归测试；`2026-08-24T18:31:49+08:00` 完成 verify、NewProject 验证和收口。
+- 结果: HTTP 任意响应状态码均视为端点可达，404 会显示为 `httpStatus: 404`；网络连接和超时仍返回 `CCS_HTTP_UNREACHABLE`。
+- 验证: `npm run verify` 通过 14 个测试文件、58 项文档链接；`npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` 通过；JS 语法和 `git diff --check` 通过。
+- 审查: P0=0, P1=0, P2=0, P3=0；未提交 Release。
+
 ### AGT-20260824-017
 
 - TaskHash: `sha256:2381b5639e007fbc8e2dc40ef4b24c72e44be3fa440ede9c6ded5f8387252790`

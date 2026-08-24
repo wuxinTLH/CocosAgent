@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-24T18:08:27+08:00`（UTC+8）
+更新时间：`2026-08-24T18:31:49+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,11 +69,80 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 设置 Cocos Agent 默认 cc-switch 端点 `http://127.0.0.1:15721`，端点缺失时不再显示 `CCS_ROUTE_URL_NOT_CONFIGURED`；支持环境变量和 CLI/MCP 覆盖。
-2. [x] Panel/Overlay 增加“复制日志”按钮，支持 `navigator.clipboard` 和 DOM 兼容回退，并反馈复制状态。
+1. [x] cc-switch HTTP 根路径返回 404 时，视为服务端点可达并显示 HTTP 状态，不再误报 `CCS_HTTP_ERROR`；网络不可达仍返回明确错误。
+```log
+{
+  "ccs": {
+    "checks": {
+      "ccSwitchConfig": {
+        "ok": true,
+        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
+      },
+      "ccsBin": {
+        "ok": false,
+        "value": null
+      },
+      "ccsUrl": {
+        "ok": true,
+        "value": "http://127.0.0.1:15721"
+      },
+      "gatewayUrl": {
+        "ok": false,
+        "value": null
+      }
+    },
+    "route": {
+      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
+      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "url": "http://127.0.0.1:15721"
+    },
+    "editors": [],
+    "creatorVersion": "3.8.8"
+  }
+}
+[ccs] CCS_HTTP_ERROR: 404
+{
+  "ccs": {
+    "checks": {
+      "ccSwitchConfig": {
+        "ok": true,
+        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
+      },
+      "ccsBin": {
+        "ok": false,
+        "value": null
+      },
+      "ccsUrl": {
+        "ok": true,
+        "value": "http://127.0.0.1:15721"
+      },
+      "gatewayUrl": {
+        "ok": false,
+        "value": null
+      }
+    },
+    "route": {
+      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
+      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "url": "http://127.0.0.1:15721"
+    },
+    "editors": [],
+    "creatorVersion": "3.8.8"
+  }
+}
+[ccs] CCS_HTTP_ERROR: 404
+
+```
 
 
 ### 本轮解决方案与验证
+
+- [x] `ccs_connect` 区分 HTTP 服务可达与网络不可达：任何 HTTP 响应（包括 404）返回 `status: connected`、`transport: http` 和 `httpStatus`。
+- [x] 新增 HTTP 404 可达性回归测试，保留 WS/WSS 连接检测和环境变量覆盖。
+
+本轮任务 hash：`sha256:f6311ea8994564b5159151dde3d7b87688a7f66e130778b57cace0bb47012ab6`。
 
 - [x] 新增 Panel/Overlay 日志复制控件、剪贴板 API 与兼容回退实现，扩展契约测试覆盖真实按钮 dispatch。
 - [x] ccs doctor 默认返回 `http://127.0.0.1:15721`，ccs connect 支持 HTTP/WS 端点并保留环境变量覆盖。

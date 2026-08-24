@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import http from 'node:http';
 import { ccsDoctor, connectRoute, normalizeCcsUrl, resolveRoute } from '../ccs.js';
 import { mockPort, startMockGateway, waitForMockGateway } from '../gateway-mock.js';
 
@@ -78,5 +79,37 @@ test('ccs endpoint remains independently resolvable when cc-switch settings are 
     assert.equal(route.url, 'http://127.0.0.1:15721');
   } finally {
     if (previous === undefined) delete process.env.CC_SWITCH_CONFIG; else process.env.CC_SWITCH_CONFIG = previous;
+  }
+});
+
+test('ccs HTTP endpoint treats an upstream 404 as reachable', async () => {
+  const server = http.createServer((_request, response) => {
+    response.writeHead(404, { 'content-type': 'text/plain' });
+    response.end('cc-switch route endpoint');
+  });
+  const settingsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-ccs-http-'));
+  const settings = path.join(settingsDir, 'settings.json');
+  fs.writeFileSync(settings, JSON.stringify({ currentProviderCodex: 'http-route' }), 'utf8');
+  const previousConfig = process.env.CC_SWITCH_CONFIG;
+  const previousUrl = process.env.COCOS_AGENT_CCS_URL;
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once('listening', () => resolve());
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1');
+    });
+    const address = server.address();
+    assert.equal(typeof address, 'object');
+    process.env.CC_SWITCH_CONFIG = settings;
+    process.env.COCOS_AGENT_CCS_URL = `http://127.0.0.1:${(address as { port: number }).port}`;
+    const result = await connectRoute();
+    assert.equal(result.status, 'connected');
+    assert.equal(result.transport, 'http');
+    assert.equal(result.httpStatus, 404);
+  } finally {
+    if (previousConfig === undefined) delete process.env.CC_SWITCH_CONFIG; else process.env.CC_SWITCH_CONFIG = previousConfig;
+    if (previousUrl === undefined) delete process.env.COCOS_AGENT_CCS_URL; else process.env.COCOS_AGENT_CCS_URL = previousUrl;
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    fs.rmSync(settingsDir, { recursive: true, force: true });
   }
 });
