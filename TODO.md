@@ -69,8 +69,85 @@
 # 任务队列
 
 ## 代办列表
-1. [x] cc-switch HTTP 根路径返回 404 时视为服务端点可达；裸 `host:port` 自动补全 `http://`，不再误报 `CCS_ROUTE_URL_INVALID`；网络不可达仍返回明确错误。
+1. 
 ```log
+{
+  "ccs": {
+    "checks": {
+      "ccSwitchConfig": {
+        "ok": true,
+        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
+      },
+      "ccsBin": {
+        "ok": false,
+        "value": null
+      },
+      "ccsUrl": {
+        "ok": true,
+        "value": "http://127.0.0.1:15721"
+      },
+      "gatewayUrl": {
+        "ok": false,
+        "value": null
+      }
+    },
+    "route": {
+      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
+      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "url": "http://127.0.0.1:15721"
+    },
+    "editors": [],
+    "creatorVersion": "3.8.8"
+  }
+}
+{
+  "provider": "gateway",
+  "saved": true
+}
+{
+  "ccs": {
+    "checks": {
+      "ccSwitchConfig": {
+        "ok": true,
+        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
+      },
+      "ccsBin": {
+        "ok": false,
+        "value": null
+      },
+      "ccsUrl": {
+        "ok": true,
+        "value": "http://127.0.0.1:15721"
+      },
+      "gatewayUrl": {
+        "ok": false,
+        "value": null
+      }
+    },
+    "route": {
+      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
+      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "url": "http://127.0.0.1:15721"
+    },
+    "editors": [],
+    "creatorVersion": "3.8.8"
+  }
+}
+{
+  "provider": "gateway",
+  "selected": true
+}
+{
+  "ccs": {
+    "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+    "url": "http://127.0.0.1:15721",
+    "status": "connected",
+    "transport": "http",
+    "httpStatus": 404
+  }
+}
 {
   "ccs": {
     "checks": {
@@ -110,7 +187,45 @@
     "httpStatus": 404
   }
 }
-[ccs] CCS_ROUTE_URL_INVALID: 127.0.0.1:15721
+{
+  "provider": "gateway",
+  "selected": true
+}
+{
+  "workspace": "saved",
+  "activeProvider": "gateway",
+  "fallbackProviders": []
+}
+{
+  "ccs": {
+    "checks": {
+      "ccSwitchConfig": {
+        "ok": true,
+        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
+      },
+      "ccsBin": {
+        "ok": false,
+        "value": null
+      },
+      "ccsUrl": {
+        "ok": true,
+        "value": "http://127.0.0.1:15721"
+      },
+      "gatewayUrl": {
+        "ok": false,
+        "value": null
+      }
+    },
+    "route": {
+      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
+      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+      "url": "http://127.0.0.1:15721"
+    },
+    "editors": [],
+    "creatorVersion": "3.8.8"
+  }
+}
 {
   "ccs": {
     "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
@@ -248,3 +363,14 @@ Release 验证收口任务 hash：`sha256:b9795dd22b79ef5a3d2528038ce0ad51a146a4
 Creator 构建与面板挂载修复任务 hash：`sha256:85a32c08907eefa8564da80e1d3ef4db2fceb47b4cafc88a6969909ace7db20f`。
 
 任务账本整理 hash：`sha256:231856d765f17be56129fdb0078de34894dcfd9b8e8407f3e12917b0dd677d0d`。
+
+## 本轮收尾结果（2026-08-24）
+
+- [x] 固化 Gateway 完整操作链路回归测试：`provider_configure` 保存端点和模型、`provider_select` 选择当前工作区会话、`agent_config` 保存 `activeProvider=gateway` 与空回退列表。
+- [x] 回归验证 `ccs_doctor` 读取独立 cc-switch 路由，并验证 `ccs_connect` 对 HTTP 404 返回 `connected`、`transport=http` 和 `httpStatus=404`。
+- [x] 断言 Gateway 配置、全局工作区配置和会话提供商均已持久化到当前项目范围内。
+- [x] `cd cli; npm run verify`：14 个测试文件通过，TypeScript strict、JavaScript 检查和文档链接 `58/0` 通过。
+- [x] `npm run test:local-project -- --ProjectRoot "C:\\Users\\13929\\NewProject"` 通过：版本、CLI、扩展路径和 Creator 3.8.8 dry-run 校验通过。
+- [x] 完成代码审查：本轮新增测试无 P0-P3 问题；`git diff --check` 仅报告用户原有 TODO 日志的尾随空格。
+
+本轮任务 hash：`sha256:211886ffa4b10a7661a8d822c9662f940348ab9cf54959d364753023a371576f`。

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { loadAgentConfig, saveAgentConfig, updateProvider } from '../config.js';
@@ -121,6 +122,71 @@ test('only-safe allows non-secret provider endpoint and model configuration', as
     assert.equal(config.providers.deepseek?.endpoint, 'https://api.deepseek.com/v1');
     assert.equal(config.providers.deepseek?.model, 'deepseek-chat');
   } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('gateway configuration, selection, workspace save, and ccs connection persist as one workflow', async () => {
+  const { root, ctx } = tempContext();
+  const settingsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-ccs-workflow-'));
+  const settings = path.join(settingsDir, 'settings.json');
+  fs.writeFileSync(settings, JSON.stringify({ currentProviderCodex: 'workflow-route' }), 'utf8');
+  const server = http.createServer((_request, response) => {
+    response.writeHead(404, { 'content-type': 'text/plain' });
+    response.end('cc-switch route endpoint');
+  });
+  const previousConfig = process.env.CC_SWITCH_CONFIG;
+  const previousUrl = process.env.COCOS_AGENT_CCS_URL;
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once('listening', () => resolve());
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1');
+    });
+    const address = server.address();
+    assert.equal(typeof address, 'object');
+    const endpoint = `http://127.0.0.1:${(address as { port: number }).port}`;
+    process.env.CC_SWITCH_CONFIG = settings;
+    process.env.COCOS_AGENT_CCS_URL = endpoint;
+
+    const configured = await dispatchTool(ctx, 'provider_configure', {
+      provider: 'gateway',
+      endpoint: `${endpoint}/gateway`,
+      model: 'workflow-model',
+    }) as { providers: { gateway?: { endpoint?: string; model?: string } } };
+    assert.deepEqual(configured.providers.gateway, { endpoint: `${endpoint}/gateway`, model: 'workflow-model' });
+
+    const selected = await dispatchTool(ctx, 'provider_select', { provider: 'gateway' }) as { provider: string };
+    assert.equal(selected.provider, 'gateway');
+    const saved = await dispatchTool(ctx, 'agent_config', {
+      activeProvider: 'gateway',
+      fallbackProviders: [],
+    }) as { current: { activeProvider: string; fallbackProviders: string[] } };
+    assert.equal(saved.current.activeProvider, 'gateway');
+    assert.deepEqual(saved.current.fallbackProviders, []);
+
+    const doctor = await dispatchTool(ctx, 'ccs_doctor', {}) as { route: { route: string; url: string } };
+    assert.equal(doctor.route?.route, 'workflow-route');
+    assert.equal(doctor.route?.url, endpoint);
+    const connected = await dispatchTool(ctx, 'ccs_connect', {}) as { status: string; transport: string; httpStatus: number };
+    assert.deepEqual(connected, {
+      route: 'workflow-route',
+      url: endpoint,
+      status: 'connected',
+      transport: 'http',
+      httpStatus: 404,
+    });
+
+    const persisted = loadAgentConfig(root);
+    assert.equal(persisted.activeProvider, 'gateway');
+    assert.deepEqual(persisted.fallbackProviders, []);
+    assert.deepEqual(persisted.providers.gateway, { endpoint: `${endpoint}/gateway`, model: 'workflow-model' });
+    assert.equal((await dispatchTool(ctx, 'workspace_list', {}) as { sessions: Array<{ provider: string }> }).sessions[0]?.provider, 'gateway');
+  } finally {
+    if (previousConfig === undefined) delete process.env.CC_SWITCH_CONFIG; else process.env.CC_SWITCH_CONFIG = previousConfig;
+    if (previousUrl === undefined) delete process.env.COCOS_AGENT_CCS_URL; else process.env.COCOS_AGENT_CCS_URL = previousUrl;
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    fs.rmSync(settingsDir, { recursive: true, force: true });
     fs.rmSync(root, { recursive: true, force: true });
   }
 });

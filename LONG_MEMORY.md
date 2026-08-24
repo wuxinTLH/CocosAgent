@@ -14,6 +14,34 @@
 
 ## 执行记录
 
+### AGT-20260824-020
+
+- TaskHash: `sha256:211886ffa4b10a7661a8d822c9662f940348ab9cf54959d364753023a371576f`
+- 开始: `2026-08-24T20:32:23+08:00`
+- 结束: `2026-08-24T20:36:40+08:00`
+- 请求: 根据 TODO.md 的内容约束等，完成 TODO.md 的需要解决的任务（一次性解决）。
+- 推理: TODO 最新日志表示 Gateway 配置保存、渠道选择、工作区保存和 cc-switch 诊断/连接均已成功，但缺少覆盖完整动作顺序与最终落盘内容的回归测试。现有实现分别写入 provider override、会话 provider 和全局 activeProvider，因此需要验证三层状态不会互相覆盖，并隔离真实用户 cc-switch 配置。
+- 计划: 读取实现和测试契约；增加端到端回归测试；运行完整 CLI 验证；验证指定 Cocos 项目；更新 TODO 与记忆；审查、提交并推送。
+- 时间线:
+
+| 时间（UTC+8） | 事件 |
+| --- | --- |
+| 2026-08-24T20:32:23+08:00 | 读取 TODO、Git 状态、Gateway/provider、cc-switch 实现与测试。 |
+| 2026-08-24T20:33:10+08:00 | 识别 provider_select 为当前会话选择，agent_config 为全局工作区保存，确定测试断言边界。 |
+| 2026-08-24T20:34:05+08:00 | 新增 Gateway 配置、选择、工作区保存、ccs doctor/connect 和配置落盘回归测试。 |
+| 2026-08-24T20:34:30+08:00 | 定向测试 7/7 通过。 |
+| 2026-08-24T20:35:20+08:00 | npm run verify 通过：14 个测试文件、文档检查 58/0。 |
+| 2026-08-24T20:35:50+08:00 | NewProject 本地验证通过，Creator 3.8.8 dry-run 正常。 |
+| 2026-08-24T20:36:40+08:00 | 完成本轮文档更新与代码审查，准备提交推送。 |
+
+- 结果: Gateway/ccs 操作链路已被自动化测试保护；没有发现需要修复的实现缺陷。所有验证通过，未创建 Release。
+- 文件:
+  - cli/src/tests/agent-workspace.test.ts
+  - TODO.md
+  - LONG_MEMORY.md
+  - SHORT_MEMORY.md
+- 后续: 推送 master 后核对本地 HEAD 与 origin/master 一致。
+
 ### AGT-20260824-019
 
 - TaskHash: `sha256:d938bb20368ebb9969497dc2488f5c46c5f4fe63df31ce43167e09c76be650c6`
