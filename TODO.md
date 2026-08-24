@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-24T18:31:49+08:00`（UTC+8）
+更新时间：`2026-08-24T19:32:18+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,7 +69,7 @@
 # 任务队列
 
 ## 代办列表
-1. [x] cc-switch HTTP 根路径返回 404 时，视为服务端点可达并显示 HTTP 状态，不再误报 `CCS_HTTP_ERROR`；网络不可达仍返回明确错误。
+1. [x] cc-switch HTTP 根路径返回 404 时视为服务端点可达；裸 `host:port` 自动补全 `http://`，不再误报 `CCS_ROUTE_URL_INVALID`；网络不可达仍返回明确错误。
 ```log
 {
   "ccs": {
@@ -101,43 +101,36 @@
     "creatorVersion": "3.8.8"
   }
 }
-[ccs] CCS_HTTP_ERROR: 404
 {
   "ccs": {
-    "checks": {
-      "ccSwitchConfig": {
-        "ok": true,
-        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
-      },
-      "ccsBin": {
-        "ok": false,
-        "value": null
-      },
-      "ccsUrl": {
-        "ok": true,
-        "value": "http://127.0.0.1:15721"
-      },
-      "gatewayUrl": {
-        "ok": false,
-        "value": null
-      }
-    },
-    "route": {
-      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
-      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "url": "http://127.0.0.1:15721"
-    },
-    "editors": [],
-    "creatorVersion": "3.8.8"
+    "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+    "url": "http://127.0.0.1:15721",
+    "status": "connected",
+    "transport": "http",
+    "httpStatus": 404
   }
 }
-[ccs] CCS_HTTP_ERROR: 404
+[ccs] CCS_ROUTE_URL_INVALID: 127.0.0.1:15721
+{
+  "ccs": {
+    "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
+    "url": "http://127.0.0.1:15721",
+    "status": "connected",
+    "transport": "http",
+    "httpStatus": 404
+  }
+}
+
 
 ```
 
 
 ### 本轮解决方案与验证
+
+- [x] `normalizeCcsUrl` 支持 `127.0.0.1:15721` 和带路径的裸 `host:port`，统一规范化为 HTTP URL。
+- [x] 新增裸端点规范化回归测试，保留 HTTP 404 可达性和 WS/WSS 测试。
+
+本轮任务 hash：`sha256:d938bb20368ebb9969497dc2488f5c46c5f4fe63df31ce43167e09c76be650c6`。
 
 - [x] `ccs_connect` 区分 HTTP 服务可达与网络不可达：任何 HTTP 响应（包括 404）返回 `status: connected`、`transport: http` 和 `httpStatus`。
 - [x] 新增 HTTP 404 可达性回归测试，保留 WS/WSS 连接检测和环境变量覆盖。

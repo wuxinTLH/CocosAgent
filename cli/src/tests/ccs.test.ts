@@ -66,6 +66,8 @@ test('ccs route connection validates the configured local route', async () => {
 
 test('ccs accepts an independent http ip:port endpoint and converts it to websocket', () => {
   assert.equal(normalizeCcsUrl('http://127.0.0.1:8787'), 'http://127.0.0.1:8787');
+  assert.equal(normalizeCcsUrl('127.0.0.1:8787'), 'http://127.0.0.1:8787');
+  assert.equal(normalizeCcsUrl('127.0.0.1:8787/ccs'), 'http://127.0.0.1:8787/ccs');
   assert.equal(normalizeCcsUrl('ws://127.0.0.1:8787'), 'ws://127.0.0.1:8787/ws');
   assert.equal(normalizeCcsUrl('https://example.test:9443/ccs'), 'https://example.test:9443/ccs');
 });

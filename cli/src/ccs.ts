@@ -15,7 +15,10 @@ export interface CcsRoute {
 }
 
 export function normalizeCcsUrl(value: string): string {
-  const candidate = value.trim();
+  const rawCandidate = value.trim();
+  const candidate = /^[^/:\s]+:\d+(?:\/[^\s]*)?$/.test(rawCandidate)
+    ? `http://${rawCandidate}`
+    : rawCandidate;
   if (!candidate) throw new Error('CCS_ROUTE_URL_EMPTY: provide http://ip:port');
   let parsed: URL;
   try {
