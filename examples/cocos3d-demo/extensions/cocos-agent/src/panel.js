@@ -46,6 +46,29 @@ function eventTargetId(event) {
   return '';
 }
 
+function copyText(value, output) {
+  if (!value) return Promise.resolve(false);
+  if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    return navigator.clipboard.writeText(value).then(() => true).catch(() => copyTextFallback(value, output));
+  }
+  return Promise.resolve(copyTextFallback(value, output));
+}
+
+function copyTextFallback(value, output) {
+  const ownerDocument = output && output.ownerDocument;
+  if (!ownerDocument || typeof ownerDocument.createElement !== 'function' || !ownerDocument.body) return false;
+  const textarea = ownerDocument.createElement('textarea');
+  textarea.value = value;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  ownerDocument.body.appendChild(textarea);
+  textarea.select();
+  const copied = typeof ownerDocument.execCommand === 'function' && ownerDocument.execCommand('copy');
+  ownerDocument.body.removeChild(textarea);
+  return copied;
+}
+
 const BRIDGE_URL = 'ws://127.0.0.1:8899/ws';
 
 function parseCommand(line) {
@@ -74,7 +97,7 @@ const panelDefinition = {
   $: {
     output: '#output', input: '#input', state: '#state', locale: '#locale', provider: '#provider', model: '#model', endpoint: '#endpoint', credential: '#credential',
     'active-provider': '#active-provider', 'fallback-providers': '#fallback-providers', 'ccs-route': '#ccs-route', 'ccs-url': '#ccs-url', 'ccs-state': '#ccs-state', form: '#form',
-    'save-provider': '#save-provider', 'select-provider': '#select-provider', 'save-workspace': '#save-workspace', 'ccs-doctor': '#ccs-doctor', 'ccs-connect': '#ccs-connect',
+    'save-provider': '#save-provider', 'select-provider': '#select-provider', 'save-workspace': '#save-workspace', 'ccs-doctor': '#ccs-doctor', 'ccs-connect': '#ccs-connect', 'copy-output': '#copy-output',
   },
   template: `
     <div class="agent-cli">
@@ -98,7 +121,7 @@ const panelDefinition = {
         <div class="agent-cli__grid"><label>路由<input id="ccs-route" type="text" autocomplete="off" placeholder="当前 cc-switch 路由" /></label><label>HTTP 端点<input id="ccs-url" type="text" value="http://127.0.0.1:15721" autocomplete="off" placeholder="http://127.0.0.1:15721" /></label></div>
         <div class="agent-cli__actions"><button id="ccs-doctor">检查 cc-switch</button><button id="ccs-connect">连接路由</button><span id="ccs-state"></span></div>
       </section>
-      <section id="output" class="agent-cli__output"></section>
+      <div class="agent-cli__output-actions"><button id="copy-output" title="Copy logs">复制日志</button></div><section id="output" class="agent-cli__output"></section>
       <form id="form" class="agent-cli__command"><input id="input" autocomplete="off" placeholder="chat 你好 | status | ccs doctor" /><button title="Run command">Run</button></form>
     </div>
   `,
@@ -118,13 +141,14 @@ const panelDefinition = {
     .agent-cli button { min-height:28px; color:#061018; background:#7ed6ff; border:0; padding:4px 10px; cursor:pointer; font:inherit; font-weight:700; }
     .agent-cli button:hover { background:#a1e2ff; } .agent-cli__actions span { color:#aab8c5; overflow-wrap:anywhere; }
     .agent-cli__output { flex:1; min-height:90px; overflow:auto; padding:9px 10px; white-space:pre-wrap; background:#171b21; }
+    .agent-cli__output-actions { display:flex; justify-content:flex-end; padding:5px 10px 0; background:#171b21; }
     .agent-cli__command { display:flex; gap:7px; margin:0; padding:8px 10px; border-top:1px solid #455767; background:#202831; }
     .agent-cli__command input { flex:1; min-width:0; }
   `,
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'currentElement', 'reportUnavailable', 'connect', 'scheduleReconnect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'run', 'append', 'dispose', 'close']) {
+    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'currentElement', 'reportUnavailable', 'connect', 'scheduleReconnect', 'request', 'handleMessage', 'refresh', 'showProvider', 'saveProvider', 'selectProvider', 'saveWorkspace', 'ccsDoctor', 'ccsConnect', 'copyOutput', 'run', 'append', 'dispose', 'close']) {
       this[name] = (...args) => panelDefinition.methods[name].apply(this, args);
     }
     this.messageId = 0;
@@ -157,7 +181,7 @@ const panelDefinition = {
   methods: {
   bindElements() {
     if (this.destroyed) return false;
-    const ids = ['output', 'input', 'state', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-url', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
+    const ids = ['output', 'input', 'state', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-url', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect', 'copy-output'];
     const elements = Object.fromEntries(ids.map((id) => [id, this.getElement(id)]));
     const ready = ids.every((id) => elements[id] && (id === 'output' || typeof elements[id].addEventListener === 'function'));
     const root = panelEventRoot(this);
@@ -180,11 +204,12 @@ const panelDefinition = {
         this.bindEvent(elements['select-provider'], 'click', (event) => { event.preventDefault(); this.selectProvider(); });
         this.bindEvent(elements['save-workspace'], 'click', (event) => { event.preventDefault(); this.saveWorkspace(); });
         this.bindEvent(elements['ccs-doctor'], 'click', (event) => { event.preventDefault(); this.ccsDoctor(); });
-        this.bindEvent(elements['ccs-connect'], 'click', (event) => { event.preventDefault(); this.ccsConnect(); });
+         this.bindEvent(elements['ccs-connect'], 'click', (event) => { event.preventDefault(); this.ccsConnect(); });
+         this.bindEvent(elements['copy-output'], 'click', (event) => { event.preventDefault(); this.copyOutput(); });
         this.bindEvent(elements.provider, 'change', () => this.showProvider(this.getElement('provider')?.value));
         if (!this.eventBindings.length && root && typeof root.addEventListener === 'function') {
           this.bindEvent(root, 'click', (event) => {
-            const actions = { 'save-provider': () => this.saveProvider(), 'select-provider': () => this.selectProvider(), 'save-workspace': () => this.saveWorkspace(), 'ccs-doctor': () => this.ccsDoctor(), 'ccs-connect': () => this.ccsConnect() };
+            const actions = { 'save-provider': () => this.saveProvider(), 'select-provider': () => this.selectProvider(), 'save-workspace': () => this.saveWorkspace(), 'ccs-doctor': () => this.ccsDoctor(), 'ccs-connect': () => this.ccsConnect(), 'copy-output': () => this.copyOutput() };
             const action = actions[eventTargetId(event)];
             if (action) { event.preventDefault(); action(); }
           });
@@ -359,6 +384,14 @@ const panelDefinition = {
     const route = ccsRoute.value.trim();
     const url = ccsUrl.value.trim();
     this.request('ccs_connect', { route, url }, (message) => this.append(message.ok ? { ccs:message.result } : `[ccs] ${message.error}`));
+  },
+  copyOutput() {
+    const output = this.currentElement('output');
+    if (!output) { this.reportUnavailable('log output'); return; }
+    copyText(output.textContent || '', output).then((copied) => {
+      const state = this.currentElement('state');
+      if (state) state.textContent = copied ? '日志已复制' : '复制失败，请选择文本后复制';
+    });
   },
   run() {
     const input = this.currentElement('input');

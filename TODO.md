@@ -4,7 +4,7 @@
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-23T17:34:11+08:00`（UTC+8）
+更新时间：`2026-08-24T18:08:27+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -69,15 +69,16 @@
 # 任务队列
 
 ## 代办列表
-1. [x] 设置 Cocos Agent 独立 cc-switch 端点，默认显示并连接 `http://127.0.0.1:15721`；支持 CLI/MCP 参数覆盖、`ws://ip:port/ws`，并保留环境变量覆盖。
+1. [x] 设置 Cocos Agent 默认 cc-switch 端点 `http://127.0.0.1:15721`，端点缺失时不再显示 `CCS_ROUTE_URL_NOT_CONFIGURED`；支持环境变量和 CLI/MCP 覆盖。
+2. [x] Panel/Overlay 增加“复制日志”按钮，支持 `navigator.clipboard` 和 DOM 兼容回退，并反馈复制状态。
+
 
 ### 本轮解决方案与验证
 
-- [x] Panel/Overlay 改为 Cocos Creator 官方 `methods` + `ready/beforeClose/close` 生命周期结构，避免回调上下文缺少 `append`、`connect`。
-- [x] 增加 `ccs-url` 独立输入，HTTP 端点使用 HTTP 探测，WebSocket 端点使用 WSS/WS 探测。
-- [x] `npm run verify`：14 个测试文件、58 项文档链接检查通过；`test:local-project`、JavaScript 语法检查、`git diff --check` 通过。
+- [x] 新增 Panel/Overlay 日志复制控件、剪贴板 API 与兼容回退实现，扩展契约测试覆盖真实按钮 dispatch。
+- [x] ccs doctor 默认返回 `http://127.0.0.1:15721`，ccs connect 支持 HTTP/WS 端点并保留环境变量覆盖。
 
-本轮任务 hash：`sha256:c313d8349c8dbcfef9e5c547bbb1b50b8e84e7132c04be46b495e5064e90a92c`。
+本轮任务 hash：`sha256:2381b5639e007fbc8e2dc40ef4b24c72e44be3fa440ede9c6ded5f8387252790`。
 
 - [x] 参考 Cocos Creator 3.8.8 官方 `html-panel` 模板：使用 `Editor.Panel.define({ $, ready, beforeClose, close })` 生命周期和 `$` 控件映射。
 - [x] Panel/Overlay 使用控件级 `click`、`submit`、`change` 监听；根节点委托只作为没有可靠控件映射时的回退。

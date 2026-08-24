@@ -36,6 +36,7 @@ test('ccs doctor reports the configured cc-switch route without exposing credent
     const result = ccsDoctor();
     assert.equal((result.checks as { ccSwitchConfig: { ok: boolean } }).ccSwitchConfig.ok, true);
     assert.equal((result.route as { route: string }).route, 'doctor-route');
+    assert.equal((result.route as { url: string }).url, 'http://127.0.0.1:15721');
     assert.equal(JSON.stringify(result).includes('TOKEN'), false);
   } finally {
     if (previous === undefined) delete process.env.CC_SWITCH_CONFIG; else process.env.CC_SWITCH_CONFIG = previous;

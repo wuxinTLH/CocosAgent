@@ -14,6 +14,19 @@
 
 ## 执行记录
 
+### AGT-20260824-017
+
+- TaskHash: `sha256:2381b5639e007fbc8e2dc40ef4b24c72e44be3fa440ede9c6ded5f8387252790`
+- 开始: `2026-08-24T18:08:27+08:00`
+- 结束: `2026-08-24T18:17:03+08:00`
+- 请求: 根据 TODO 修复 cc-switch 默认端点错误，并为 Panel/Overlay 增加日志复制能力。
+- 推理: cc-switch 端点应始终有默认值 `http://127.0.0.1:15721`，否则面板会继续报告未配置；日志复制需优先使用 WebView 剪贴板 API，并提供 `execCommand` 兼容回退，避免 Creator 环境权限差异造成不可用。
+- 计划: 增加复制控件和事件绑定；验证默认端点 doctor/connect 路径；补按钮 dispatch 和剪贴板回归测试；同步示例与 NewProject；更新记忆并推送。
+- 时间线: `2026-08-24T18:08:27+08:00` 读取 TODO/约束并生成 hash；`2026-08-24T18:12:00+08:00` 完成 Panel/Overlay 复制实现和测试；`2026-08-24T18:14:00+08:00` 完成默认端点断言、verify 和脚本检查；`2026-08-24T18:17:03+08:00` 完成 NewProject/示例同步和 hash 校验。
+- 结果: TODO 两项已闭环；cc-switch 默认 URL 不再因缺少环境变量返回未配置错误，面板可复制日志并显示成功/失败状态。三处 Panel/Overlay SHA-256 一致。
+- 验证: `npm run verify` 通过 14 个测试文件、58 项文档链接；`npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` 通过；JavaScript 语法和 `git diff --check` 通过。
+- 审查: P0=0, P1=0, P2=0, P3=0；未重建 Release。
+
 ### AGT-20260823-016
 
 - TaskHash: `sha256:c313d8349c8dbcfef9e5c547bbb1b50b8e84e7132c04be46b495e5064e90a92c`

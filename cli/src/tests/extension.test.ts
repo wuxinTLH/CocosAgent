@@ -149,6 +149,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(panel.template ?? '', /id="save-provider"/);
     assert.match(panel.template ?? '', /id="ccs-connect"/);
     assert.match(panel.template ?? '', /id="ccs-url"/);
+    assert.match(panel.template ?? '', /id="copy-output"/);
     assert.doesNotMatch(fs.readFileSync(panelPath, 'utf8'), /document\.getElementById/);
     assert.match(overlay.template ?? '', /Cocos Agent/);
     assert.match(overlay.template ?? '', /chat/);
@@ -161,6 +162,7 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /panelEventRoot/);
     assert.match(fs.readFileSync(overlayPath, 'utf8'), /bindEvent\(root, 'click'/);
     assert.match(overlay.template ?? '', /id="close"/);
+    assert.match(overlay.template ?? '', /id="copy-output"/);
     assert.doesNotMatch(fs.readFileSync(overlayPath, 'utf8'), /document\.getElementById/);
     assert.match(mainSource, /ELECTRON_RUN_AS_NODE/);
     assert.match(mainSource, /overlay-status\.json/);
@@ -190,12 +192,15 @@ test('Cocos Creator extension manifest and panel contract are valid', () => {
   }
 });
 
-test('extension callbacks tolerate unloaded DOM and dispose bridge resources', () => {
+test('extension callbacks tolerate unloaded DOM, copy logs, and dispose bridge resources', async () => {
   const previousEditor = globals.Editor;
   const previousWebSocket = globals.WebSocket;
+  const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
   const closedPanels: string[] = [];
   globals.Editor = { Panel: { define: (definition: unknown) => definition, close: (name: string) => closedPanels.push(name) } };
   globals.WebSocket = FakeWebSocket as unknown as typeof WebSocket;
+  let copiedText = '';
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { clipboard: { writeText: async (value: string) => { copiedText = value; } } } });
   try {
     const panelPath = path.join(extensionRoot, 'src', 'panel.js');
     delete require.cache[require.resolve(panelPath)];
@@ -203,13 +208,17 @@ test('extension callbacks tolerate unloaded DOM and dispose bridge resources', (
       ready?: () => void;
       close?: () => void;
     };
-    const ids = ['output', 'input', 'state', 'locale', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-url', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect'];
+    const ids = ['output', 'input', 'state', 'locale', 'provider', 'model', 'endpoint', 'credential', 'active-provider', 'fallback-providers', 'ccs-route', 'ccs-url', 'ccs-state', 'form', 'save-provider', 'select-provider', 'save-workspace', 'ccs-doctor', 'ccs-connect', 'copy-output'];
     const root = new FakeRoot(ids);
     const mapped = Object.fromEntries(ids.map((id) => [id, root.nodes[id]]));
     const instance = { $: mapped } as Record<string, unknown>;
     panelDefinition.ready?.call(instance as never);
     const socket = instance.ws as FakeWebSocket;
     assert.ok(socket);
+    root.nodes.output.textContent = 'panel log';
+    root.nodes['copy-output'].dispatch('click');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(copiedText, 'panel log');
     socket.onopen?.();
     root.nodes['save-provider'].dispatch('click');
     assert.ok(socket.sent.some((payload) => JSON.parse(payload).tool === 'provider_configure'));
@@ -227,10 +236,14 @@ test('extension callbacks tolerate unloaded DOM and dispose bridge resources', (
     const overlayPath = path.join(extensionRoot, 'src', 'overlay.js');
     delete require.cache[require.resolve(overlayPath)];
     const overlayDefinition = require(overlayPath) as { ready?: () => void; close?: () => void };
-    const overlayRoot = new FakeRoot(['output', 'input', 'state', 'form', 'close']);
+    const overlayRoot = new FakeRoot(['output', 'input', 'state', 'form', 'close', 'copy-output']);
     const overlay = { $: Object.fromEntries(Object.entries(overlayRoot.nodes)) } as Record<string, unknown>;
     overlayDefinition.ready?.call(overlay as never);
     const overlaySocket = overlay.ws as FakeWebSocket;
+    overlayRoot.nodes.output.textContent = 'overlay log';
+    overlayRoot.nodes['copy-output'].dispatch('click');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(copiedText, 'overlay log');
     overlayRoot.nodes.close.dispatch('click');
     (overlay.close as (() => void) | undefined)?.call(overlay);
     assert.equal(overlay.destroyed, true);
@@ -240,5 +253,6 @@ test('extension callbacks tolerate unloaded DOM and dispose bridge resources', (
   } finally {
     globals.Editor = previousEditor;
     globals.WebSocket = previousWebSocket;
+    if (previousNavigator) Object.defineProperty(globalThis, 'navigator', previousNavigator); else delete (globalThis as { navigator?: unknown }).navigator;
   }
 });

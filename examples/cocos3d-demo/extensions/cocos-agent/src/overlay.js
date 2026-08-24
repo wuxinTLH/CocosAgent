@@ -46,6 +46,29 @@ function eventTargetId(event) {
   return '';
 }
 
+function copyText(value, output) {
+  if (!value) return Promise.resolve(false);
+  if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    return navigator.clipboard.writeText(value).then(() => true).catch(() => copyTextFallback(value, output));
+  }
+  return Promise.resolve(copyTextFallback(value, output));
+}
+
+function copyTextFallback(value, output) {
+  const ownerDocument = output && output.ownerDocument;
+  if (!ownerDocument || typeof ownerDocument.createElement !== 'function' || !ownerDocument.body) return false;
+  const textarea = ownerDocument.createElement('textarea');
+  textarea.value = value;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  ownerDocument.body.appendChild(textarea);
+  textarea.select();
+  const copied = typeof ownerDocument.execCommand === 'function' && ownerDocument.execCommand('copy');
+  ownerDocument.body.removeChild(textarea);
+  return copied;
+}
+
 const BRIDGE_URL = 'ws://127.0.0.1:8899/ws';
 
 function commandFor(line) {
@@ -79,10 +102,10 @@ function commandFor(line) {
 }
 
 const panelDefinition = {
-  $: { output: '#output', input: '#input', state: '#state', form: '#form', close: '#close' },
+  $: { output: '#output', input: '#input', state: '#state', form: '#form', close: '#close', 'copy-output': '#copy-output' },
   template: `
     <div class="agent-overlay">
-      <div class="agent-overlay__bar"><strong>Cocos Agent</strong><span id="state">offline</span><button id="close" title="Close overlay">x</button></div>
+      <div class="agent-overlay__bar"><strong>Cocos Agent</strong><span id="state">offline</span><button id="copy-output" title="Copy logs">复制日志</button><button id="close" title="Close overlay">x</button></div>
       <div id="output" class="agent-overlay__output"></div>
       <form id="form" class="agent-overlay__form"><input id="input" autocomplete="off" placeholder="chat 你好" /><button title="Run command">Run</button></form>
     </div>
@@ -102,7 +125,7 @@ const panelDefinition = {
   ready() {
     // Creator may invoke lifecycle callbacks with a panel instance that does
     // not inherit methods from this definition object.
-    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'connect', 'scheduleReconnect', 'run', 'append', 'dispose', 'close']) {
+    for (const name of ['bindElements', 'bindEvent', 'removeEventBindings', 'scheduleBind', 'connect', 'scheduleReconnect', 'run', 'append', 'copyOutput', 'dispose', 'close']) {
       this[name] = (...args) => panelDefinition.methods[name].apply(this, args);
     }
     this.ws = null;
@@ -128,17 +151,19 @@ const panelDefinition = {
     if (this.destroyed) return false;
     const form = this.getElement('form');
     const close = this.getElement('close');
+    const copy = this.getElement('copy-output');
     const output = this.getElement('output');
     const input = this.getElement('input');
     const state = this.getElement('state');
     const root = panelEventRoot(this);
-    if (form && close && output && input && state && typeof form.addEventListener === 'function' && typeof close.addEventListener === 'function' && (!this.eventsBound || this.eventRoot !== root)) {
+    if (form && close && copy && output && input && state && typeof form.addEventListener === 'function' && typeof close.addEventListener === 'function' && typeof copy.addEventListener === 'function' && (!this.eventsBound || this.eventRoot !== root)) {
       this.removeEventBindings();
       this.output = output;
       this.input = input;
       this.state = state;
       this.bindEvent(form, 'submit', (event) => { event.preventDefault(); this.run(); });
       this.bindEvent(close, 'click', (event) => { event.preventDefault(); this.close(); });
+      this.bindEvent(copy, 'click', (event) => { event.preventDefault(); this.copyOutput(); });
       if (!this.eventBindings.length && root && typeof root.addEventListener === 'function') {
         this.bindEvent(root, 'click', (event) => { if (eventTargetId(event) === 'close') { event.preventDefault(); this.close(); } });
         this.bindEvent(root, 'submit', (event) => { if (event.target?.id === 'form') { event.preventDefault(); this.run(); } });
@@ -227,6 +252,14 @@ const panelDefinition = {
     if (!output) return;
     output.textContent += `${text}\n`;
     output.scrollTop = output.scrollHeight;
+  },
+  copyOutput() {
+    const output = this.getElement('output');
+    if (!output) return;
+    copyText(output.textContent || '', output).then((copied) => {
+      const state = this.getElement('state');
+      if (state) state.textContent = copied ? '日志已复制' : '复制失败，请选择文本后复制';
+    });
   },
   },
   beforeClose() {
