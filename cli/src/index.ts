@@ -50,6 +50,19 @@ function requireString(args: ParsedArgs, key: string): string {
   return value;
 }
 
+async function readApiKeyStdin(): Promise<string> {
+  if (process.stdin.isTTY) throw new Error('PROVIDER_CREDENTIAL_STDIN_REQUIRED: pipe the key via stdin');
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of process.stdin) {
+    const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += data.length;
+    if (size > 16384) throw new Error('PROVIDER_CREDENTIAL_INVALID');
+    chunks.push(data);
+  }
+  return Buffer.concat(chunks).toString('utf8').trimEnd();
+}
+
 async function main(): Promise<void> {
   const [, , command, ...rest] = process.argv;
   const ctx = loadContext();
@@ -229,8 +242,19 @@ async function main(): Promise<void> {
           provider: requireString(args, 'provider'),
           endpoint: args.flags.endpoint ? String(args.flags.endpoint) : undefined,
           model: args.flags.model ? String(args.flags.model) : undefined,
+          protocol: args.flags.protocol,
+          apiKey: args.flags['api-key-stdin'] === true ? await readApiKeyStdin() : undefined,
         });
         console.log(JSON.stringify(result, null, 2));
+      } else if (sub === 'create') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'provider_create', {
+          name: requireString(args, 'name'), endpoint: requireString(args, 'endpoint'), model: requireString(args, 'model'), protocol: requireString(args, 'protocol'),
+          apiKey: args.flags['api-key-stdin'] === true ? await readApiKeyStdin() : undefined,
+        }), null, 2));
+      } else if (sub === 'delete') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'provider_delete', { provider: requireString(args, 'provider') }), null, 2));
+      } else if (sub === 'clear-key') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'provider_credential_clear', { provider: requireString(args, 'provider') }), null, 2));
       } else {
         throw new Error(`UNKNOWN_SUBCOMMAND: provider ${sub ?? ''}`);
       }
@@ -253,8 +277,10 @@ async function main(): Promise<void> {
         console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_switch', { id: requireString(args, 'id') }), null, 2));
       } else if (sub === 'delete') {
         console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_delete', { id: requireString(args, 'id') }), null, 2));
+      } else if (sub === 'rollback') {
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_rollback', { id: requireString(args, 'id'), messageIndex: Number(requireString(args, 'message-index')) }), null, 2));
       } else if (sub === 'chat') {
-        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_chat', { chat: requireString(args, 'chat') }), null, 2));
+        console.log(JSON.stringify(await dispatchTool(ctx, 'workspace_chat', { chat: requireString(args, 'chat'), mode: 'agent' }), null, 2));
       } else {
         throw new Error(`UNKNOWN_SUBCOMMAND: workspace ${sub ?? ''}`);
       }

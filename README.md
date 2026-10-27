@@ -13,7 +13,8 @@
 - 提供 Skills（OCR 识别、Scene 读写、素材库、cc-switch 连接、长连接对话）和 MCP 服务。
 - 提供 TypeScript CLI，并可在 Cocos Creator 内打开 CLI 面板窗口。
 - 支持 OpenAI、Anthropic、DeepSeek、Kimi、Qwen 与 WSS Gateway，提供会话工作区、回退链及中英文对话。
-- Cocos Creator 的 `Open CLI` 面板提供模型、端点、默认/回退渠道和 cc-switch / ccs 路由的表单式配置；密钥只读取环境变量。
+- Cocos Creator 的 `Open CLI` 面板采用 IDE 风格 Agent 对话布局，模型通过二级页面添加、编辑或删除；API Key 可加密保存在 Windows 当前用户凭据存储，环境变量优先，不写入项目配置。
+- 默认有限权限；完整权限须用户明确确认。支持对话管理、上下文回退、输入历史、可复制的脱敏 API 诊断，以及受控项目工具执行；回退上下文不撤销项目修改。
 - 内置 `only-access`、`only-safe`、`full-access` 权限模式；支持项目内受控 CMD、PowerShell 与 Windows Terminal。
 - 提供 Cocos AnimationClip 分析、OCR 状态识别、动作优化建议和公开 Animation API 状态控制器生成。
 
@@ -77,6 +78,13 @@ Release 包提供 `CocosAgentOverlay.exe`。不传项目路径时会打开 Cocos
 powershell -ExecutionPolicy Bypass -File scripts/verify.ps1
 powershell -ExecutionPolicy Bypass -File scripts/run-wss-smoke.ps1
 ```
+
+## 使用与验证边界
+
+- 模型设置与 Agent 工具范围见 [CLI 说明](cli/README.md#agent-项目执行)，面板操作与连接排查见 [扩展说明](extensions/cocos-agent/README.md)。仅保存连接不表示认证成功；WSS Gateway 尚不支持 Agent 工具协议。
+- 验证入口：在 `cli` 中运行 `npm run verify`；指定项目验证使用 `npm run test:local-project -- --ProjectRoot C:/Users/13929/NewProject`。后者构建并同步项目扩展、检查安装后的 CLI 与 Creator 启动参数，属于 dry-run，不等于编辑器联动成功。
+- 最近实机测试已看到 Creator 3.8.8 新面板，权限切换、临时模型删除及上下文回退接口通过；扩展桥接未持续监听，独立启动桥接后实时编辑器查询返回 `EDITOR_NOT_CONNECTED`。因此不宣称实时编辑器联动或真实云端模型端到端验收通过；面板 `ready` 只证明面板已打开。
+- 本轮仅更新并提交源码与文档，版本保持 `v0.0.0.1-a`，不创建 Release。
 
 ## 目录结构
 

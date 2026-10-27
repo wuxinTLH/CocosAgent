@@ -45,7 +45,7 @@ test('agent configuration persists i18n, permission modes, and provider metadata
   }
 });
 
-test('workspace chat falls back to a configured gateway and records the conversation', async () => {
+test('workspace chat rejects gateway without tool support even in legacy chat mode', async () => {
   const { root, ctx } = tempContext();
   const server = startMockGateway(0);
   try {
@@ -56,12 +56,10 @@ test('workspace chat falls back to a configured gateway and records the conversa
     updateProvider(root, 'gateway', { endpoint: `ws://127.0.0.1:${mockPort(server)}/ws`, model: 'mock-model' });
     const session = await dispatchTool(ctx, 'workspace_create', { name: 'Fallback', provider: 'deepseek' }) as { id: string };
     assert.ok(session.id);
-    const result = await dispatchTool(ctx, 'workspace_chat', { chat: 'fallback works' }) as { usedFallback: boolean; provider: string; content: string };
-    assert.equal(result.usedFallback, true);
-    assert.equal(result.provider, 'gateway');
-    assert.match(result.content, /fallback works/);
+    await dispatchTool(ctx, 'provider_select', { provider: 'gateway' });
+    await assert.rejects(dispatchTool(ctx, 'workspace_chat', { chat: 'fallback works', mode: 'chat' }), /PROVIDER_TOOLS_UNSUPPORTED/);
     const sessions = await dispatchTool(ctx, 'workspace_list', {}) as { sessions: Array<{ messages: unknown[] }> };
-    assert.equal(sessions.sessions.at(-1)?.messages.length, 2);
+    assert.equal(sessions.sessions.at(-1)?.messages.length, 1);
   } finally {
     server.close();
     fs.rmSync(root, { recursive: true, force: true });
@@ -118,9 +116,12 @@ test('only-safe allows non-secret provider endpoint and model configuration', as
       provider: 'deepseek',
       endpoint: 'https://api.deepseek.com/v1',
       model: 'deepseek-chat',
-    }) as { providers: { deepseek?: { endpoint?: string; model?: string } } };
-    assert.equal(config.providers.deepseek?.endpoint, 'https://api.deepseek.com/v1');
-    assert.equal(config.providers.deepseek?.model, 'deepseek-chat');
+      protocol: 'responses',
+    }) as { endpoint: string; model: string; modelProtocol: string };
+    assert.equal(config.endpoint, 'https://api.deepseek.com/v1');
+    assert.equal(config.model, 'deepseek-chat');
+    assert.equal(config.modelProtocol, 'responses');
+    await assert.rejects(dispatchTool(ctx, 'provider_configure', { provider: 'gateway', protocol: 'responses' }), /PROVIDER_PROTOCOL_NOT_SUPPORTED/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -153,8 +154,9 @@ test('gateway configuration, selection, workspace save, and ccs connection persi
       provider: 'gateway',
       endpoint: `${endpoint}/gateway`,
       model: 'workflow-model',
-    }) as { providers: { gateway?: { endpoint?: string; model?: string } } };
-    assert.deepEqual(configured.providers.gateway, { endpoint: `${endpoint}/gateway`, model: 'workflow-model' });
+    }) as { endpoint: string; model: string };
+    assert.equal(configured.endpoint, `${endpoint}/gateway`);
+    assert.equal(configured.model, 'workflow-model');
 
     const selected = await dispatchTool(ctx, 'provider_select', { provider: 'gateway' }) as { provider: string };
     assert.equal(selected.provider, 'gateway');

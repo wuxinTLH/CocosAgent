@@ -14,6 +14,107 @@
 
 ## 执行记录
 
+### AGT-20261027-029
+
+- TaskHash: `sha256:b1f5ba82b88678744501fa2be0aa3348b683e59880c72e7978640971de012a11`。
+- 时间: `2026-10-27T18:27:00+08:00`（收尾记录）。
+- 请求: 根据 TODO 约束一次性完成待办：更新文档并提交 GitHub；保持版本，不创建 Release。
+- 推理: 根 README 仍称密钥只从环境读取及旧式配置布局，与已实现面板不符；需要将累计实现、验证证据与实机连接限制一同提交，而非掩盖已知问题。
+- 计划与时间线: 核对约束及全部未提交文件 → 更新根／CLI／扩展与示例说明 → 独立审查累计代码 → 修复自主场景写入结构校验 → 完整验证与指定项目同步 → 记录并提交 master，再推送 origin。
+- 结果: 文档说明二级模型管理、加密 API Key、Agent 权限与上下文操作；记录最近实机桥接未持续监听、独立桥接返回 EDITOR_NOT_CONNECTED，面板 ready 不代表编辑器或云端验收成功。删除已检查的临时实机探针，不提交项目状态、凭据或构建产物。
+- 审查: P1 场景写入只校验数组已修复：自主入口在备份／覆写前验证非空对象数组、SceneAsset/Prefab 根、Scene/Node 目标及本地引用范围；补无效输入保持原文件与合法循环引用回归。该校验是结构门禁，不是完整 Creator 反序列化器。复核后无其他确认 P0/P1/P2。
+- 验证: 最终 `cd cli && npm run verify` 通过 20 个测试文件、TypeScript strict、8 个 JS 文件检查及 60 篇文档／0 问题；`npm run test:local-project -- --ProjectRoot C:/Users/13929/NewProject` 通过，完成同步、安装 CLI status 和 Creator 3.8.8 dry-run。临时探针移除后 JS 检查数量由 9 变为 8。
+- 提交: 将累计已授权功能、回归及本文档纳入普通 Git 提交，目标 origin/master；实际提交号与推送结果以 Git 历史和收尾回复为准。不修改版本、不创建标签或 Release。
+- 限制: 本轮不扩展为修复桥接生命周期；真实云端密钥与人工逐项交互未验收，旧式直接 scene write 不属于本轮自主入口加固范围。Hindsight 未配置 token，检索不可用，使用仓库记忆。
+
+### AGT-20261025-028
+
+- TaskHash: `sha256:d1c3a1ba48b4fa9525ea2f69ad8a98b28b88e4a49bba8098d8ca0c807cda55e8`。
+- 结束: `2026-10-25T17:29:00+08:00`。
+- 请求: 自定义模型可删除、仅 Agent、默认有限权限与完整权限切换、保留 API 错误、UI 文字可复制、上下文回退、上下键输入历史。
+- 推理: 低频模型管理保留二级页面，破坏性操作再次确认；授权必须由可信面板手动操作，不向模型或 MCP 暴露；回退仅改变模型上下文，不假装撤销项目变更。
+- 计划与时间线: 登记任务 → 并行实现后端与面板 → 真实桥接授权测试 → 独立只读审查 → 修正真实目录结构与聊天返回结构不匹配 → 补删除预检／失败恢复和跨面板回退校验 → 全套回归及 NewProject 同步。
+- 结果: 自定义模型删除会清理保存凭据、配置及全部会话引用；损坏会话先拒绝，后续写入失败尽力恢复加密凭据与原始项目快照。仅 Agent，新配置默认 only-safe；完整权限需明确确认，通用配置提权保护保留。API 错误保留有界脱敏正文、HTTP 状态和网络原因；所有 UI 文字可选择，消息可复制。回退验证用户消息索引及 expectedMessage 内容／时间并恢复问题草稿；上下键历史保留多行、选区及输入法行为。
+- 审查闭环: 修复自定义模型删除错误依赖不存在的 custom 属性；聊天完成后刷新持久化消息以立即显示回退按钮；删除前校验所有会话并覆盖配置写入失败恢复；回退拒绝另一面板已替换的用户消息。开发中全套验证曾撞到镜像更新中和 Windows 注入测试路径匹配问题，修复后最终完整重跑通过。
+- 验证: `cd cli && npm run verify` 最终通过 20 个测试文件、TypeScript strict、9 个 JS 文件、文档 58/0；`npm run test:local-project -- --ProjectRoot C:/Users/13929/NewProject` 成功，Creator 3.8.8 dry-run、安装 CLI status 根路径与版本匹配。保留其他已有改动，未提交／发布 Release。
+- 边界: 本轮未重启 Creator 人工验证七项新交互；无真实供应商密钥，外部云端 Agent 全链路未验收。同步文件不代表已运行的桥接进程自动重载。Hindsight 仍因未配置 API token 返回 401，使用仓库记忆记录。
+
+### AGT-20261025-027
+
+- TaskHash: `sha256:2fa7465888e5fbf445e79b315a4722af65ac9087b3453c878b0499417c04df95`。
+- 结束: `2026-10-25T17:15:14+08:00`。
+- 请求: 移除高级设置、固定未配置服务商，二级添加模型，提供对话删除和 IDE 风格聊天；让模型真正调用受控 Cocos 项目与编辑器工具。
+- 推理: 将低频连接管理移出聊天主界面，避免把普通问答误称为具备执行能力的 Agent；用有限工具循环与明确权限、文件边界及真实编辑器 IPC 连接实现可验证能力。
+- 计划与时间线: 登记任务 → 并行实现紧凑面板和模型工具协议 → 增加会话删除及执行锁 → 项目读写／测试工具与经过认证的编辑器适配 → 回归与实机查询 → 安全审查和最终同步。
+- 结果: 两份面板保持一致，模型管理二级界面、删除确认、工具活动展示；OpenAI Chat Completions/Responses/Anthropic 工具循环，调用预算、参数校验、路径与链接拒绝、写权限、失败后禁止重放变更、可追踪执行记录。Gateway 不支持 Agent 时明确报错。编辑器工具使用受控官方 IPC，模型不得管理凭据或提升自身权限。修复审查发现的桥接 Origin:null 漏洞并增加拒绝测试。
+- 验证: `cd cli && npm run verify` 通过 19 个测试文件、TypeScript strict、9 个 JS 文件、文档 58/0；`git diff --check` 通过。指定 NewProject 最终 dry-run 同步成功；实时 `editor_scene_query` 返回 Scene/Main Light/Main Camera，dirty=false。本地 HTTP 端点验证三种协议真实请求／工具结果往返及记录持久化；会话删除测试 3/3。
+- 边界: 不以本地端点模拟成功代替所有云端供应商验收；未实机执行任意场景生成、项目调试和写操作。桥接旧式直接场景工具存在独立的历史链接边界风险，模型新路径走加固执行器，本轮未扩展旧接口重构。保留所有先前未提交修改，不创建 Release。
+
+### AGT-20261024-026
+
+- TaskHash: `sha256:c9baff05826c15320bb5d16a62b56f9a80f1d311ec6606ff2096e0e331a00d87`。
+- 开始/结束: `2026-10-24T20:34:03+08:00` / `2026-10-24T20:48:02+08:00`。
+- 请求: 简化模型 API 连接方式，参考 Novel Agent。
+- 推理: 原面板同时展示多个服务商配置表单，添加后仍需手动切换；Novel Agent 将已保存连接的选择与按需新增／编辑分离，适合在 Creator 保留对话优先布局的同时简化操作，不必改变已有安全凭据存储和协议支持。
+- 计划与时间线: 核对 Novel Agent 实际模型设置界面及后端工具协议 → 将 Creator 两份面板改为已保存模型选择＋统一新增／编辑表单 → 保存后自动选择当前对话模型、隐藏高级工作区选项 → 扩展交互回归 → 全量验证及指定 NewProject 同步 → 审查发现并修复工作区配置响应顺序、命令误判、会话历史刷新问题。
+- 结果: 新增默认 OpenAI Base URL 与 chat-completions，统一名称、模型 ID、Base URL、协议、API Key 输入；编辑保留已存密钥，密钥字段取消／提交后清空，异常采用不回显服务端原文的安全提示；已保存模型可直接选用。Anthropic/Gateway 固定协议不显示不适用选项，工作区／cc-switch 保留在高级设置中。原有 DPAPI 密钥存储、会话能力和旧命令保留。
+- 验证: `cd cli && npm run verify` 通过 16 个测试文件、TypeScript strict、8 个 JS 文件检查、文档 58/0；`npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` dry-run 同步成功，根／示例／项目面板字节一致，`git diff --check` 无错误。模型审查为 partial，3 条 medium 候选经源码确认并修复、补回归；审查不能宣称完整覆盖。
+- 限制: 无真实供应商 API Key，不能宣称外部模型回答已实际成功；本轮未重新打开 Creator 目视验证新表单。保留前序工作区未提交改动，不创建 Release。
+
+### AGT-20261024-025
+
+- TaskHash: `sha256:16c14d13208bf50dc1fec8771f80c746621df49142cd8d450ffd4d06eb6e49b4`。
+- 开始/结束: `2026-10-24T20:21:00+08:00` / `2026-10-24T20:31:46+08:00`。
+- 请求: 在 Cocos Agent 中添加 API Key 配置和第三方模型服务商。
+- 推理: 原面板仅支持环境变量和固定服务商，用户无法在 Creator 内配置凭据或新增兼容接口；凭据必须避开项目配置与日志，且本地桥接需抵御普通网页跨源调用。
+- 计划与时间线: 审阅配置/提供商/面板与约束 → 添加 Windows 当前用户 DPAPI 加密凭据存储、CLI 标准输入密钥及自定义提供商元数据 → 镜像 Creator 面板并补交互与安全测试 → 全量 CLI 验证、NewProject 同步和桥接探测 → 记录限制。
+- 结果: 面板设置提供 API Key 添加、清除、配置状态与第三方服务商创建；自定义提供商可供会话与快捷切换，支持 Chat Completions/Responses。密钥不返回给界面，不写项目配置，环境变量优先；桥接拒绝非本地面板 WebSocket Origin。无密钥时既有配置不被空输入清除。
+- 验证: `cd cli && npm run verify` 通过 16 个测试文件、TypeScript strict、8 个 JS 文件检查、文档 58/0；`npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` 通过并同步项目，根/示例/NewProject 三份面板字节一致；使用新版桥接针对该项目执行 `provider_list` 成功；`git diff --check` 无错误。
+- 限制: 未提供真实云服务 API Key，未验证真实模型回答；本轮未重新打开 Creator 目视检查新控件。自动审查服务尝试后返回任务状态不可读取，因此不能声称其审查通过；保留原工作区未提交改动，不创建 Release。
+
+### AGT-20261024-024
+
+- TaskHash: `sha256:acfa033d73b047b665ca1f13020c3933184327f7c27c5b69298f6fa3bc1b917f`。
+- 开始/结束: `2026-10-24T20:14:00+08:00` / `2026-10-24T20:20:15+08:00`。
+- 请求: 启动 Cocos，并对前次重新设计的 Cocos Agent 面板进行实际测试。
+- 推理: 原任务只做 Creator dry-run 与扩展交互模拟，尚欠实机目视验证；本轮在 TODO 指定项目启动 Creator，通过非模型命令测试面板到桥接的实际交互，避免无凭据时声称模型对话已通。
+- 计划与时间线: 核对进程启动参数与安装面板镜像 → 查询桥接工具 → 将 Creator 项目窗口置前并目视检查 → 点击设置收起及诊断展开 → 在面板执行 `/status` → 点击新对话并核验 → 记录边界。
+- 结果: Creator 3.8.8 实际打开 `C:\Users\13929\NewProject`；扩展面板显示已连接，常驻对话/模型/输入，设置可折叠、诊断可展开。面板执行 `/status` 后日志显示项目根 `C:/Users/13929/NewProject`、版本 `v0.0.0.1-a`；“＋ 新对话”实际创建并选中新会话。WebSocket 桥接的 `status`、`provider_list`、`workspace_list`、`ccs_doctor` 均成功；根扩展与安装扩展面板字节相同，`git diff --check` 无错误。
+- 限制: 面板显示供应商密钥未配置，未发送真实外部模型请求，因此不能宣称模型生成回答已实机验证。未修改 Cocos 项目场景或资源；本轮只是运行时验证和任务记录，无 Release。
+
+### AGT-20261024-023
+
+- TaskHash: `sha256:55d4db8268a180bfe68a66014eba2fc5244d3f6b3864c8ac6217c456da7f7d9b`
+- 开始/结束: `2026-10-24T19:59:00+08:00` / `2026-10-24T20:10:03+08:00`。
+- 请求: 用户提供 Creator 面板截图，认为界面过于复杂，要求根据 Novel Agent 重新设计。
+- 推理: 截图显示始终展开的三组配置和巨量 JSON 挤占对话空间；Novel Agent 的模型设置按作用域分层而不是在主区常驻，但它没有可直接照搬的通用聊天界面。Creator 窄面板适合对话优先、配置与诊断渐进展开。
+- 计划与时间线: 阅读截图、现有面板/测试及 Novel Agent 参考源码；调整布局与聊天行为；增加交互回归；修复代码审查指出的会话初始化、并发切换、旧命令兼容问题；同步示例与 NewProject；验证并记录。
+- 结果: 对话/模型快捷切换/新建会话常驻，设置和诊断默认收起；普通文本直发，Enter 发送、Shift+Enter 换行、斜杠/旧命令兼容；加载中阻止跨会话误发送，过期列表响应忽略。没有改变 Overlay 或 Cocos 私有引擎资源。
+- 验证: `cd cli && npm run verify` 通过 15 个测试文件、strict 类型、8 个 JavaScript 检查文件和 58/0 文档检查；扩展定向测试 3/3；`npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` 通过，同步 Creator 3.8.8 dry-run；根/示例/NewProject 面板字节相同；`git diff --check` 无错误。本轮未实际在 Creator 中目视检查新版 UI；无外部模型凭据，未验证真实聊天 API。
+- 审查: P0=0、P1=0，审查工具提出的三个候选（初始加载竞态、快速切换、旧命令）已处理，测试通过；工具报告为 partial，复核阶段未完成，因此不能称完整自动审查通过。保留工作区原有未提交模型连接改动，不创建 Release。
+
+
+### AGT-20261024-022
+
+- TaskHash: `sha256:c3de863f081f24bcd010e6750a4b543445b00e024dce2803419f2f4e1d1ce9c1`
+- 开始: `2026-10-24T19:51:05+08:00`；请求规范化文本：根据 TODO.md 待办，参照 Novel Agent 完善 Cocos Agent 模型 API 连接，并验证 Cocos Creator 集成。
+- 请求: 继续完成 Novel Agent 模型 API 连接待办；用户允许主动启动 Cocos，并提供 `E:\CocosDashboard` 安装目录。
+- 推理: 之前命令执行器报错导致验证空缺；必须确认现有代码实测可构建，按 TODO 指定 NewProject 项目验证，同时区分 Dashboard 安装目录与项目。缺少供应商 API 凭据时不可声称真实外部模型连通。
+- 计划与时间线: 确认环境/Git 状态与项目位置 → 完整 CLI 测试 → NewProject 同步及 Creator 实际启动 → 面板镜像、diff、任务 hash、文档收尾。
+- 结果: `npm run verify` 通过（15 个测试文件、TS strict、8 文件 JS 检查、文档检查 58/0）；`npm run test:local-project -- --ProjectRoot C:\Users\13929\NewProject` 通过；启动 Creator 3.8.8，NewProject Overlay 的 `state=ready`；根、示例和 NewProject 面板字节一致；`git diff --check` 无错误。Responses 助手消息异常状态补回归并通过。
+- 审查: P0=0、P1=0、P2=0；当前工作区含未提交改动，不创建 Release；审查工具部分文件曾因 reader budget 未完全覆盖，配合最终人工复核和测试。E:\CocosDashboard 非 Cocos 项目而是安装目录，不向安装目录写项目扩展；环境中供应商 API Key 均未设置，真实云端认证及聊天未验证。
+
+### AGT-20260824-021
+
+- TaskHash: `sha256:未能计算（DSH 工作区预处理缺少 Microsoft.PowerShell.Security/Get-Acl）`
+- 开始/结束: `2026-08-24T20:40:00+08:00` / `2026-08-24T20:55:00+08:00`
+- 请求: 根据 Novel Agent 的连接方式完善 Cocos Agent 的模型 API 连接。
+- 推理: 现有提供商调用固定 Chat Completions，无法选择 Responses，且面板/CLI 未持久化协议；需要在安全端点和不泄露供应商错误内容的前提下补齐配置、请求解析、诊断和回归测试。
+- 计划与时间线: 读取 TODO、约束、配置/工具/提供商及面板；并行实现 CLI 与面板；增加协议、端点、响应错误和镜像一致性测试；执行代码审查；最后运行 `npm run verify` 与 `npm run test:local-project -- --ProjectRoot C:\\Users\\13929\\NewProject`。
+- 结果: OpenAI-compatible 提供商支持 `chat-completions`/`responses`，配置通过 CLI/MCP/面板持久化和透传；Responses、Anthropic 空输出/截断、拒绝/失败/网络/HTTP/重定向均有明确固定错误；端点限制为 HTTPS 或 loopback HTTP，拒绝凭据/查询/片段；HTTP 错误响应体取消已修复。根扩展与示例面板同步，协议选择仅对兼容提供商显示。
+- 验证: `ops_bash`、`pwsh` 和一次带权限参数的验证均未进入命令执行阶段，统一被 DSH workspace preparation 的 `Microsoft.PowerShell.Security`/`Get-Acl` 缺失阻断；不能声称类型检查、测试或 NewProject 验证通过。代码审查 P0=0，报告发现的响应体资源问题已修复；部分文件因 reader budget 未完整审查，环境恢复后需补审。
+- 未创建 Release；建议修复本机 DSH 预处理后重新计算任务 hash、运行完整验证和补充审查。
+
 ### AGT-20260824-020
 
 - TaskHash: `sha256:211886ffa4b10a7661a8d822c9662f940348ab9cf54959d364753023a371576f`

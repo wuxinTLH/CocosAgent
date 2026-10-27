@@ -1,10 +1,10 @@
 import { loadAgentConfig, type PermissionMode } from './config.js';
 
 const ACCESS_TOOLS = new Set([
-  'status', 'task_hash', 'ocr_recognize', 'scene_read', 'scene_nodes', 'asset_find',
+  'status', 'task_hash', 'ocr_recognize', 'scene_read', 'scene_nodes', 'asset_find', 'script_read', 'editor_scene_query',
   'ccs_resolve', 'ccs_doctor', 'skills_list', 'mcp_status', 'provider_list', 'workspace_list', 'agent_config', 'animation_analyze', 'animation_optimize', 'animation_ocr_states', 'math_analyze',
 ]);
-const SAFE_TOOLS = new Set([...ACCESS_TOOLS, 'gateway_chat', 'workspace_chat', 'ccs_connect', 'workspace_create', 'workspace_switch', 'workspace_delete', 'provider_configure', 'provider_select']);
+const SAFE_TOOLS = new Set([...ACCESS_TOOLS, 'gateway_chat', 'workspace_chat', 'ccs_connect', 'workspace_create', 'workspace_switch', 'workspace_delete', 'workspace_rollback', 'provider_delete', 'provider_configure', 'provider_create', 'provider_credential_clear', 'provider_select']);
 
 export function permissionSummary(mode: PermissionMode): { mode: PermissionMode; description: string } {
   switch (mode) {

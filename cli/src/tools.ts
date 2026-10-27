@@ -10,11 +10,13 @@ import { findAssets } from './assets.js';
 import { ccsDoctor, connectRoute, resolveRoute } from './ccs.js';
 import { chatOnce } from './gateway.js';
 import { AGENT_VERSION } from './version.js';
-import { loadAgentConfig, saveAgentConfig, updateProvider, type PermissionMode } from './config.js';
+import { loadAgentConfig, saveAgentConfig, setUserPermission, updateProvider, createCustomProvider, saveProviderCredential, clearProviderCredential, validateProviderCredential, isProviderId, type PermissionMode } from './config.js';
 import { localeCatalog } from './i18n.js';
 import { assertToolPermission, permissionSummary } from './permissions.js';
-import { providerCatalog, chatWithFallback, resolveProvider } from './providers.js';
-import { activeSession, appendMessage, conversationContext, createSession, deleteSession, listSessions, switchSession, updateSessionProvider } from './workspace.js';
+import { providerCatalog, agentWithFallback, resolveProvider, providerToken } from './providers.js';
+import { PROJECT_TOOLS, executeProjectTool } from './project-tools.js';
+import { EDITOR_TOOLS, executeEditorTool } from './editor-tools.js';
+import { activeSession, beginSessionRun, assertProjectIdle, repairSessionProviders, rollbackSession, appendMessage, conversationContext, createSession, deleteSession, listSessions, switchSession, updateSessionProvider } from './workspace.js';
 import { runTerminal, type TerminalShell } from './terminal.js';
 import { analyzeAnimation, createAnimationController, optimizeAnimation, recognizeAnimationStates } from './animation.js';
 import { analyzeMath } from './math.js';
@@ -26,6 +28,8 @@ export interface McpToolDefinition {
 }
 
 export const MCP_TOOLS: McpToolDefinition[] = [
+  ...EDITOR_TOOLS,
+  ...PROJECT_TOOLS.filter(tool => ['script_read', 'script_write', 'project_test'].includes(tool.name)),
   {
     name: 'ocr_recognize',
     description: 'OCR 识别当前项目内图像或场景区域',
@@ -116,8 +120,8 @@ export const MCP_TOOLS: McpToolDefinition[] = [
   },
   {
     name: 'workspace_chat',
-    description: '使用当前模型工作区会话对话，并按配置自动回退提供商',
-    inputSchema: { type: 'object', properties: { chat: { type: 'string' } }, required: ['chat'] },
+    description: '当前工作区 Agent 对话，始终启用有界项目工具执行（兼容旧 mode 参数）',
+    inputSchema: { type: 'object', properties: { chat: { type: 'string', maxLength: 32000 }, mode: { type: 'string', enum: ['chat', 'agent'], default: 'agent' } }, required: ['chat'], additionalProperties: false },
   },
   {
     name: 'workspace_list',
@@ -140,14 +144,32 @@ export const MCP_TOOLS: McpToolDefinition[] = [
     inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
+    name: 'workspace_rollback', description: '截断指定用户消息及其后续消息，返回待编辑草稿；不回滚项目文件',
+    inputSchema: { type: 'object', properties: { id: { type: 'string' }, messageIndex: { type: 'integer', minimum: 0 }, expectedMessage: { type: 'object', properties: { content: { type: 'string' }, timeUtc8: { type: 'string' } }, required: ['content', 'timeUtc8'], additionalProperties: false } }, required: ['id', 'messageIndex'], additionalProperties: false },
+  },
+  {
+    name: 'provider_delete', description: '删除自定义提供商及凭据并修复全部会话引用；项目运行时禁止',
+    inputSchema: { type: 'object', properties: { provider: { type: 'string' } }, required: ['provider'], additionalProperties: false },
+  },
+  {
     name: 'provider_list',
     description: '列出 OpenAI、Anthropic、DeepSeek、Kimi、Qwen 和 Gateway 配置状态',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'provider_configure',
-    description: '配置提供商的 API 端点或默认模型，令牌仅从环境变量读取',
-    inputSchema: { type: 'object', properties: { provider: { type: 'string' }, endpoint: { type: 'string' }, model: { type: 'string' } }, required: ['provider'] },
+    description: '配置端点、模型、协议和用户级加密保存的 API Key（绝不在响应中返回密钥）',
+    inputSchema: { type: 'object', properties: { provider: { type: 'string' }, endpoint: { type: 'string' }, model: { type: 'string' }, protocol: { type: 'string', enum: ['chat-completions', 'responses'] }, apiKey: { type: 'string' } }, required: ['provider'] },
+  },
+  {
+    name: 'provider_create',
+    description: '创建第三方 OpenAI 兼容提供商，返回非密钥元数据',
+    inputSchema: { type: 'object', properties: { name: { type: 'string' }, endpoint: { type: 'string' }, model: { type: 'string' }, protocol: { type: 'string', enum: ['chat-completions', 'responses'] }, apiKey: { type: 'string' } }, required: ['name', 'endpoint', 'model', 'protocol'] },
+  },
+  {
+    name: 'provider_credential_clear',
+    description: '删除该项目该提供商在用户凭据库中的 API Key（不影响环境变量）',
+    inputSchema: { type: 'object', properties: { provider: { type: 'string' } }, required: ['provider'] },
   },
   {
     name: 'provider_select',
@@ -260,7 +282,16 @@ export async function dispatchTool(
   ctx: ProjectContext,
   tool: string,
   args: Record<string, unknown>,
+  options: { allowUserPermissionChange?: boolean } = {},
 ): Promise<unknown> {
+  // This dedicated dispatch is never included in the Agent's project/editor allowlist.
+  if (tool === 'permission_set') {
+    if (options.allowUserPermissionChange !== true) throw new Error('PERMISSION_SET_UI_ONLY');
+    if (Object.keys(args).some(key => key !== 'mode' && key !== 'userInitiated')) throw new Error('PERMISSION_SET_INVALID');
+    const previous = loadAgentConfig(ctx.root);
+    const current = setUserPermission(ctx.root, args.mode, args.userInitiated);
+    return { previous, current, permissions: permissionSummary(current.permissionMode) };
+  }
   assertToolPermission(ctx.root, tool);
   switch (tool) {
     case 'status':
@@ -309,7 +340,7 @@ export async function dispatchTool(
       }
       return chatOnce({
         url: requestedUrl,
-        token: process.env.COCOS_AGENT_GATEWAY_TOKEN,
+        token: providerToken(ctx.root, 'gateway', gateway.tokenEnv),
         chat: String(args.chat ?? ''),
         memoryContext: buildMemoryContext(ctx.root),
         model: gateway.model,
@@ -323,13 +354,66 @@ export async function dispatchTool(
       return switchSession(ctx.root, String(args.id ?? ''));
     case 'workspace_delete':
       return deleteSession(ctx.root, String(args.id ?? ''));
+    case 'workspace_rollback':
+      if (Object.keys(args).some(key => key !== 'id' && key !== 'messageIndex' && key !== 'expectedMessage')) throw new Error('WORKSPACE_ROLLBACK_INVALID');
+      return rollbackSession(ctx.root, args.id, args.messageIndex, args.expectedMessage);
+    case 'provider_delete': {
+      assertProjectIdle(ctx.root);
+      const config = loadAgentConfig(ctx.root); const id = args.provider;
+      if (!isProviderId(id, ctx.root)) throw new Error('PROVIDER_NOT_SUPPORTED');
+      if (!config.customProviders.some(provider => provider.id === id)) throw new Error('PROVIDER_DELETE_BUILTIN: built-in providers cannot be deleted');
+      const replacement = config.activeProvider === id ? config.fallbackProviders.find(provider => provider !== id) ?? 'gateway' : config.activeProvider;
+      // Compute every repair before deleting credentials, including inactive sessions.
+      repairSessionProviders(ctx.root, id, replacement, true);
+      const snapshots = ['workspace.json', 'config.json'].map(name => { const file = path.join(ctx.root, '.cocos-agent', name); return { file, content: fs.existsSync(file) ? fs.readFileSync(file) : undefined }; });
+      const restoreCredential = clearProviderCredential(ctx.root, id);
+      try {
+        const workspace = repairSessionProviders(ctx.root, id, replacement);
+        const providers = { ...config.providers }; delete providers[id];
+        const current = saveAgentConfig(ctx.root, { customProviders: config.customProviders.filter(provider => provider.id !== id), providers, activeProvider: replacement, fallbackProviders: config.fallbackProviders.filter(provider => provider !== id && provider !== replacement) });
+        return { deleted: id, config: current, ...workspace };
+      } catch (error) {
+        const rollbackErrors: string[] = [];
+        for (const snapshot of snapshots) try { if (snapshot.content === undefined) fs.rmSync(snapshot.file, { force: true }); else fs.writeFileSync(snapshot.file, snapshot.content); } catch { rollbackErrors.push('project state'); }
+        try { restoreCredential(); } catch { rollbackErrors.push('credential'); }
+        if (rollbackErrors.length) throw new Error(`PROVIDER_DELETE_ROLLBACK_FAILED: could not restore ${rollbackErrors.join(', ')}; ${(error as Error).message}`);
+        throw error;
+      }
+    }
     case 'provider_list':
       return providerCatalog(ctx.root);
-    case 'provider_configure':
-      return updateProvider(ctx.root, String(args.provider ?? '') as never, {
-        endpoint: args.endpoint ? String(args.endpoint) : undefined,
-        model: args.model ? String(args.model) : undefined,
-      });
+    case 'provider_configure': {
+      const id = args.provider;
+      if (!isProviderId(id, ctx.root)) throw new Error('PROVIDER_NOT_SUPPORTED');
+      if (args.apiKey !== undefined) validateProviderCredential(args.apiKey);
+      if (args.apiKey !== undefined && process.platform !== 'win32') throw new Error('PROVIDER_CREDENTIAL_STORAGE_UNAVAILABLE');
+      if (args.endpoint !== undefined && typeof args.endpoint !== 'string') throw new Error('PROVIDER_ENDPOINT_INVALID');
+      if (args.model !== undefined && typeof args.model !== 'string') throw new Error('PROVIDER_MODEL_INVALID');
+      if (args.endpoint !== undefined || args.model !== undefined || args.protocol !== undefined) {
+        updateProvider(ctx.root, id, { endpoint: args.endpoint as string | undefined, model: args.model as string | undefined, protocol: args.protocol as never });
+      }
+      if (args.apiKey !== undefined) saveProviderCredential(ctx.root, id, args.apiKey);
+      return providerCatalog(ctx.root).find((provider) => provider.id === id);
+    }
+    case 'provider_create': {
+      if (args.apiKey !== undefined) validateProviderCredential(args.apiKey);
+      if (args.apiKey !== undefined && process.platform !== 'win32') throw new Error('PROVIDER_CREDENTIAL_STORAGE_UNAVAILABLE');
+      const provider = createCustomProvider(ctx.root, { name: args.name as string, endpoint: args.endpoint as string, model: args.model as string, protocol: args.protocol as never });
+      try {
+        if (args.apiKey !== undefined) saveProviderCredential(ctx.root, provider.id, args.apiKey);
+      } catch {
+        const config = loadAgentConfig(ctx.root);
+        saveAgentConfig(ctx.root, { customProviders: config.customProviders.filter((item) => item.id !== provider.id) });
+        throw new Error('PROVIDER_CREDENTIAL_STORAGE_UNAVAILABLE');
+      }
+      return providerCatalog(ctx.root).find((item) => item.id === provider.id);
+    }
+    case 'provider_credential_clear': {
+      const id = args.provider;
+      if (!isProviderId(id, ctx.root)) throw new Error('PROVIDER_NOT_SUPPORTED');
+      clearProviderCredential(ctx.root, id);
+      return providerCatalog(ctx.root).find((provider) => provider.id === id);
+    }
     case 'provider_select':
       return updateSessionProvider(ctx.root, String(args.provider ?? '') as never);
     case 'agent_config': {
@@ -348,6 +432,13 @@ export async function dispatchTool(
       return { file: skillManifest(ctx.root, String(args.name ?? '')) };
     case 'mcp_status':
       return { name: 'cocos-agent', tools: MCP_TOOLS.map((item) => item.name) };
+    case 'editor_scene_query':
+    case 'editor_node_create':
+      return executeEditorTool(ctx.root, tool, args);
+    case 'script_read':
+    case 'script_write':
+    case 'project_test':
+      return executeProjectTool(ctx.root, tool, args);
     case 'terminal_run':
       return runTerminal(ctx.root, String(args.shell ?? '') as TerminalShell, String(args.command ?? ''), args.dryRun === true);
     case 'workspace_chat': {
@@ -355,14 +446,18 @@ export async function dispatchTool(
       const config = loadAgentConfig(ctx.root);
       const chat = String(args.chat ?? '').trim();
       if (!chat) throw new Error('MISSING_ARG: chat');
-      appendMessage(ctx.root, session.id, { role: 'user', content: chat, timeUtc8: nowUtc8() });
-      const result = await chatWithFallback({
-        root: ctx.root, provider: session.provider, fallbacks: session.fallbackProviders, chat,
-        memoryContext: `${buildMemoryContext(ctx.root)}\n${conversationContext(activeSession(ctx.root))}`,
-        locale: config.locale,
-      });
-      appendMessage(ctx.root, session.id, { role: 'assistant', content: result.content, timeUtc8: nowUtc8(), provider: result.provider });
-      return { sessionId: session.id, ...result };
+      if (chat.length > 32000) throw new Error('WORKSPACE_CHAT_LIMIT');
+      if (args.mode !== undefined && args.mode !== 'chat' && args.mode !== 'agent') throw new Error('WORKSPACE_MODE_INVALID');
+      const release = beginSessionRun(ctx.root, session.id);
+      try {
+        const memoryContext = `${buildMemoryContext(ctx.root)}\n${conversationContext(session)}`;
+        appendMessage(ctx.root, session.id, { role: 'user', content: chat, timeUtc8: nowUtc8() });
+        const options = { root: ctx.root, provider: session.provider, fallbacks: session.fallbackProviders, chat, memoryContext, locale: config.locale };
+        const result = await agentWithFallback({ ...options, tools: [...PROJECT_TOOLS, ...EDITOR_TOOLS], execute: (name, toolArgs) => EDITOR_TOOLS.some(tool => tool.name === name) ? executeEditorTool(ctx.root, name, toolArgs) : executeProjectTool(ctx.root, name, toolArgs) });
+        const toolTrace = 'toolTrace' in result ? result.toolTrace as import('./agent-runner.js').ToolTrace[] : [];
+        appendMessage(ctx.root, session.id, { role: 'assistant', content: result.content, timeUtc8: nowUtc8(), provider: result.provider, toolTrace });
+        return { sessionId: session.id, ...result, toolTrace };
+      } finally { release(); }
     }
     case 'animation_analyze':
       return analyzeAnimation(ctx.root, String(args.path ?? ''));

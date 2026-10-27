@@ -1,10 +1,10 @@
-﻿# 版本约束
+# 版本约束
 
 - MUST: 全局版本设置为 `v0.0.0.1-a`，根目录 `VERSION` 为唯一来源。
 - MSUT: 测试项目位置: "C:\\Users\\13929\\NewProject"
 
 # TODO 全局任务队列
-更新时间：`2026-08-24T19:32:18+08:00`（UTC+8）
+更新时间：`2026-10-27T18:27:00+08:00`（UTC+8）
 说明：所有 Agent 执行必须以本文件为全局任务入口；任务完成前更新状态，完成后写入 LONG_MEMORY 与 SHORT_MEMORY。
 
 ## 约束覆盖声明
@@ -68,179 +68,85 @@
 
 # 任务队列
 
-## 代办列表
-1. 
-```log
-{
-  "ccs": {
-    "checks": {
-      "ccSwitchConfig": {
-        "ok": true,
-        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
-      },
-      "ccsBin": {
-        "ok": false,
-        "value": null
-      },
-      "ccsUrl": {
-        "ok": true,
-        "value": "http://127.0.0.1:15721"
-      },
-      "gatewayUrl": {
-        "ok": false,
-        "value": null
-      }
-    },
-    "route": {
-      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
-      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "url": "http://127.0.0.1:15721"
-    },
-    "editors": [],
-    "creatorVersion": "3.8.8"
-  }
-}
-{
-  "provider": "gateway",
-  "saved": true
-}
-{
-  "ccs": {
-    "checks": {
-      "ccSwitchConfig": {
-        "ok": true,
-        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
-      },
-      "ccsBin": {
-        "ok": false,
-        "value": null
-      },
-      "ccsUrl": {
-        "ok": true,
-        "value": "http://127.0.0.1:15721"
-      },
-      "gatewayUrl": {
-        "ok": false,
-        "value": null
-      }
-    },
-    "route": {
-      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
-      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "url": "http://127.0.0.1:15721"
-    },
-    "editors": [],
-    "creatorVersion": "3.8.8"
-  }
-}
-{
-  "provider": "gateway",
-  "selected": true
-}
-{
-  "ccs": {
-    "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-    "url": "http://127.0.0.1:15721",
-    "status": "connected",
-    "transport": "http",
-    "httpStatus": 404
-  }
-}
-{
-  "ccs": {
-    "checks": {
-      "ccSwitchConfig": {
-        "ok": true,
-        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
-      },
-      "ccsBin": {
-        "ok": false,
-        "value": null
-      },
-      "ccsUrl": {
-        "ok": true,
-        "value": "http://127.0.0.1:15721"
-      },
-      "gatewayUrl": {
-        "ok": false,
-        "value": null
-      }
-    },
-    "route": {
-      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
-      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "url": "http://127.0.0.1:15721"
-    },
-    "editors": [],
-    "creatorVersion": "3.8.8"
-  }
-}
-{
-  "ccs": {
-    "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-    "url": "http://127.0.0.1:15721",
-    "status": "connected",
-    "transport": "http",
-    "httpStatus": 404
-  }
-}
-{
-  "provider": "gateway",
-  "selected": true
-}
-{
-  "workspace": "saved",
-  "activeProvider": "gateway",
-  "fallbackProviders": []
-}
-{
-  "ccs": {
-    "checks": {
-      "ccSwitchConfig": {
-        "ok": true,
-        "path": "C:\\Users\\13929\\.cc-switch\\settings.json"
-      },
-      "ccsBin": {
-        "ok": false,
-        "value": null
-      },
-      "ccsUrl": {
-        "ok": true,
-        "value": "http://127.0.0.1:15721"
-      },
-      "gatewayUrl": {
-        "ok": false,
-        "value": null
-      }
-    },
-    "route": {
-      "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "source": "C:\\Users\\13929\\.cc-switch\\settings.json",
-      "provider": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-      "url": "http://127.0.0.1:15721"
-    },
-    "editors": [],
-    "creatorVersion": "3.8.8"
-  }
-}
-{
-  "ccs": {
-    "route": "universal-codex-d85fbc03-b560-418d-9b00-bbbc1a94c881",
-    "url": "http://127.0.0.1:15721",
-    "status": "connected",
-    "transport": "http",
-    "httpStatus": 404
-  }
-}
+## 待办任务
+
+1. [x] 更新文档、验证指定 NewProject 并完成提交前审查；本条随累计功能提交至 GitHub，远端结果以 Git 历史及执行回执为准。版本保持 `v0.0.0.1-a`，不创建 Release。
+   - 最终验证：20 个测试文件、TypeScript strict、8 个 JS 文件、60 篇文档／0 问题；指定 NewProject 同步、CLI status 与 Creator 3.8.8 dry-run 通过。
+   - 审查修复：自主场景写入增加根结构与本地引用校验，无效输入不会覆盖现有资源；无其他确认 P0/P1/P2。
+   - TaskHash: `sha256:b1f5ba82b88678744501fa2be0aa3348b683e59880c72e7978640971de012a11`。
+   - 已知限制（独立记录，不以文档提交掩盖）：最近实机扩展桥接未持续监听，独立桥接查询返回 `EDITOR_NOT_CONNECTED`；真实云端模型与本轮逐项人工交互尚未验收。
 
 
-```
+### Agent 模式与会话操作完善（2026-10-25，已实现）
 
+- [x] 已添加自定义模型可确认删除，清理凭据与会话引用；预检损坏会话，写入失败尽力恢复配置、会话与加密凭据。
+- [x] 仅保留 Agent 模式；提供有限权限／完整权限，新配置默认有限权限，提权由用户显式确认；模型与 MCP 不可调用授权入口。
+- [x] 保留脱敏 API 错误详情、HTTP 状态与网络原因，支持界面文字自由选择及消息复制。
+- [x] 提供上下文回滚与上下键输入历史导航；回滚不撤销项目写入，校验所选消息内容及时间，拒绝跨面板过期操作；输入历史兼容 IME、多行与草稿恢复。
+- [x] 完成回归与审查修复：20 个测试文件、TypeScript strict、9 个 JS 文件、文档 58/0 通过；指定 NewProject 同步、CLI status 与 Creator 3.8.8 dry-run 通过，已更新记忆。本轮未重新打开 Creator 目视验证七项操作，也未用真实云端密钥验收。
 
-### 本轮解决方案与验证
+本轮任务 hash：`sha256:d1c3a1ba48b4fa9525ea2f69ad8a98b28b88e4a49bba8098d8ca0c807cda55e8`。
+
+### IDE 聊天界面与可执行 Cocos Agent（2026-10-25，已实现）
+
+- [x] 移除高级设置及固定未配置服务商；已存模型选择与二级添加／编辑界面，采用紧凑 IDE 聊天布局。
+- [x] 添加带确认的对话删除；删除当前／最后／默认对话后安全建立可用会话，保留其他对话。
+- [x] 实现有次数与范围限制的模型工具循环，支持项目场景／脚本读写及测试，严格执行权限，不允许模型管理密钥或自提权，展示工具结果。
+- [x] 完成回归、完整验证、代码审查及 NewProject/Creator 实机验证：19 个测试文件、严格类型、9 个 JS 文件、文档 58/0 通过；NewProject 最终同步成功，实时查询返回 Scene/Main Light/Main Camera、dirty=false。修复审查确认的 Origin:null 网页跨源调用风险并补回归。模型三种协议的工具循环通过本地 HTTP 端点测试；不把它当成外部云端模型的全链路验收，也不声称已实机执行任意生成／调试任务。
+
+本轮任务 hash：`sha256:2fa7465888e5fbf445e79b315a4722af65ac9087b3453c878b0499417c04df95`。
+
+### 简化模型 API 连接（2026-10-24，已实现）
+
+- [x] 参照 Novel Agent 将模型切换与新增／修改连接分开；统一 Base URL、协议、模型 ID 与 API Key 表单，保存后自动切换当前对话模型，保留原有安全存储及 Creator 会话能力。
+- [x] 补齐交互回归，`npm run verify` 通过 16 个测试文件、TypeScript strict、8 个 JS 文件检查、文档 58/0；指定 `C:\Users\13929\NewProject` 同步测试成功，根／示例／项目面板字节一致。审查反馈的工作区配置响应顺序、自然语言命令误判和当前对话历史刷新问题均已修复并补回归。
+- [ ] 无真实供应商密钥，外部模型回答未做端到端验证；本轮仅 dry-run 同步，没有重新打开 Creator 目视验证新设置界面。
+
+本轮任务 hash：`sha256:c9baff05826c15320bb5d16a62b56f9a80f1d311ec6606ff2096e0e331a00d87`。
+
+### API Key 与自定义第三方服务商配置（2026-10-24，已实现）
+
+- [x] Creator 面板在设置内提供密钥添加/清除，不在界面或桥接响应回显；Windows 当前用户 DPAPI 加密存储于用户目录，环境变量优先。
+- [x] 新增自定义 OpenAI 兼容服务商（名称、端点、模型、协议与可选 API Key），可加入快捷切换和会话选择。
+- [x] 增加 CLI/桥接回归测试：`npm run verify` 通过 16 个测试文件、严格类型与 8 个 JS 文件检查、文档 58/0；指定 NewProject 同步及安装 CLI status 成功，面板字节一致，新桥接 `provider_list` 成功。未输入真实供应商密钥，也未对新界面做本轮 Creator 人工目视测试。
+
+本轮任务 hash：`sha256:16c14d13208bf50dc1fec8771f80c746621df49142cd8d450ffd4d06eb6e49b4`。
+
+### Creator 3.8.8 实机面板验证（2026-10-24）
+
+- [x] 在指定 `C:\Users\13929\NewProject` 启动 Creator 3.8.8；项目扩展与仓库面板字节一致，Overlay 状态 `ready`，面板显示“已连接”。
+- [x] 目视核验新版布局：对话/模型快捷切换与底部输入区常驻；设置和诊断默认折叠；实际点击设置切换、展开诊断。
+- [x] 在 Creator 面板中输入并执行 `/status`；诊断记录显示项目根 `C:/Users/13929/NewProject`、版本 `v0.0.0.1-a`；新对话按钮创建并切换成功，本地桥接 `status/provider_list/workspace_list/ccs_doctor` 全部响应成功。
+- [ ] 无模型供应商密钥，真实外部模型聊天暂未验证；取得密钥后需单独验证端到端对话。
+
+本轮实机验证任务 hash：`sha256:acfa033d73b047b665ca1f13020c3933184327f7c27c5b69298f6fa3bc1b917f`。
+
+- [x] 根据 Novel Agent 的信息架构简化 Creator 的 Open CLI：对话与模型快捷切换保持常驻，配置及诊断按需展开；保留历史命令、协议配置、工作区和 cc-switch 操作。
+
+### 对话优先面板重设计（2026-10-24）
+
+- [x] 主面板显示当前对话/新对话、快捷模型选择、对话记录和固定输入区；普通输入直接聊天，Enter 发送、Shift+Enter 换行，`/` 命令与旧格式 `status`、`chat 你好` 等继续可用。
+- [x] 将模型渠道、工作区和 cc-switch 收纳进“设置”；诊断记录默认收起，自动健康检查不再填满聊天界面。
+- [x] 修正审查发现的会话加载和快速切换竞态：加载中阻止发送与新建/切换冲突，忽略过期列表响应；保持日志和 API 错误显示。
+- [x] 根扩展、示例镜像及 `C:\Users\13929\NewProject` 同步；Creator 3.8.8 dry-run 与项目 CLI/status 检查通过。原任务当时未实际打开 Creator；后续实机验证见下方记录。
+- [x] `cd cli && npm run verify` 通过：15 个测试文件、严格类型检查、JavaScript 检查、文档检查 58/0；扩展交互测试 3/3 包括对话发送/设置展开/会话与模型切换；`git diff --check` 通过。
+
+本轮任务 hash：`sha256:55d4db8268a180bfe68a66014eba2fc5244d3f6b3864c8ac6217c456da7f7d9b`。
+
+1. [x] 根据 Novel Agent 的连接方式完善 Cocos Agent 的模型 API 连接：OpenAI 兼容提供商支持 Chat Completions/Responses 协议选择；配置持久化并通过 CLI、MCP 和 Cocos 面板透传；限制安全端点、禁止自动重定向、提供商响应失败/拒绝/截断/空输出给出明确诊断；Anthropic 与 Gateway 保持各自协议。
+
+### 本轮实现与验证（2026-10-24）
+
+- [x] CLI 配置、工具 schema、命令行 `provider configure --protocol`、提供商目录和 Cocos 面板已支持协议选择。
+- [x] OpenAI-compatible Responses 解析、Chat Completions 兼容路径、Anthropic 空响应/截断、HTTP/网络/重定向错误和敏感信息不回显已覆盖回归测试。
+- [x] 提供商端点仅允许 HTTPS 或 loopback HTTP；禁止 URL 凭据、查询、片段；请求设置 `redirect: 'error'`。
+- [x] `cd cli && npm run verify` 通过：TypeScript strict、JavaScript 检查（8 文件）、15 个测试文件（全部通过）、文档链接 58/0。
+- [x] `cd cli && npm run test:local-project -- --ProjectRoot 'C:\\Users\\13929\\NewProject'` 通过：CLI status、版本 `v0.0.0.1-a`、项目同步及 Creator 3.8.8 dry-run 均正常；使用授权的 Creator 3.8.8 实际启动该项目，Overlay 状态报告 `ready`；根扩展、示例及 NewProject 的 Panel 内容一致。`E:\\CocosDashboard` 是 Dashboard 安装目录而非 Cocos 项目，不向其同步扩展。
+- [x] 代码审查：P0=0、P1=0、P2=0；已修复 HTTP 非成功响应体未取消及 Responses 助手消息非完成状态误判。`git diff --check` 通过；历史审查插件部分分组耗尽 reader budget，最终以实际编译、测试、Creator 启动和人工差异复核补充。无供应商密钥，因此未执行真实外部模型认证/聊天请求。
+
+本轮任务 hash：`sha256:c3de863f081f24bcd010e6750a4b543445b00e024dce2803419f2f4e1d1ce9c1`（开始 `2026-10-24T19:51:05+08:00`，请求：根据 TODO.md 待办，参照 Novel Agent 完善 Cocos Agent 模型 API 连接，并验证 Cocos Creator 集成）。
+
+### 历史方案与验证
 
 - [x] `normalizeCcsUrl` 支持 `127.0.0.1:15721` 和带路径的裸 `host:port`，统一规范化为 HTTP URL。
 - [x] 新增裸端点规范化回归测试，保留 HTTP 404 可达性和 WS/WSS 测试。
