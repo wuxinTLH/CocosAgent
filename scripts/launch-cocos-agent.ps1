@@ -82,6 +82,9 @@ foreach ($runtimeDir in @('dist', 'node_modules')) {
     if (Test-Path -LiteralPath $targetRuntimeDir) { Remove-Item -LiteralPath $targetRuntimeDir -Recurse -Force }
     Copy-Item -LiteralPath $sourceRuntimeDir -Destination $projectCliRoot -Recurse -Force
 }
+$projectScriptsRoot = Join-Path $projectCliRoot 'scripts'
+New-Item -ItemType Directory -Force -Path $projectScriptsRoot | Out-Null
+Copy-Item -LiteralPath (Join-Path $cliRoot 'scripts\windows-ocr.ps1') -Destination $projectScriptsRoot -Force
 Copy-Item -LiteralPath (Join-Path $cliRoot 'package.json') -Destination $projectCliRoot -Force
 
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $extensionTarget) | Out-Null

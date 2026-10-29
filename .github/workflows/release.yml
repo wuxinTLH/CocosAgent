@@ -26,10 +26,12 @@ jobs:
           test "$GITHUB_REF_NAME" = "$(tr -d '\r\n' < ../VERSION)"
           node -e "const fs=require('fs'); const version=fs.readFileSync('../VERSION','utf8').trim(); const cli=require('./package.json'); const ext=require('../extensions/cocos-agent/package.json'); if (cli.cocosAgentVersion !== version || ext.cocosAgentVersion !== version) throw new Error('Version mismatch: ' + version);"
           npm ci
-          npm run build
+          npm run verify
           npm prune --omit=dev
           mkdir -p ../release-package/cli ../release-package/extensions ../release-package/bin ../release-package/scripts
           cp -r dist ../release-package/cli/dist
+          mkdir -p ../release-package/cli/scripts
+          cp scripts/windows-ocr.ps1 ../release-package/cli/scripts/
           cp -r node_modules ../release-package/cli/node_modules
           cp package.json ../release-package/cli/package.json
           cp package-lock.json ../release-package/cli/package-lock.json
@@ -37,20 +39,24 @@ jobs:
           cp -r ../scripts/launch-cocos-agent.ps1 ../scripts/install-extension.ps1 ../release-package/scripts/
           cp -r ../bin/cocos-agent-overlay.cmd ../release-package/bin/
           cp ../VERSION ../README.md ../CHANGELOG.md ../release-package/
+          node ../release-package/cli/dist/index.js status
+          git rev-parse HEAD > ../release-package/COMMIT
           cd ..
           dotnet publish launcher/CocosAgentOverlay.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
           cp launcher/bin/Release/net8.0-windows/win-x64/publish/CocosAgentOverlay.exe release-package/
           zip -r "cocos-agent-${GITHUB_REF_NAME}-windows.zip" release-package >/dev/null
+          sha256sum "cocos-agent-${GITHUB_REF_NAME}-windows.zip" > "cocos-agent-${GITHUB_REF_NAME}-windows.zip.sha256"
       - name: Create or update GitHub prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "cocos-agent-${GITHUB_REF_NAME}-windows.zip" --clobber
+            gh release upload "$GITHUB_REF_NAME" "cocos-agent-${GITHUB_REF_NAME}-windows.zip" "cocos-agent-${GITHUB_REF_NAME}-windows.zip.sha256" --clobber
+            gh release edit "$GITHUB_REF_NAME" --notes-file CHANGELOG.md --prerelease
           else
             gh release create "$GITHUB_REF_NAME" \
               --title "Cocos Agent $GITHUB_REF_NAME" \
               --notes-file CHANGELOG.md \
               --prerelease \
-              "cocos-agent-${GITHUB_REF_NAME}-windows.zip"
+              "cocos-agent-${GITHUB_REF_NAME}-windows.zip" "cocos-agent-${GITHUB_REF_NAME}-windows.zip.sha256"
           fi

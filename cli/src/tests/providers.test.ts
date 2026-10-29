@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadAgentConfig, saveAgentConfig, updateProvider, storedProviderCredential } from '../config.js';
+import { loadAgentConfig, saveAgentConfig, updateProvider, storedProviderCredential, saveProviderCredential } from '../config.js';
 import { chatWithProvider, providerCatalog } from '../providers.js';
 import { dispatchTool } from '../tools.js';
 
 function tempRoot(): string { return fs.mkdtempSync(path.join(os.tmpdir(), 'cocos-agent-providers-')); }
 
-test('custom providers and encrypted credentials round trip through bridge tools without project plaintext', async () => {
+test('custom providers and encrypted credentials round trip through bridge tools without project plaintext', { skip: process.platform !== 'win32' }, async () => {
   const root = tempRoot();
   const credentials = tempRoot();
   const originalDir = process.env.COCOS_AGENT_CREDENTIAL_DIR;
@@ -40,6 +40,46 @@ test('custom providers and encrypted credentials round trip through bridge tools
     await assert.rejects(dispatchTool(ctx, 'provider_configure', { provider: created.id, apiKey: key, endpoint: 'http://example.org/v1' }), /PROVIDER_ENDPOINT_INVALID/);
     assert.equal(storedProviderCredential(root, created.id), undefined);
     await assert.rejects(dispatchTool(ctx, 'provider_create', { name: 'bad', endpoint: 'https://example.org/v1?key=' + key, model: 'x', protocol: 'responses', apiKey: key }), (error: Error) => !error.message.includes(key));
+  } finally {
+    if (originalDir === undefined) delete process.env.COCOS_AGENT_CREDENTIAL_DIR; else process.env.COCOS_AGENT_CREDENTIAL_DIR = originalDir;
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.rmSync(credentials, { recursive: true, force: true });
+  }
+});
+
+test('non-Windows credential storage rejects safely without plaintext or provider changes', { skip: process.platform === 'win32' }, async () => {
+  const root = tempRoot();
+  const credentials = tempRoot();
+  const originalDir = process.env.COCOS_AGENT_CREDENTIAL_DIR;
+  process.env.COCOS_AGENT_CREDENTIAL_DIR = credentials;
+  const ctx = { root, cwd: root };
+  const key = 'test-private-' + Date.now().toString(36);
+  const options = { name: 'Local Test', endpoint: 'http://localhost:8787/v1', model: 'test-model', protocol: 'responses' };
+  const storageUnavailable = (error: Error) => error.message.startsWith('PROVIDER_CREDENTIAL_STORAGE_UNAVAILABLE') && !error.message.includes(key);
+  try {
+    await assert.rejects(dispatchTool(ctx, 'provider_create', { ...options, apiKey: key }), storageUnavailable);
+    assert.equal(loadAgentConfig(root).customProviders.length, 0);
+    assert.equal(fs.existsSync(path.join(root, '.cocos-agent', 'config.json')), false);
+    assert.deepEqual(fs.readdirSync(credentials), []);
+
+    // Credential-free custom providers remain usable on every supported platform.
+    const created = await dispatchTool(ctx, 'provider_create', options) as { id: `custom-${string}`; configured: boolean; modelProtocol: string };
+    assert.match(created.id, /^custom-[a-f0-9]{24}$/);
+    assert.equal(created.configured, false);
+    assert.equal(created.modelProtocol, 'responses');
+    assert.equal(loadAgentConfig(root).customProviders[0]?.label, 'Local Test');
+    const configured = await dispatchTool(ctx, 'provider_configure', { provider: created.id, model: 'next-model', protocol: 'chat-completions' }) as { model: string; configured: boolean };
+    assert.equal(configured.model, 'next-model');
+    assert.equal(configured.configured, false);
+    const configFile = path.join(root, '.cocos-agent', 'config.json');
+    const before = fs.readFileSync(configFile, 'utf8');
+    await assert.rejects(dispatchTool(ctx, 'provider_configure', { provider: created.id, model: 'must-not-persist', apiKey: key }), storageUnavailable);
+    assert.equal(fs.readFileSync(configFile, 'utf8'), before);
+    assert.throws(() => saveProviderCredential(root, created.id, key), storageUnavailable);
+    assert.equal(storedProviderCredential(root, created.id), undefined);
+    assert.deepEqual(fs.readdirSync(credentials), []);
+    assert.ok(!fs.readFileSync(configFile, 'utf8').includes(key));
+    assert.ok(!JSON.stringify({ created, configured }).includes(key));
   } finally {
     if (originalDir === undefined) delete process.env.COCOS_AGENT_CREDENTIAL_DIR; else process.env.COCOS_AGENT_CREDENTIAL_DIR = originalDir;
     fs.rmSync(root, { recursive: true, force: true });
