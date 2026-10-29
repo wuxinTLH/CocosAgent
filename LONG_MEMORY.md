@@ -23,7 +23,8 @@
 - 计划与时间线: 核实远端 → 分平台验证安全凭据行为 → CI 增加 Windows/Linux 矩阵 → 发布前 verify、运行时 smoke、提交标记与校验和 → 本地验证与独立审查 → 推送 master 并更新现有固定版本标签及预发布。
 - 实现: Windows 保留真实 DPAPI 回归，非 Windows 验证安全拒绝、不泄漏、不变更配置；生产安全实现不变。发布及项目安装补齐 windows-ocr.ps1；更新现有 Release 说明及 ZIP、SHA-256 资产，不提升版本。
 - 验证: 本地 npm run verify 通过 20 个测试文件、8 JS、60 文档/0 问题；NewProject 同步与 Creator 3.8.8 dry-run 通过；Windows self-contained 启动器 publish 成功。直接运行安装后的 OCR 测试因未打包测试 fixture 报 IMAGE_NOT_FOUND，改用安装模块读取仓库测试 fixture，识别 COCOS/AGENT/2026 成功。Bash 初次 /p MSBuild 参数被路径转换，改用 -p 后构建通过。
-- 审查: 独立复核 CI、发布、平台测试及 OCR helper 打包安装，无确认 P0/P1/P2。远端 CI 40820553556 Linux/Windows 均成功；更新既有标签未自动触发 Release，补 workflow_dispatch 并在版本标签上显式触发，最终资产状态以 Actions 和执行回执为准。
+- 审查: 独立复核 CI、发布、平台测试及 OCR helper 打包安装，无确认 P0/P1/P2。远端 CI 40820553556、最终代码 CI 40820833807 Linux/Windows 均成功。补 workflow_dispatch；随后标签与手动发布重复，上传报 HTTP 404，取消重复任务后单独重跑 40820861716 成功。
+- 发布结果: master 与固定标签发布提交为 9bae0455d00cc743194746b23aedbba2dbe03e4c；预发布 Windows ZIP 85,003,339 bytes，API digest sha256:915e255f099917cb8f5bf3d29a95b143ea0e4fb076788e49aadbd08f625feb27，ZIP 与 .sha256 均 uploaded。后续仅收尾记录提交不移动已验收发布标签。下载本地复核因网络过慢中止并清理半成品，不宣称本地 ZIP 校验完成；资产 digest 依据 GitHub API，打包提交与内容依据成功 Actions 日志。
 - 边界: 不将本次 dry-run 与本地 HTTP 回归表述为 Creator 实机及真实云端全链路验收。Hindsight 401，使用仓库文档。
 
 ### AGT-20261027-029

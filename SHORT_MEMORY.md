@@ -10,7 +10,7 @@
 
 | # | TaskHash | UTC+8 | 摘要 | 状态 |
 | --- | --- | --- | --- | --- |
-| 17 | `sha256:af655a696f70f725cb31c34d55eb75afe99a27089fd26cd8e81e22f09fa545aa` | 2026-10-29T12:53:51+08:00 | 修复实际 Ubuntu CI 凭据测试错误，增加双平台 CI；补 Release/安装 OCR helper、校验和与提交标记；20 文件、NewProject dry-run、安装 OCR 与 Windows 启动器通过 | 推送发布中，远端结果见回执 |
+| 17 | `sha256:af655a696f70f725cb31c34d55eb75afe99a27089fd26cd8e81e22f09fa545aa` | 2026-10-29T12:53:51+08:00 | 修复实际 Ubuntu CI 凭据测试错误，增加双平台 CI；补 Release/安装 OCR helper、校验和与提交标记；20 文件、NewProject dry-run、安装 OCR 与 Windows 启动器通过 | 完成：双平台 CI 40820833807、Release 40820861716 成功；9bae045 固定标签，ZIP/SHA256 已上传 |
 | 16 | `sha256:b1f5ba82b88678744501fa2be0aa3348b683e59880c72e7978640971de012a11` | 2026-10-27T18:27:00+08:00 | 更新文档并随累计功能提交 master；修复自主场景写入结构门禁，20 测试文件、8 JS、60 文档与指定 NewProject dry-run 通过；实机桥接断连仍明确记录，不发布 Release | 完成（远端结果见执行回执） |
 | 15 | `sha256:d1c3a1ba48b4fa9525ea2f69ad8a98b28b88e4a49bba8098d8ca0c807cda55e8` | 2026-10-25T17:29:00+08:00 | 七项 Agent 控制完成；模型删除失败恢复、可信手动授权、脱敏 API 诊断、复制、过期回退保护及输入历史；20 测试文件与 NewProject 同步通过，未重启 Creator／云端验收 | 完成（注明边界） |
 | 14 | `sha256:2fa7465888e5fbf445e79b315a4722af65ac9087b3453c878b0499417c04df95` | 2026-10-25T17:15:14+08:00 | IDE 聊天、二级模型管理与对话删除；受限模型工具循环与实时编辑器查询，19 测试文件及 NewProject 同步通过；修复 null Origin；不宣称任意云端任务实机验收 | 完成（注明边界） |

@@ -70,7 +70,7 @@
 
 ## 待办任务
 
-- [进行中] 修复 GitHub CI 的跨平台凭据测试，重新推送并构建更新 `v0.0.0.1-a` Release；核验 CI、标签与 Windows 资产。TaskHash: `sha256:af655a696f70f725cb31c34d55eb75afe99a27089fd26cd8e81e22f09fa545aa`。
+- [x] 修复 GitHub CI 的跨平台凭据测试，已重新推送并更新 `v0.0.0.1-a` Release；最终代码 CI `40820833807` 双平台通过，Release `40820861716` 成功，Windows ZIP 与校验和均 uploaded，发布提交 `9bae045`。TaskHash: `sha256:af655a696f70f725cb31c34d55eb75afe99a27089fd26cd8e81e22f09fa545aa`。
 
 1. [x] 更新文档、验证指定 NewProject 并完成提交前审查；本条随累计功能提交至 GitHub，远端结果以 Git 历史及执行回执为准。版本保持 `v0.0.0.1-a`，不创建 Release。
    - 最终验证：20 个测试文件、TypeScript strict、8 个 JS 文件、60 篇文档／0 问题；指定 NewProject 同步、CLI status 与 Creator 3.8.8 dry-run 通过。
